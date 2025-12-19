@@ -3,95 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRINITY LOGIC: 04</title>
+    <title>TRINITY LOGIC: 05</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Firebase SDKs v11.6.1 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        window.firebaseModules = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, getDoc, deleteDoc };
-        window.firebaseLoaded = true;
-    </script>
+    <!-- Fonts for Luxury Casino Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
-
         body {
-            font-family: 'Zen Kaku Gothic New', sans-serif;
-            background-color: #0f172a;
+            font-family: 'Playfair Display', serif;
+            background-color: #050505;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             color: #e2e8f0;
             overflow-x: hidden;
             user-select: none;
         }
 
-        .font-tech {
-            font-family: 'Orbitron', sans-serif;
+        .font-casino {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Gold Gradient Text */
+        .text-gold {
+            background: linear-gradient(to bottom, #cfc09f 22%, #634f2c 24%, #cfc09f 26%, #cfc09f 27%, #ffecb3 40%, #3a2c0f 78%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            color: #d4af37;
+        }
+        
+        .border-gold {
+            border-color: #d4af37;
+            box-shadow: 0 0 5px #b8860b;
+        }
+
+        .bg-felt {
+            background-color: #0f2e18; /* Dark Green Felt */
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23133820' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 0 1px #333 inset;
         }
 
         .card-anim-enter {
-            animation: slideIn 0.3s ease-out forwards;
+            animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         .reversal-flash {
             animation: flash 0.5s ease-in-out;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes dealCard {
+            from { transform: translateY(50px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
 
         @keyframes flash {
             0% { background-color: transparent; }
-            50% { background-color: rgba(234, 179, 8, 0.3); }
+            50% { background-color: rgba(212, 175, 55, 0.2); }
             100% { background-color: transparent; }
         }
 
         .perspective-container {
-            perspective: 1000px;
+            perspective: 1200px;
         }
         
-        .timer-warning {
-            animation: pulse-red 1s infinite;
-        }
-        @keyframes pulse-red {
-            0% { color: #f87171; }
-            50% { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
-            100% { color: #f87171; }
-        }
-
-        .intermission-enter {
-            animation: fadeIn 1s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .tech-input {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid #475569;
-            color: #e2e8f0;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.1em;
-            text-align: center;
-        }
-        .tech-input:focus {
-            border-color: #38bdf8;
-            outline: none;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-        }
-        
-        .disabled-btn {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(100%);
+        /* Timer Ring Animation */
+        .timer-ring circle {
+            transition: stroke-dashoffset 1s linear;
         }
     </style>
 </head>
@@ -101,165 +83,146 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Firebase Hook ---
-        const useFirebase = () => {
-            const [fb, setFb] = useState(null);
-            const [user, setUser] = useState(null);
-            const [isReady, setIsReady] = useState(false);
-
-            useEffect(() => {
-                const init = async () => {
-                    const waitForModules = () => new Promise(resolve => {
-                        const check = () => {
-                            if (window.firebaseModules && window.firebaseLoaded) resolve(window.firebaseModules);
-                            else setTimeout(check, 100);
-                        };
-                        check();
-                    });
-
-                    try {
-                        const modules = await waitForModules();
-                        const firebaseConfig = JSON.parse(__firebase_config);
-                        const app = modules.initializeApp(firebaseConfig);
-                        const auth = modules.getAuth(app);
-                        const db = modules.getFirestore(app);
-                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            try {
-                                await modules.signInWithCustomToken(auth, __initial_auth_token);
-                            } catch (e) {
-                                await modules.signInAnonymously(auth);
-                            }
-                        } else {
-                            await modules.signInAnonymously(auth);
-                        }
-
-                        modules.onAuthStateChanged(auth, (u) => {
-                            setUser(u);
-                            if (u) setIsReady(true);
-                        });
-
-                        setFb({ auth, db, appId, ...modules });
-                    } catch (error) {
-                        console.error("Firebase Init Error:", error);
-                    }
-                };
-                init();
-            }, []);
-
-            return { fb, user, isReady };
-        };
-
-        // --- Icons ---
+        // --- Icons (SVG) ---
         const IconSword = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" /><line x1="13" y1="19" x2="19" y2="13" /><line x1="16" y1="16" x2="20" y2="20" /><line x1="19" y1="21" x2="21" y2="19" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
         );
         const IconWind = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" /><path d="M9.6 4.6A2 2 0 1 1 11 8H2" /><path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
         );
         const IconScale = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="M7 21h10" /><path d="M12 3v18" /><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
         );
         const IconTrophy = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
         );
         const IconSkull = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M16 4.9a5.9 5.9 0 0 0-1.8 0" /><circle cx="9" cy="12" r="1" /><circle cx="15" cy="12" r="1" /><path d="M8 20v2h8v-2" /><path d="M12.5 20v-2.18c0-1.29 1.15-2.22 2.5-1.82 2.94.87 4.54-1.28 4.28-3.57A6.5 6.5 0 0 0 6.58 6.58c-3.14 1.76-4.57 5.25-3.3 8.43.58 1.45 2.38 2.37 3.5 1.82 1.35-.4 2.5.53 2.5 1.82V20" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 4.9a5.9 5.9 0 0 0-1.8 0"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="M12.5 20v-2.18c0-1.29 1.15-2.22 2.5-1.82 2.94.87 4.54-1.28 4.28-3.57A6.5 6.5 0 0 0 6.58 6.58c-3.14 1.76-4.57 5.25-3.3 8.43.58 1.45 2.38 2.37 3.5 1.82 1.35-.4 2.5.53 2.5 1.82V20"/></svg>
         );
         const IconRefresh = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         );
         const IconHome = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-        );
-        const IconClock = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         );
         const IconUsers = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-        );
-        const IconGlobe = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-        );
-        const IconWifi = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-                <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         );
 
-        // --- Phases and Constants ---
-        // Defined here so they are available to App
-        const PHASES = {
-            1: { name: 'POWER BATTLE', icon: <IconSword size={24} />, desc: '大きい数字が勝利', color: 'text-red-400', border: 'border-red-500' },
-            2: { name: 'SPEED BATTLE', icon: <IconWind size={24} />, desc: '小さい数字が勝利', color: 'text-blue-400', border: 'border-blue-500' },
-            3: { name: 'BALANCE BATTLE', icon: <IconScale size={24} />, desc: '5に近い数字が勝利', color: 'text-green-400', border: 'border-green-500' }
-        };
+        // --- Config ---
         const ALL_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         const ROUND_TIME_LIMIT = 15;
 
         // --- Components ---
+        
+        // Luxury Card Component
         const Card = ({ number, owner, onClick, disabled, isSelected, isWinner, isLoser, showFace = true }) => {
-            let baseStyle = "relative w-20 h-28 md:w-24 md:h-36 rounded-xl flex items-center justify-center text-3xl font-bold font-tech shadow-lg transition-all duration-200 border-2 ";
-            
+            // Base Style
+            let cardClasses = "relative w-20 h-28 md:w-24 md:h-36 rounded-lg flex items-center justify-center text-4xl font-bold font-casino transition-all duration-300 transform preserve-3d cursor-default ";
+            let innerStyle = "absolute inset-0 rounded-lg flex items-center justify-center border-2 shadow-2xl ";
+
             if (!showFace) {
-                baseStyle += "bg-slate-700 border-slate-600";
-            } else {
-                if (owner === 'player') {
-                    baseStyle += "bg-slate-800 border-indigo-500 text-indigo-100 hover:bg-slate-700 cursor-pointer ";
-                    if (isSelected) baseStyle += "ring-4 ring-yellow-400 -translate-y-2 ";
-                    if (disabled) baseStyle += "opacity-50 cursor-not-allowed hover:bg-slate-800 ";
-                } else {
-                    baseStyle += "bg-slate-800 border-rose-500 text-rose-100 ";
-                }
+                // Back of card (Pattern)
+                innerStyle += "bg-zinc-900 border-yellow-700 opacity-90";
+                return (
+                    <div className={`${cardClasses} ${disabled ? '' : 'hover:-translate-y-1'}`} onClick={disabled ? undefined : onClick}>
+                        <div className={innerStyle} style={{backgroundImage: 'repeating-linear-gradient(45deg, #111 0, #111 10px, #222 10px, #222 20px)'}}>
+                            <div className="w-12 h-12 rounded-full border-2 border-yellow-700/30 flex items-center justify-center">
+                                <span className="text-yellow-700/30 font-casino text-xl">TL</span>
+                            </div>
+                        </div>
+                    </div>
+                );
             }
 
-            if (isWinner) baseStyle += " ring-4 ring-yellow-500 scale-110 z-10 bg-yellow-900/50 ";
-            if (isLoser) baseStyle += " opacity-50 scale-90 grayscale ";
+            // Face of card
+            if (owner === 'player') {
+                innerStyle += "bg-zinc-100 text-zinc-900 border-yellow-600 ";
+                if (isSelected) cardClasses += " -translate-y-4 ring-4 ring-yellow-400 z-10 ";
+                else if (!disabled) cardClasses += " hover:-translate-y-2 cursor-pointer ";
+                if (disabled && !isSelected) cardClasses += " opacity-50 grayscale ";
+            } else {
+                // Opponent Card (Face Up)
+                innerStyle += "bg-zinc-900 text-yellow-500 border-yellow-600 ";
+                if (disabled) cardClasses += " opacity-70 ";
+            }
+
+            if (isWinner) {
+                cardClasses += " scale-110 z-20 ";
+                innerStyle += " ring-4 ring-yellow-400 bg-yellow-100 text-yellow-900 shadow-[0_0_30px_rgba(234,179,8,0.6)] ";
+            }
+            if (isLoser) {
+                cardClasses += " scale-90 grayscale opacity-40 ";
+            }
 
             return (
-                <div className={baseStyle} onClick={!disabled ? onClick : undefined}>
-                    {showFace ? number : (
-                        <div className="w-8 h-8 rounded-full bg-slate-600/50"></div>
-                    )}
-                    <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-current opacity-50"></div>
-                    <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-current opacity-50"></div>
+                <div className={cardClasses} onClick={disabled ? undefined : onClick}>
+                    <div className={innerStyle}>
+                        {number}
+                        {/* Decorative Corners */}
+                        <span className="absolute top-1 left-2 text-xs opacity-50">{number}</span>
+                        <span className="absolute bottom-1 right-2 text-xs opacity-50 rotate-180">{number}</span>
+                        <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-current opacity-30"></div>
+                        <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-current opacity-30"></div>
+                    </div>
                 </div>
             );
         };
 
+        // Circular Timer Component
+        const CircularTimer = ({ timeLeft, maxTime }) => {
+            const radius = 36;
+            const stroke = 6;
+            const normalizedRadius = radius - stroke * 2;
+            const circumference = normalizedRadius * 2 * Math.PI;
+            const strokeDashoffset = circumference - (timeLeft / maxTime) * circumference;
+            
+            const isWarning = timeLeft <= 5;
+
+            return (
+                <div className="relative flex items-center justify-center w-24 h-24">
+                    <svg height={radius * 2} width={radius * 2} className="rotate-[-90deg]">
+                        <circle
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth={stroke}
+                            r={normalizedRadius}
+                            cx={radius}
+                            cy={radius}
+                            fill="transparent"
+                        />
+                        <circle
+                            className="timer-ring"
+                            stroke={isWarning ? "#ef4444" : "#d4af37"}
+                            strokeWidth={stroke}
+                            strokeDasharray={circumference + ' ' + circumference}
+                            style={{ strokeDashoffset }}
+                            strokeLinecap="round"
+                            r={normalizedRadius}
+                            cx={radius}
+                            cy={radius}
+                            fill="rgba(0,0,0,0.5)"
+                        />
+                    </svg>
+                    <div className={`absolute text-3xl font-casino font-bold ${isWarning ? 'text-red-500 timer-warning' : 'text-yellow-500'}`}>
+                        {timeLeft}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
         const App = () => {
-            const { fb, user, isReady } = useFirebase();
-            const [gameMode, setGameMode] = useState('offline');
-            const [gameState, setGameState] = useState('intro');
+            // Constants within App
+            const PHASES = {
+                1: { name: 'POWER', icon: <IconSword size={20} />, desc: 'High Number Wins', color: 'text-red-500' },
+                2: { name: 'SPEED', icon: <IconWind size={20} />, desc: 'Low Number Wins', color: 'text-blue-400' },
+                3: { name: 'BALANCE', icon: <IconScale size={20} />, desc: 'Close to 5 Wins', color: 'text-green-500' }
+            };
+
+            const [gameState, setGameState] = useState('intro'); // intro, draft, battle, result, intermission
             const [cpuCount, setCpuCount] = useState(1);
             
-            // --- Online State ---
-            const [roomId, setRoomId] = useState("");
-            const [isHost, setIsHost] = useState(false);
-            const [onlineStatus, setOnlineStatus] = useState("");
-            
-            // --- Game Data ---
+            // Game Data
             const [availableCards, setAvailableCards] = useState([...ALL_CARDS]);
             const [playerDeck, setPlayerDeck] = useState([]);
             const [cpuDeck, setCpuDeck] = useState([]);
@@ -284,11 +247,12 @@
             const [isProcessing, setIsProcessing] = useState(false);
             const [timeLeft, setTimeLeft] = useState(ROUND_TIME_LIMIT);
             const timerRef = useRef(null);
-            const unsubscribeRef = useRef(null);
 
+            // Helpers
             const cpuDraft = (currAvail) => currAvail[Math.floor(Math.random() * currAvail.length)];
             const cpuPlayCard = (hand) => hand[Math.floor(Math.random() * hand.length)];
 
+            // Timer Logic
             useEffect(() => {
                 if (gameState === 'battle' && !selectedCard && !isProcessing) {
                     timerRef.current = setInterval(() => {
@@ -308,23 +272,16 @@
             }, [gameState, selectedCard, isProcessing, roundInPhase]);
 
             const handleTimeOut = () => {
-                if (gameMode === 'offline') {
-                    const randomCard = playerHand[Math.floor(Math.random() * playerHand.length)];
-                    handleBattle(randomCard);
-                } else if (gameMode === 'online') {
-                    const randomCard = playerHand[Math.floor(Math.random() * playerHand.length)];
-                    handleBattle(randomCard);
-                }
+                const randomCard = playerHand[Math.floor(Math.random() * playerHand.length)];
+                handleBattle(randomCard);
             };
 
             const goHome = () => {
-                if (unsubscribeRef.current) unsubscribeRef.current();
                 setGameState('intro');
                 clearInterval(timerRef.current);
             };
 
-            const startOfflineGame = (count) => {
-                setGameMode('offline');
+            const startGame = (count) => {
                 setCpuCount(count);
                 resetGameData();
                 setGameState('draft');
@@ -345,265 +302,8 @@
                 setIsProcessing(false);
             };
 
-            const createRoom = async () => {
-                if (!fb || !user) return;
-                const newRoomId = Math.floor(100000 + Math.random() * 900000).toString();
-                const roomRef = fb.collection(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms');
-                
-                await fb.setDoc(fb.doc(roomRef, newRoomId), {
-                    hostId: user.uid,
-                    status: 'waiting',
-                    availableCards: ALL_CARDS,
-                    turn: 'host',
-                    hostDeck: [],
-                    guestDeck: [],
-                    hostHand: [],
-                    guestHand: [],
-                    hostCard: null,
-                    guestCard: null,
-                    scores: { host: 0, guest: 0 },
-                    phase: 1,
-                    round: 1,
-                    updatedAt: new Date().toISOString()
-                });
-
-                setRoomId(newRoomId);
-                setIsHost(true);
-                setGameMode('online');
-                setGameState('lobby');
-                startRoomListener(newRoomId, true);
-            };
-
-            const joinRoom = async (inputRoomId) => {
-                if (!fb || !user || !inputRoomId) return;
-                const roomRef = fb.doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms', inputRoomId);
-                const roomSnap = await fb.getDoc(roomRef);
-
-                if (!roomSnap.exists()) {
-                    alert("部屋が見つかりません");
-                    return;
-                }
-                
-                await fb.updateDoc(roomRef, {
-                    guestId: user.uid,
-                    status: 'draft_ready'
-                });
-
-                setRoomId(inputRoomId);
-                setIsHost(false);
-                setGameMode('online');
-                setGameState('lobby');
-                startRoomListener(inputRoomId, false);
-            };
-
-            const startRoomListener = (rid, amIHost) => {
-                const roomRef = fb.doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms', rid);
-                
-                unsubscribeRef.current = fb.onSnapshot(roomRef, (doc) => {
-                    const data = doc.data();
-                    if (!data) return;
-
-                    if (data.status === 'draft_ready' || data.status === 'drafting') {
-                        setGameState('draft');
-                    } else if (data.status === 'battle') {
-                        setGameState('battle');
-                    } else if (data.status === 'intermission') {
-                        setGameState('intermission');
-                    } else if (data.status === 'finished') {
-                        setGameState('result');
-                    }
-
-                    setAvailableCards(data.availableCards || []);
-                    setCurrentPhase(data.phase);
-                    setRoundInPhase(data.round);
-                    setScore({ player: amIHost ? data.scores.host : data.scores.guest, cpu: amIHost ? data.scores.guest : data.scores.host, cpu2: 0 });
-
-                    setPlayerDeck(amIHost ? data.hostDeck : data.guestDeck);
-                    setCpuDeck(amIHost ? data.guestDeck : data.hostDeck);
-
-                    setPlayerHand(amIHost ? data.hostHand : data.guestHand);
-                    setCpuHand(amIHost ? data.guestHand : data.hostHand);
-
-                    const myCard = amIHost ? data.hostCard : data.guestCard;
-                    const oppCard = amIHost ? data.guestCard : data.hostCard;
-                    
-                    setSelectedCard(myCard);
-                    setCpuCard(oppCard);
-
-                    if (amIHost && data.status === 'battle' && data.hostCard && data.guestCard && !data.resultProcessing) {
-                         resolveOnlineBattle(rid, data);
-                    }
-
-                    if (data.lastResult && data.lastResult.round === (data.phase-1)*3 + data.round && !isProcessing) {
-                         setBattleResult(amIHost ? data.lastResult.winnersHostView : data.lastResult.winnersGuestView);
-                         setIsReversal(data.lastResult.reversal);
-                         setCpuCard(oppCard);
-                         setIsProcessing(true);
-                    }
-                    
-                    if (data.round !== roundInPhase) {
-                        setIsProcessing(false);
-                        setBattleResult(null);
-                        setSelectedCard(null);
-                        setCpuCard(null);
-                        setTimeLeft(ROUND_TIME_LIMIT);
-                    }
-
-                    setOnlineStatus(data.status);
-                });
-            };
-
-            const handleOnlineDraft = async (number) => {
-                if (isProcessing) return;
-                const roomRef = fb.doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms', roomId);
-                const roomSnap = await fb.getDoc(roomRef);
-                const data = roomSnap.data();
-
-                const myRole = isHost ? 'host' : 'guest';
-                if (data.turn !== myRole) return;
-
-                setIsProcessing(true);
-
-                const newDeck = isHost ? [...data.hostDeck, number] : [...data.guestDeck, number];
-                const newAvail = data.availableCards.filter(c => c !== number);
-                const nextTurn = myRole === 'host' ? 'guest' : 'host';
-                
-                let updates = {
-                    availableCards: newAvail,
-                    turn: nextTurn,
-                    [isHost ? 'hostDeck' : 'guestDeck']: newDeck
-                };
-
-                if (data.hostDeck.length + data.guestDeck.length + 1 >= 6) {
-                    updates.status = 'battle';
-                    updates.hostHand = isHost ? newDeck : data.hostDeck;
-                    updates.guestHand = isHost ? data.guestDeck : newDeck;
-                }
-
-                await fb.updateDoc(roomRef, updates);
-                setIsProcessing(false);
-            };
-
-            const handleOnlineBattle = async (number) => {
-                if (isProcessing || selectedCard) return;
-                const roomRef = fb.doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms', roomId);
-                
-                await fb.updateDoc(roomRef, {
-                    [isHost ? 'hostCard' : 'guestCard']: number
-                });
-                setSelectedCard(number);
-            };
-
-            const resolveOnlineBattle = async (rid, data) => {
-                const roomRef = fb.doc(fb.db, 'artifacts', fb.appId, 'public', 'data', 'trinity_rooms', rid);
-                await fb.updateDoc(roomRef, { resultProcessing: true });
-
-                const hVal = data.hostCard;
-                const gVal = data.guestCard;
-                const sum = hVal + gVal;
-                const reversal = sum === 10;
-                
-                let hWin = false;
-                let gWin = false;
-                
-                if (data.phase === 1) {
-                    if (hVal > gVal) hWin = true;
-                    else if (gVal > hVal) gWin = true;
-                } else if (data.phase === 2) {
-                    if (hVal < gVal) hWin = true;
-                    else if (gVal < hVal) gWin = true;
-                } else {
-                    const hDist = Math.abs(hVal - 5);
-                    const gDist = Math.abs(gVal - 5);
-                    if (hDist < gDist) hWin = true;
-                    else if (gDist < hDist) gWin = true;
-                }
-
-                if (reversal) {
-                    hWin = !hWin;
-                    gWin = !gWin;
-                }
-                
-                const newScores = { ...data.scores };
-                if (hWin) newScores.host++;
-                if (gWin) newScores.guest++;
-
-                let winnersHostView = [];
-                if (hWin) winnersHostView.push('player');
-                if (gWin) winnersHostView.push('cpu');
-                
-                let winnersGuestView = [];
-                if (gWin) winnersGuestView.push('player');
-                if (hWin) winnersGuestView.push('cpu');
-
-                await fb.updateDoc(roomRef, {
-                    lastResult: {
-                        winnersHostView,
-                        winnersGuestView,
-                        reversal,
-                        round: (data.phase-1)*3 + data.round
-                    },
-                    scores: newScores
-                });
-
-                setTimeout(async () => {
-                    let nextRound = data.round + 1;
-                    let nextPhase = data.phase;
-                    let nextStatus = 'battle';
-                    
-                    let nextHostHand = data.hostHand.filter(c => c !== hVal);
-                    let nextGuestHand = data.guestHand.filter(c => c !== gVal);
-
-                    if (nextRound > 3) {
-                        nextRound = 1;
-                        nextPhase++;
-                        nextHostHand = data.hostDeck;
-                        nextGuestHand = data.guestDeck;
-                        if (nextPhase > 3) {
-                            nextStatus = 'finished';
-                        } else {
-                            nextStatus = 'intermission';
-                        }
-                    }
-
-                    await fb.updateDoc(roomRef, {
-                        phase: nextPhase,
-                        round: nextRound,
-                        status: nextStatus,
-                        hostHand: nextHostHand,
-                        guestHand: nextGuestHand,
-                        hostCard: null,
-                        guestCard: null,
-                        resultProcessing: false,
-                        lastResult: null
-                    });
-
-                    if (nextStatus === 'intermission') {
-                        setTimeout(async () => {
-                             await fb.updateDoc(roomRef, { status: 'battle' });
-                        }, 4000);
-                    }
-
-                }, 4000);
-            };
-
+            // Draft Phase
             const handleDraftPick = (number) => {
-                if (gameMode === 'online') {
-                    handleOnlineDraft(number);
-                } else {
-                    handleOfflineDraft(number);
-                }
-            };
-
-            const handleBattle = (number) => {
-                if (gameMode === 'online') {
-                    handleOnlineBattle(number);
-                } else {
-                    handleOfflineBattle(number);
-                }
-            };
-
-            const handleOfflineDraft = (number) => {
                 if (isProcessing) return;
                 const newPlayerDeck = [...playerDeck, number];
                 setPlayerDeck(newPlayerDeck);
@@ -639,7 +339,7 @@
                     }
                     setAvailableCards(nextAvailable);
                     setIsProcessing(false);
-                }, 800);
+                }, 600);
             };
 
             const startBattlePhase = (phaseNum, pDeck, cDeck, c2Deck) => {
@@ -662,28 +362,31 @@
                 setTimeLeft(ROUND_TIME_LIMIT);
             };
 
-            const handleOfflineBattle = (pCard) => {
+            const handleBattle = (pCard) => {
                 if (isProcessing) return;
                 setSelectedCard(pCard);
                 setIsProcessing(true);
+                
                 const cCard = cpuPlayCard(cpuHand);
                 let c2Card = null;
                 if (cpuCount === 2) c2Card = cpuPlayCard(cpu2Hand);
                 
+                // Card Reveal Animation Sequence
                 setTimeout(() => {
-                    setCpuCard(cCard);
+                    setCpuCard(cCard); // CPU 1 Reveal
+                    
                     if (cpuCount === 2) {
                         setTimeout(() => {
-                            setCpu2Card(c2Card);
-                            setTimeout(() => resolveOfflineBattle(pCard, cCard, c2Card), 800);
+                            setCpu2Card(c2Card); // CPU 2 Reveal
+                            setTimeout(() => resolveBattle(pCard, cCard, c2Card), 1000);
                         }, 1000);
                     } else {
-                        setTimeout(() => resolveOfflineBattle(pCard, cCard, null), 800);
+                        setTimeout(() => resolveBattle(pCard, cCard, null), 1000);
                     }
                 }, 1000);
             };
 
-            const resolveOfflineBattle = (pVal, cVal, c2Val) => {
+            const resolveBattle = (pVal, cVal, c2Val) => {
                 const sum = pVal + cVal + (c2Val || 0);
                 const reversal = sum === 10;
                 setIsReversal(reversal);
@@ -693,9 +396,21 @@
 
                 const determineWinners = () => {
                     let sorted = [...participants];
-                    if (currentPhase === 1) { sorted.sort((a, b) => b.val - a.val); const max = sorted[0].val; return participants.filter(p => p.val === max).map(p => p.owner); }
-                    else if (currentPhase === 2) { sorted.sort((a, b) => a.val - b.val); const min = sorted[0].val; return participants.filter(p => p.val === min).map(p => p.owner); }
-                    else { sorted.sort((a, b) => Math.abs(a.val - 5) - Math.abs(b.val - 5)); const closest = Math.abs(sorted[0].val - 5); return participants.filter(p => Math.abs(p.val - 5) === closest).map(p => p.owner); }
+                    if (currentPhase === 1) { // Power
+                        sorted.sort((a, b) => b.val - a.val); 
+                        const max = sorted[0].val; 
+                        return participants.filter(p => p.val === max).map(p => p.owner); 
+                    }
+                    else if (currentPhase === 2) { // Speed
+                        sorted.sort((a, b) => a.val - b.val); 
+                        const min = sorted[0].val; 
+                        return participants.filter(p => p.val === min).map(p => p.owner); 
+                    }
+                    else { // Balance
+                        sorted.sort((a, b) => Math.abs(a.val - 5) - Math.abs(b.val - 5)); 
+                        const closest = Math.abs(sorted[0].val - 5); 
+                        return participants.filter(p => Math.abs(p.val - 5) === closest).map(p => p.owner); 
+                    }
                 };
 
                 let winners = determineWinners();
@@ -713,10 +428,10 @@
                 setBattleResult(winners);
                 setBattleLog(prev => [{ phase: currentPhase, round: roundInPhase, pVal, cVal, c2Val, winners, reversal }, ...prev]);
 
-                setTimeout(() => nextRoundOffline(pVal, cVal, c2Val), 2500);
+                setTimeout(() => nextRound(pVal, cVal, c2Val), 3000);
             };
 
-            const nextRoundOffline = (pVal, cVal, c2Val) => {
+            const nextRound = (pVal, cVal, c2Val) => {
                 setPlayerHand(prev => prev.filter(c => c !== pVal));
                 setCpuHand(prev => prev.filter(c => c !== cVal));
                 setCpu2Hand(prev => prev.filter(c => c !== c2Val));
@@ -734,76 +449,47 @@
                 }
             };
 
+            // --- Render Screens ---
+
+            // Common: Home Button
             const HomeButton = () => (
-                <button onClick={goHome} className="fixed top-2 left-2 z-50 p-2 bg-slate-800 text-slate-400 hover:text-white rounded-full border border-slate-600 hover:border-slate-400 transition-colors">
-                    <IconHome size={20} />
+                <button onClick={goHome} className="fixed top-4 left-4 z-50 text-yellow-600 hover:text-yellow-400 transition-colors">
+                    <IconHome size={28} />
                 </button>
             );
 
-            // --- Render ---
+            // Intro
             if (gameState === 'intro') {
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center relative">
-                        {/* Status Indicator */}
-                        <div className="absolute top-4 right-4 text-xs font-tech text-slate-500 flex items-center gap-2">
-                            {isReady ? <span className="flex items-center gap-2"><IconWifi size={14} className="text-emerald-500" /> ONLINE READY</span> : <span className="flex items-center gap-2"><IconRefresh size={14} className="animate-spin" /> SYSTEM LOADING...</span>}
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+                        <div className="mb-4">
+                            <IconSword size={48} className="inline text-yellow-600 mx-2" />
+                            <IconScale size={48} className="inline text-yellow-600 mx-2" />
+                            <IconWind size={48} className="inline text-yellow-600 mx-2" />
                         </div>
-
-                        <h1 className="text-5xl md:text-7xl font-tech font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 mb-4 tracking-tighter">
-                            TRINITY LOGIC: 04
+                        <h1 className="text-5xl md:text-8xl font-casino font-black mb-2 text-gold tracking-widest drop-shadow-lg">
+                            TRINITY
                         </h1>
-                        <p className="text-xl text-slate-400 mb-8 font-tech">Deck Loop Ver.</p>
+                        <h2 className="text-2xl md:text-4xl font-casino text-yellow-700/80 tracking-[0.5em] mb-12">
+                            LOGIC
+                        </h2>
                         
-                        <div className="flex flex-col gap-4 w-full max-w-xs">
-                            <button onClick={() => startOfflineGame(1)} className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-tech text-lg tracking-widest shadow-lg transition-all flex items-center justify-center gap-3">
-                                <IconUsers size={20} /> 1 PLAYER (vs CPU)
+                        <div className="flex flex-col gap-6 w-full max-w-xs">
+                            <button onClick={() => startGame(1)} className="group relative px-8 py-4 bg-zinc-900 border border-yellow-700 hover:bg-yellow-900/20 text-yellow-500 font-casino tracking-widest transition-all overflow-hidden">
+                                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1s_infinite]"></div>
+                                <span className="flex items-center justify-center gap-3">
+                                    <IconUsers size={20} /> VS DEALER
+                                </span>
                             </button>
-                            <button onClick={() => startOfflineGame(2)} className="px-8 py-4 bg-rose-700 hover:bg-rose-600 text-white rounded font-tech text-lg tracking-widest shadow-lg transition-all flex items-center justify-center gap-3">
-                                <span className="flex items-center"><IconUsers size={20} /><IconUsers size={20} className="-ml-2" /></span> 2 PLAYERS (vs 2CPU)
-                            </button>
-                            <div className="h-px bg-slate-700 w-full my-2"></div>
-                            <button 
-                                onClick={() => isReady && setGameState('lobby_menu')} 
-                                disabled={!isReady}
-                                className={`px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-tech text-lg tracking-widest shadow-lg transition-all flex items-center justify-center gap-3 ${!isReady ? 'disabled-btn' : ''}`}
-                            >
-                                <IconGlobe size={20} /> {isReady ? 'ONLINE BATTLE' : 'LOADING...'}
+                            <button onClick={() => startGame(2)} className="group relative px-8 py-4 bg-zinc-900 border border-yellow-700 hover:bg-yellow-900/20 text-yellow-500 font-casino tracking-widest transition-all">
+                                <span className="flex items-center justify-center gap-3">
+                                    <IconUsers size={20} /><IconUsers size={20} className="-ml-3" /> TRI-BATTLE
+                                </span>
                             </button>
                         </div>
-                    </div>
-                );
-            }
-
-            // Online Lobby Menu
-            if (gameState === 'lobby_menu') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center relative">
-                        <HomeButton />
-                        <h2 className="text-3xl font-tech text-emerald-400 mb-8">ONLINE LOBBY</h2>
-                        <div className="flex flex-col gap-4 w-full max-w-xs">
-                            <button onClick={createRoom} className="px-8 py-4 bg-emerald-700 hover:bg-emerald-600 text-white rounded font-tech tracking-widest shadow-lg">
-                                CREATE ROOM
-                            </button>
-                            <div className="flex gap-2">
-                                <input id="roomInput" type="text" placeholder="ROOM ID" className="flex-1 p-4 rounded bg-slate-800 border border-slate-600 text-white font-tech text-center" maxLength={6} />
-                                <button onClick={() => joinRoom(document.getElementById('roomInput').value)} className="px-4 bg-slate-700 hover:bg-slate-600 text-white rounded font-bold">JOIN</button>
-                            </div>
+                        <div className="mt-12 text-zinc-600 text-xs font-casino tracking-widest">
+                            CASINO ROYALE EDITION
                         </div>
-                    </div>
-                );
-            }
-
-            // Waiting Lobby
-            if (gameState === 'lobby') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center relative">
-                        <HomeButton />
-                        <h2 className="text-2xl font-tech text-slate-300 mb-4">WAITING FOR OPPONENT...</h2>
-                        <div className="p-8 bg-slate-800 rounded-xl border border-slate-600 animate-pulse">
-                            <div className="text-xs text-slate-500 mb-2 font-tech">ROOM ID</div>
-                            <div className="text-5xl font-bold font-tech text-emerald-400 tracking-[0.2em]">{roomId}</div>
-                        </div>
-                        <p className="mt-8 text-slate-400 text-sm">この番号を相手に伝えてください</p>
                     </div>
                 );
             }
@@ -811,51 +497,67 @@
             // Draft
             if (gameState === 'draft') {
                 return (
-                    <div className="min-h-screen p-4 flex flex-col items-center bg-slate-900 relative">
+                    <div className="min-h-screen p-4 flex flex-col items-center bg-felt relative">
                         <HomeButton />
-                        <div className="w-full max-w-4xl flex justify-between items-start mb-8 mt-12 pl-12 md:pl-0">
+                        
+                        <div className="w-full max-w-5xl mt-12 mb-8 flex justify-between items-start">
+                            {/* Player Status */}
                             <div className="text-left">
-                                <div className="text-xs text-indigo-400 font-bold mb-1 font-tech">YOU</div>
-                                <div className="flex gap-2 h-20">
+                                <div className="text-xs text-yellow-600 font-casino mb-2 tracking-widest">YOUR HAND</div>
+                                <div className="flex gap-2 h-24">
                                     {playerDeck.map((n, i) => (
-                                        <div key={i} className="w-12 h-16 bg-indigo-900/50 border border-indigo-500 flex items-center justify-center font-bold text-lg rounded">{n}</div>
+                                        <div key={i} className="w-16 h-24 bg-zinc-100 border-2 border-yellow-600 rounded flex items-center justify-center text-2xl font-casino font-bold text-black shadow-lg">
+                                            {n}
+                                        </div>
                                     ))}
-                                    {[...Array(3 - playerDeck.length)].map((_, i) => <div key={`e-${i}`} className="w-12 h-16 border border-dashed border-slate-600 rounded"></div>)}
+                                    {[...Array(3 - playerDeck.length)].map((_, i) => (
+                                        <div key={`e-${i}`} className="w-16 h-24 border-2 border-dashed border-yellow-800/30 rounded"></div>
+                                    ))}
                                 </div>
                             </div>
-                            
-                            <div className="text-center pt-4">
-                                <h2 className="text-2xl font-tech text-cyan-400">DRAFT PHASE</h2>
-                                <p className="text-slate-400 text-xs animate-pulse">
-                                    {isProcessing ? 'OPPONENT SELECTION...' : 'SELECT CARD'}
+
+                            <div className="text-center pt-2">
+                                <h2 className="text-3xl font-casino text-gold drop-shadow-md">DRAFT</h2>
+                                <p className="text-yellow-700/70 text-sm mt-1 tracking-widest animate-pulse">
+                                    {isProcessing ? 'DEALER IS CHOOSING...' : 'CHOOSE YOUR CARD'}
                                 </p>
                             </div>
 
+                            {/* CPU Status */}
                             <div className="text-right">
-                                <div className="text-xs text-rose-400 font-bold mb-1 font-tech">{gameMode === 'online' ? 'OPPONENT' : 'CPU'}</div>
-                                <div className="flex gap-2 justify-end h-16">
-                                    {cpuDeck.map((n, i) => <div key={i} className="w-10 h-14 bg-rose-900/50 border border-rose-500 flex items-center justify-center font-bold text-lg rounded text-rose-200">?</div>)}
-                                    {[...Array(3 - cpuDeck.length)].map((_, i) => <div key={`ce-${i}`} className="w-10 h-14 border border-dashed border-slate-600 rounded"></div>)}
+                                <div className="text-xs text-yellow-600 font-casino mb-2 tracking-widest">DEALER HAND</div>
+                                <div className="flex gap-2 justify-end h-24">
+                                    {cpuDeck.map((n, i) => (
+                                        <div key={i} className="w-16 h-24 bg-zinc-900 border border-yellow-700 rounded flex items-center justify-center text-xl font-casino text-yellow-500 shadow-lg">
+                                            {n}
+                                        </div>
+                                    ))}
+                                    {[...Array(3 - cpuDeck.length)].map((_, i) => (
+                                        <div key={`ce-${i}`} className="w-16 h-24 border-2 border-dashed border-yellow-800/30 rounded"></div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 mt-4">
+                        <div className="grid grid-cols-3 gap-6 mt-4">
                             {ALL_CARDS.map(number => {
                                 const isAvailable = availableCards.includes(number);
                                 const isPlayerPick = playerDeck.includes(number);
                                 const isCpuPick = cpuDeck.includes(number) || cpu2Deck.includes(number);
-                                let cardClass = "w-20 h-28 md:w-28 md:h-40 rounded-xl flex items-center justify-center text-3xl font-tech font-bold transition-all duration-300 border-2 ";
                                 
-                                if (isAvailable) {
-                                    cardClass += "bg-slate-800 border-slate-600 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] cursor-pointer text-slate-300";
-                                } else if (isPlayerPick) cardClass += "bg-indigo-900 border-indigo-500 text-indigo-200 opacity-50 scale-95";
-                                else if (isCpuPick) cardClass += "bg-rose-900 border-rose-500 text-rose-200 opacity-50 scale-95";
-
                                 return (
-                                    <button key={number} disabled={!isAvailable || isProcessing} onClick={() => handleDraftPick(number)} className={cardClass}>
-                                        {number}
-                                    </button>
+                                    <div key={number} className="relative">
+                                        <Card 
+                                            number={number} 
+                                            owner={isPlayerPick ? 'player' : 'cpu'} // Visual style only
+                                            showFace={true}
+                                            onClick={() => handleDraftPick(number)}
+                                            disabled={!isAvailable || isProcessing}
+                                            isSelected={isPlayerPick}
+                                            isLoser={!isAvailable && !isPlayerPick && !isCpuPick} // Fade out unavailable
+                                        />
+                                        {isCpuPick && <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg text-yellow-500 font-casino text-xs tracking-widest border border-yellow-500/50">TAKEN</div>}
+                                    </div>
                                 );
                             })}
                         </div>
@@ -867,18 +569,15 @@
             if (gameState === 'intermission') {
                 const nextPhase = PHASES[currentPhase + 1] || PHASES[1];
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 relative intermission-enter">
-                        <HomeButton />
-                        <div className="text-center">
-                            <h2 className="text-xl text-slate-400 font-tech mb-4 tracking-widest">PHASE COMPLETED</h2>
-                            <div className="h-0.5 w-32 bg-slate-700 mx-auto mb-8"></div>
-                            <p className="text-sm text-slate-500 mb-2">NEXT BATTLEFIELD</p>
-                            <div className={`text-4xl md:text-6xl font-bold font-tech ${nextPhase.color} flex flex-col items-center gap-4`}>
-                                <div className="animate-bounce">{nextPhase.icon}</div>
-                                {nextPhase.name}
+                    <div className="min-h-screen flex flex-col items-center justify-center bg-black intermission-enter text-center p-8">
+                        <div className="border-y-2 border-yellow-800/50 py-12 w-full max-w-2xl bg-zinc-900/50 backdrop-blur-sm">
+                            <h2 className="text-sm text-yellow-600 font-casino tracking-[0.5em] mb-6">NEXT STAGE</h2>
+                            <div className={`text-6xl font-casino font-bold ${nextPhase.color} flex flex-col items-center gap-6 mb-4 drop-shadow-lg`}>
+                                {nextPhase.icon}
+                                <span className="text-gold">{nextPhase.name}</span>
                             </div>
-                            <p className="mt-4 text-slate-300 text-lg">{nextPhase.desc}</p>
-                            <div className="mt-8 text-xs text-slate-600 animate-pulse">SYSTEM LOADING...</div>
+                            <div className="w-16 h-1 bg-yellow-700 mx-auto mb-6"></div>
+                            <p className="text-xl text-zinc-400 font-serif italic">{nextPhase.desc}</p>
                         </div>
                     </div>
                 );
@@ -889,116 +588,138 @@
                 const phaseConfig = PHASES[currentPhase];
                 
                 return (
-                    <div className={`min-h-screen flex flex-col bg-slate-900 transition-colors duration-500 ${isReversal ? 'bg-yellow-900/20' : ''}`}>
+                    <div className={`min-h-screen flex flex-col bg-felt transition-colors duration-1000 ${isReversal ? 'saturate-150 brightness-110' : ''}`}>
                         <HomeButton />
                         
-                        {/* Header */}
-                        <div className="w-full bg-slate-800 border-b border-slate-700 p-2 md:p-4 flex justify-between items-center shadow-lg relative z-20">
-                            <div className="flex items-center gap-4 pl-12 md:pl-0 z-10">
-                                <div className="text-center">
-                                    <div className="text-[10px] text-indigo-400 font-bold">YOU</div>
-                                    <div className="text-2xl font-tech text-indigo-100">{score.player}</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-[10px] text-rose-400 font-bold">{gameMode === 'online' ? 'RIVAL' : 'CPU'}</div>
-                                    <div className="text-2xl font-tech text-rose-100">{score.cpu}</div>
-                                </div>
-                                {cpuCount === 2 && (
-                                    <div className="text-center">
-                                        <div className="text-[10px] text-orange-400 font-bold">CPU2</div>
-                                        <div className="text-2xl font-tech text-orange-100">{score.cpu2}</div>
+                        {/* Header Area */}
+                        <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-10 bg-gradient-to-b from-black/80 to-transparent h-32 pointer-events-none">
+                            <div className="text-center pl-12">
+                                <div className="text-[10px] text-yellow-600 font-casino tracking-widest">YOU</div>
+                                <div className="text-4xl font-casino text-white drop-shadow-md">{score.player}</div>
+                            </div>
+                            
+                            <div className="text-center">
+                                <div className={`flex flex-col items-center ${phaseConfig.color} drop-shadow-lg`}>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        {phaseConfig.icon}
+                                        <span className="font-casino text-2xl font-bold tracking-widest text-gold">{phaseConfig.name}</span>
                                     </div>
-                                )}
-                            </div>
-
-                            {/* Timer */}
-                            <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center font-tech ${timeLeft <= 5 ? 'timer-warning' : 'text-slate-200'} z-0`}>
-                                <div className="flex items-center gap-1">
-                                    <IconClock size={16} />
-                                    <span className="text-2xl font-bold">{timeLeft}</span>
+                                    <div className="text-xs text-zinc-300 font-serif italic opacity-80">{phaseConfig.desc}</div>
                                 </div>
                             </div>
 
-                            <div className={`flex flex-col items-end ${phaseConfig.color} z-10`}>
-                                <div className="flex items-center gap-2">
-                                    {phaseConfig.icon}
-                                    <span className="font-tech text-lg font-bold tracking-wider hidden md:block">{phaseConfig.name}</span>
-                                    <span className="font-tech text-lg font-bold tracking-wider md:hidden">BATTLE {currentPhase}</span>
-                                </div>
-                                <div className="text-xs text-slate-300">{phaseConfig.desc}</div>
+                            <div className="text-center">
+                                <div className="text-[10px] text-yellow-600 font-casino tracking-widest">DEALER</div>
+                                <div className="text-4xl font-casino text-white drop-shadow-md">{score.cpu}</div>
                             </div>
                         </div>
 
-                        {/* Field */}
-                        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden p-4">
+                        {/* Game Field */}
+                        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden w-full max-w-6xl mx-auto">
+                            
+                            {/* Center Timer - Absolute Center */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-80">
+                                <CircularTimer timeLeft={timeLeft} maxTime={ROUND_TIME_LIMIT} />
+                            </div>
+
+                            {/* Reversal Effect */}
                             {isReversal && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 reversal-flash">
-                                    <div className="text-yellow-500 font-tech text-6xl md:text-8xl font-bold opacity-20 rotate-12 tracking-widest border-4 border-yellow-500 p-8">REVERSAL</div>
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 reversal-flash">
+                                    <div className="text-yellow-400 font-casino text-6xl md:text-9xl font-bold tracking-widest border-y-4 border-yellow-400 bg-black/50 w-full text-center py-4 transform -rotate-6 backdrop-blur-sm">
+                                        REVERSAL
+                                    </div>
                                 </div>
                             )}
 
-                            <div className="w-full flex justify-around mb-4 md:mb-8">
-                                <div className="flex flex-col items-center">
-                                    <div className="mb-2 flex gap-1">
-                                        {cpuHand.map((_, i) => <div key={i} className="w-8 h-12 bg-slate-700 rounded border border-slate-600"></div>)}
+                            {/* Opponent Area (Top) */}
+                            <div className="w-full flex justify-around mb-12 z-10">
+                                {/* CPU 1 */}
+                                <div className="flex flex-col items-center gap-4">
+                                    {/* Open Hand Display */}
+                                    <div className="flex gap-1 p-2 bg-black/40 rounded-lg border border-yellow-900/30">
+                                        <span className="text-[10px] text-yellow-700 font-casino mr-1 writing-vertical">HAND</span>
+                                        {cpuHand.map((n, i) => (
+                                            <div key={i} className="w-6 h-8 bg-zinc-800 text-yellow-600 flex items-center justify-center text-xs font-bold border border-yellow-900 rounded">
+                                                {n}
+                                            </div>
+                                        ))}
                                     </div>
-                                    <div className="relative">
+                                    
+                                    {/* Play Slot */}
+                                    <div className="relative h-36 w-24 flex items-center justify-center">
                                         {cpuCard ? (
                                             <div className="card-anim-enter">
                                                 <Card number={cpuCard} owner="cpu" isWinner={battleResult && battleResult.includes('cpu')} isLoser={battleResult && !battleResult.includes('cpu')} />
+                                                {battleResult && battleResult.includes('cpu') && <div className="absolute -top-8 text-yellow-400 font-casino font-bold text-sm tracking-widest animate-bounce">WIN</div>}
                                             </div>
                                         ) : (
-                                            <div className="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center">
-                                                <span className="text-rose-900 font-bold">{gameMode === 'online' && !cpuCard ? 'THINKING' : (gameMode === 'online' ? 'READY' : 'CPU')}</span>
+                                            <div className="w-20 h-28 border-2 border-dashed border-yellow-800/30 rounded-lg flex items-center justify-center">
+                                                <span className="text-yellow-900/50 font-casino text-xs">DEALER</span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
+
+                                {/* CPU 2 */}
                                 {cpuCount === 2 && (
-                                    <div className="flex flex-col items-center">
-                                        <div className="mb-2 flex gap-1">
-                                            {cpu2Hand.map((_, i) => <div key={i} className="w-8 h-12 bg-slate-700 rounded border border-slate-600"></div>)}
+                                    <div className="flex flex-col items-center gap-4">
+                                        <div className="flex gap-1 p-2 bg-black/40 rounded-lg border border-yellow-900/30">
+                                            <span className="text-[10px] text-orange-700 font-casino mr-1 writing-vertical">HAND</span>
+                                            {cpu2Hand.map((n, i) => (
+                                                <div key={i} className="w-6 h-8 bg-zinc-800 text-orange-600 flex items-center justify-center text-xs font-bold border border-orange-900 rounded">
+                                                    {n}
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="relative">
+                                        <div className="relative h-36 w-24 flex items-center justify-center">
                                             {cpu2Card ? (
                                                 <div className="card-anim-enter">
                                                     <Card number={cpu2Card} owner="cpu2" isWinner={battleResult && battleResult.includes('cpu2')} isLoser={battleResult && !battleResult.includes('cpu2')} />
                                                 </div>
-                                            ) : <div className="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center"><span className="text-orange-900 font-bold">CPU2</span></div>}
+                                            ) : <div className="w-20 h-28 border-2 border-dashed border-orange-800/30 rounded-lg flex items-center justify-center"><span className="text-orange-900/50 font-casino text-xs">RIVAL</span></div>}
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="my-2 h-8">
+                            {/* Result Text Area */}
+                            <div className="h-8 mb-4 z-20">
                                 {battleResult && (
-                                    <div className="font-tech text-2xl font-bold animate-bounce text-center">
-                                        {battleResult.includes('player') ? <span className="text-indigo-400">WIN! </span> : ''}
-                                        {battleResult.length > 0 && !battleResult.includes('player') ? <span className="text-rose-400">LOSE...</span> : ''}
-                                        {battleResult.length === 0 && <span className="text-slate-400">DRAW</span>}
-                                        {isReversal && <span className="text-yellow-500 text-sm ml-2 block">REVERSAL!</span>}
+                                    <div className="font-casino text-3xl font-bold animate-bounce text-center drop-shadow-lg tracking-widest">
+                                        {battleResult.includes('player') ? <span className="text-emerald-400">YOU WIN</span> : ''}
+                                        {battleResult.length > 0 && !battleResult.includes('player') ? <span className="text-red-500">YOU LOSE</span> : ''}
+                                        {battleResult.length === 0 && <span className="text-zinc-400">DRAW</span>}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-col items-center mt-2">
-                                <div className="relative mb-8">
+                            {/* Player Area (Bottom) */}
+                            <div className="flex flex-col items-center mt-auto z-10 w-full">
+                                {/* Play Slot */}
+                                <div className="relative h-36 w-24 mb-6 flex items-center justify-center">
                                     {selectedCard ? (
                                         <div className="card-anim-enter">
                                             <Card number={selectedCard} owner="player" isWinner={battleResult && battleResult.includes('player')} isLoser={battleResult && !battleResult.includes('player')} />
+                                            {battleResult && battleResult.includes('player') && <div className="absolute -top-8 left-0 right-0 text-center text-emerald-400 font-casino font-bold text-sm tracking-widest animate-bounce">WIN</div>}
                                         </div>
                                     ) : (
-                                        <div className="w-20 h-28 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center opacity-50">
-                                            <span className="text-xs text-slate-400">SLOT</span>
+                                        <div className="w-20 h-28 border-2 border-dashed border-yellow-500/20 rounded-lg flex items-center justify-center animate-pulse">
+                                            <span className="text-yellow-500/50 font-casino text-xs">PLACE</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="bg-slate-800/90 backdrop-blur rounded-xl border border-slate-700 p-4 pb-2 flex flex-col items-center shadow-2xl">
-                                    <div className="text-[10px] text-slate-400 mb-2 font-tech tracking-widest">COMMAND</div>
-                                    <div className="flex gap-4">
+                                {/* Hand UI */}
+                                <div className="w-full bg-gradient-to-t from-black via-black/90 to-transparent pt-8 pb-4 px-4 flex justify-center">
+                                    <div className="flex gap-4 md:gap-8 items-end h-32">
                                         {playerHand.map((num, i) => (
-                                            <Card key={`${currentPhase}-${roundInPhase}-${i}`} number={num} owner="player" onClick={() => !selectedCard && handleBattle(num)} disabled={!!selectedCard} />
+                                            <Card 
+                                                key={`${currentPhase}-${roundInPhase}-${i}`} 
+                                                number={num} 
+                                                owner="player" 
+                                                onClick={() => !selectedCard && handleBattle(num)} 
+                                                disabled={!!selectedCard} 
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -1008,43 +729,48 @@
                 );
             }
 
-            // Result
+            // Result Screen
             if (gameState === 'result') {
                 const scores = [
-                    { name: 'YOU', val: score.player, color: 'text-indigo-400' },
-                    { name: gameMode === 'online' ? 'RIVAL' : 'CPU', val: score.cpu, color: 'text-rose-400' }
+                    { name: 'YOU', val: score.player, isPlayer: true },
+                    { name: 'DEALER', val: score.cpu, isPlayer: false }
                 ];
-                if (cpuCount === 2) scores.push({ name: 'CPU2', val: score.cpu2, color: 'text-orange-400' });
+                if (cpuCount === 2) scores.push({ name: 'RIVAL', val: score.cpu2, isPlayer: false });
                 scores.sort((a, b) => b.val - a.val);
-                const isWinner = scores[0].name === 'YOU';
-                const isDraw = scores[0].val === score.player && scores[0].name !== 'YOU';
+                const isWinner = scores[0].isPlayer;
+                const isDraw = scores[0].val === score.player && !scores[0].isPlayer;
 
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center relative">
-                        <HomeButton />
-                        <div className="mb-8 scale-150">
-                            {isWinner && !isDraw ? <IconTrophy size={64} className="text-yellow-400" /> : 
-                             isDraw ? <IconRefresh size={64} className="text-slate-400" /> :
-                             <IconSkull size={64} className="text-rose-500" />}
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-black relative overflow-hidden">
+                        {/* Background Effect */}
+                        {isWinner && !isDraw && <div className="absolute inset-0 bg-gradient-to-b from-yellow-900/20 to-black animate-pulse"></div>}
+                        
+                        <div className="mb-8 scale-150 relative z-10">
+                            {isWinner && !isDraw ? <IconTrophy size={80} className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" /> : 
+                             isDraw ? <IconRefresh size={80} className="text-zinc-500" /> :
+                             <IconSkull size={80} className="text-red-900" />}
                         </div>
-                        <h2 className="text-4xl md:text-6xl font-tech font-bold mb-8">
-                            {isWinner && !isDraw ? <span className="text-yellow-400">VICTORY</span> : 
-                             isDraw ? <span className="text-slate-400">DRAW GAME</span> : 
-                             <span className="text-rose-500">DEFEAT</span>}
+                        
+                        <h2 className="text-5xl md:text-7xl font-casino font-bold mb-12 relative z-10 tracking-widest">
+                            {isWinner && !isDraw ? <span className="text-gold">VICTORY</span> : 
+                             isDraw ? <span className="text-zinc-400">DRAW</span> : 
+                             <span className="text-red-800">DEFEAT</span>}
                         </h2>
-                        <div className="flex flex-col gap-4 mb-8 w-full max-w-sm">
+
+                        <div className="flex flex-col gap-4 mb-12 w-full max-w-md relative z-10">
                             {scores.map((s, i) => (
-                                <div key={i} className="flex justify-between items-center bg-slate-800 p-4 rounded border border-slate-700">
+                                <div key={i} className={`flex justify-between items-center p-6 rounded border ${s.isPlayer ? 'bg-zinc-800 border-yellow-600' : 'bg-zinc-900 border-zinc-800'}`}>
                                     <div className="flex items-center gap-4">
-                                        <span className="text-xl font-bold font-tech text-slate-500">#{i + 1}</span>
-                                        <span className={`text-xl font-bold ${s.color}`}>{s.name}</span>
+                                        <span className="text-2xl font-casino text-zinc-500">#{i + 1}</span>
+                                        <span className={`text-xl font-bold font-casino tracking-widest ${s.isPlayer ? 'text-yellow-400' : 'text-zinc-400'}`}>{s.name}</span>
                                     </div>
-                                    <span className="text-3xl font-tech font-bold text-white">{s.val}</span>
+                                    <span className="text-4xl font-casino font-bold text-white">{s.val}</span>
                                 </div>
                             ))}
                         </div>
-                        <button onClick={goHome} className="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded font-tech tracking-wider border border-slate-500 transition-colors flex items-center gap-2">
-                            <IconRefresh size={18} /> REBOOT SYSTEM
+
+                        <button onClick={goHome} className="relative z-10 px-10 py-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded font-casino tracking-widest border border-zinc-600 transition-colors flex items-center gap-3">
+                            <IconRefresh size={20} /> PLAY AGAIN
                         </button>
                     </div>
                 );
