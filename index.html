@@ -12,11 +12,13 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        // Fixed: Added signInWithCustomToken to imports
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         
         // Expose to window for React component
-        window.firebaseModules = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, getDoc, deleteDoc };
+        // Fixed: Added signInWithCustomToken to exported modules
+        window.firebaseModules = { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, getDoc, deleteDoc };
     </script>
 
     <style>
@@ -121,7 +123,12 @@
                     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await modules.signInWithCustomToken(auth, __initial_auth_token).catch(() => modules.signInAnonymously(auth));
+                        try {
+                            await modules.signInWithCustomToken(auth, __initial_auth_token);
+                        } catch (e) {
+                            console.error("Custom token auth failed, falling back to anon:", e);
+                            await modules.signInAnonymously(auth);
+                        }
                     } else {
                         await modules.signInAnonymously(auth);
                     }
