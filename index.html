@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRINITY LOGIC</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Zen Kaku Gothic New', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .card-anim-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .reversal-flash {
+            animation: flash 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes flash {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(234, 179, 8, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        .perspective-container {
+            perspective: 1000px;
+        }
+        
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- アイコンコンポーネント (SVG直接定義) ---
+        const IconSword = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5" />
+                <line x1="13" y1="19" x2="19" y2="13" />
+                <line x1="16" y1="16" x2="20" y2="20" />
+                <line x1="19" y1="21" x2="21" y2="19" />
+            </svg>
+        );
+
+        const IconWind = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+                <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+                <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+            </svg>
+        );
+
+        const IconScale = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+                <path d="M7 21h10" />
+                <path d="M12 3v18" />
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+            </svg>
+        );
+
+        const IconTrophy = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+            </svg>
+        );
+
+        const IconSkull = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M16 4.9a5.9 5.9 0 0 0-1.8 0" />
+                <circle cx="9" cy="12" r="1" />
+                <circle cx="15" cy="12" r="1" />
+                <path d="M8 20v2h8v-2" />
+                <path d="M12.5 20v-2.18c0-1.29 1.15-2.22 2.5-1.82 2.94.87 4.54-1.28 4.28-3.57A6.5 6.5 0 0 0 6.58 6.58c-3.14 1.76-4.57 5.25-3.3 8.43.58 1.45 2.38 2.37 3.5 1.82 1.35-.4 2.5.53 2.5 1.82V20" />
+            </svg>
+        );
+
+        const IconRefresh = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                <path d="M8 16H3v5" />
+            </svg>
+        );
+
+        // --- 定数と設定 ---
+        const ALL_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        
+        const PHASES = {
+            1: { name: 'POWER BATTLE', icon: <IconSword size={24} />, desc: '大きい数字が勝利', color: 'text-red-400', border: 'border-red-500' },
+            2: { name: 'SPEED BATTLE', icon: <IconWind size={24} />, desc: '小さい数字が勝利', color: 'text-blue-400', border: 'border-blue-500' },
+            3: { name: 'BALANCE BATTLE', icon: <IconScale size={24} />, desc: '5に近い数字が勝利', color: 'text-green-400', border: 'border-green-500' }
+        };
+
+        // --- コンポーネント: カード ---
+        const Card = ({ number, owner, onClick, disabled, isSelected, isWinner, isLoser }) => {
+            let baseStyle = "relative w-20 h-28 md:w-24 md:h-36 rounded-xl flex items-center justify-center text-3xl font-bold font-tech shadow-lg transition-all duration-200 border-2 ";
+            
+            if (owner === 'cpu' && !number) {
+                // 裏面
+                baseStyle += "bg-slate-700 border-slate-600";
+            } else {
+                // 表面
+                if (owner === 'player') {
+                    baseStyle += "bg-slate-800 border-indigo-500 text-indigo-100 hover:bg-slate-700 cursor-pointer ";
+                    if (isSelected) baseStyle += "ring-4 ring-yellow-400 -translate-y-2 ";
+                    if (disabled) baseStyle += "opacity-50 cursor-not-allowed hover:bg-slate-800 ";
+                } else {
+                    baseStyle += "bg-slate-800 border-rose-500 text-rose-100 ";
+                }
+            }
+
+            if (isWinner) baseStyle += " ring-4 ring-yellow-500 scale-110 z-10 bg-yellow-900/50 ";
+            if (isLoser) baseStyle += " opacity-50 scale-90 grayscale ";
+
+            return (
+                <div className={baseStyle} onClick={!disabled ? onClick : undefined}>
+                    {number ? number : (
+                        <div className="w-8 h-8 rounded-full bg-slate-600/50"></div>
+                    )}
+                    {/* 装飾的なコーナー */}
+                    <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-current opacity-50"></div>
+                    <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-current opacity-50"></div>
+                </div>
+            );
+        };
+
+        // --- メインアプリ ---
+        const App = () => {
+            // Game State
+            const [gameState, setGameState] = useState('intro'); // intro, draft, battle, result
+            const [availableCards, setAvailableCards] = useState([...ALL_CARDS]);
+            const [playerDeck, setPlayerDeck] = useState([]);
+            const [cpuDeck, setCpuDeck] = useState([]);
+            
+            // Battle State
+            const [currentPhase, setCurrentPhase] = useState(1);
+            const [roundInPhase, setRoundInPhase] = useState(1); // 1, 2, 3
+            const [playerHand, setPlayerHand] = useState([]);
+            const [cpuHand, setCpuHand] = useState([]);
+            const [battleLog, setBattleLog] = useState([]);
+            
+            // Turn Execution
+            const [selectedCard, setSelectedCard] = useState(null);
+            const [cpuCard, setCpuCard] = useState(null);
+            const [battleResult, setBattleResult] = useState(null); // 'win', 'lose', 'draw'
+            const [isReversal, setIsReversal] = useState(false);
+            const [score, setScore] = useState({ player: 0, cpu: 0 });
+            const [isProcessing, setIsProcessing] = useState(false);
+
+            // --- ヘルパー関数: CPU AI ---
+            const cpuDraft = (currentAvailable) => {
+                // シンプルなAI: ランダムに選ぶ
+                const randomIndex = Math.floor(Math.random() * currentAvailable.length);
+                return currentAvailable[randomIndex];
+            };
+
+            const cpuPlayCard = (hand) => {
+                // 手札からランダムに1枚出す
+                const randomIndex = Math.floor(Math.random() * hand.length);
+                return hand[randomIndex];
+            };
+
+            // --- ゲーム進行ロジック ---
+
+            // ゲーム開始
+            const startGame = () => {
+                setAvailableCards([...ALL_CARDS]);
+                setPlayerDeck([]);
+                setCpuDeck([]);
+                setScore({ player: 0, cpu: 0 });
+                setBattleLog([]);
+                setGameState('draft');
+            };
+
+            // ドラフト処理
+            const handleDraftPick = (number) => {
+                if (isProcessing) return;
+                
+                // プレイヤーのピック
+                const newPlayerDeck = [...playerDeck, number];
+                setPlayerDeck(newPlayerDeck);
+                
+                let nextAvailable = availableCards.filter(n => n !== number);
+                setAvailableCards(nextAvailable);
+
+                // デッキが3枚揃ったら
+                if (newPlayerDeck.length === 3) {
+                    setIsProcessing(true);
+                    setTimeout(() => {
+                        // CPUの最後のピック（まだCPUが2枚の場合）
+                         // プレイヤー先行で始まるため、プレイヤーが3枚取った時点で
+                         // CPUは2枚持っている。CPUが3枚目を取って終了。
+                        const cpuPick = cpuDraft(nextAvailable);
+                        setCpuDeck(prev => [...prev, cpuPick]);
+                        setAvailableCards(nextAvailable.filter(n => n !== cpuPick));
+                        
+                        setTimeout(() => startBattlePhase(1, newPlayerDeck, [...cpuDeck, cpuPick]), 1000);
+                    }, 500);
+                    return;
+                }
+
+                // CPUのターン
+                setIsProcessing(true);
+                setTimeout(() => {
+                    const cpuPick = cpuDraft(nextAvailable);
+                    const newCpuDeck = [...cpuDeck, cpuPick];
+                    setCpuDeck(newCpuDeck);
+                    setAvailableCards(nextAvailable.filter(n => n !== cpuPick));
+                    setIsProcessing(false);
+                }, 800);
+            };
+
+            // バトルフェーズ開始（またはフェーズ移行）
+            const startBattlePhase = (phaseNum, pDeck, cDeck) => {
+                setCurrentPhase(phaseNum);
+                setRoundInPhase(1);
+                // 手札をリセット（デッキループ）
+                setPlayerHand([...pDeck]);
+                setCpuHand([...cDeck]);
+                
+                setSelectedCard(null);
+                setCpuCard(null);
+                setBattleResult(null);
+                setIsReversal(false);
+                setGameState('battle');
+                setIsProcessing(false);
+            };
+
+            // カード選択後のバトル実行
+            const handleBattle = (pCard) => {
+                if (isProcessing) return;
+                setSelectedCard(pCard);
+                setIsProcessing(true);
+
+                // CPUの選択
+                const cCard = cpuPlayCard(cpuHand);
+                
+                // 少し間をおいてCPUカード公開と判定
+                setTimeout(() => {
+                    setCpuCard(cCard);
+                    resolveBattle(pCard, cCard);
+                }, 800);
+            };
+
+            // 勝敗判定
+            const resolveBattle = (pVal, cVal) => {
+                const sum = pVal + cVal;
+                const reversal = sum === 10;
+                setIsReversal(reversal);
+
+                let winner = null; // 'player', 'cpu', 'draw'
+
+                // 基本ルールの判定ロジック
+                const getStandardWinner = () => {
+                    if (currentPhase === 1) return pVal > cVal ? 'player' : (pVal < cVal ? 'cpu' : 'draw'); // Power
+                    if (currentPhase === 2) return pVal < cVal ? 'player' : (pVal > cVal ? 'cpu' : 'draw'); // Speed
+                    if (currentPhase === 3) { // Balance
+                        const pDist = Math.abs(pVal - 5);
+                        const cDist = Math.abs(cVal - 5);
+                        return pDist < cDist ? 'player' : (pDist > cDist ? 'cpu' : 'draw');
+                    }
+                };
+
+                let result = getStandardWinner();
+
+                // Reversal時の反転
+                if (reversal) {
+                    if (result === 'player') result = 'cpu';
+                    else if (result === 'cpu') result = 'player';
+                    // drawは反転してもdraw
+                }
+
+                setBattleResult(result);
+
+                // スコア更新
+                if (result === 'player') setScore(s => ({ ...s, player: s.player + 1 }));
+                if (result === 'cpu') setScore(s => ({ ...s, cpu: s.cpu + 1 }));
+
+                // ログ記録
+                const logEntry = {
+                    phase: currentPhase,
+                    round: roundInPhase,
+                    pVal, cVal, result, reversal
+                };
+                setBattleLog(prev => [logEntry, ...prev]);
+
+                // 次のラウンドへ
+                setTimeout(() => {
+                    nextRound(pVal, cVal);
+                }, 2500);
+            };
+
+            const nextRound = (pValUsed, cValUsed) => {
+                // 使用したカードを手札から削除
+                const nextPHand = playerHand.filter((c, i) => i !== playerHand.indexOf(pValUsed));
+                const nextCHand = cpuHand.filter((c, i) => i !== cpuHand.indexOf(cValUsed));
+                
+                setPlayerHand(nextPHand);
+                setCpuHand(nextCHand);
+                
+                // リセット
+                setSelectedCard(null);
+                setCpuCard(null);
+                setBattleResult(null);
+                setIsReversal(false);
+                setIsProcessing(false);
+
+                if (roundInPhase < 3) {
+                    // 同じフェーズ内の次ラウンド
+                    setRoundInPhase(r => r + 1);
+                } else {
+                    // フェーズ終了
+                    if (currentPhase < 3) {
+                        // 次のフェーズへ
+                        startBattlePhase(currentPhase + 1, playerDeck, cpuDeck);
+                    } else {
+                        // 全フェーズ終了、結果画面へ
+                        setGameState('result');
+                    }
+                }
+            };
+
+            // --- 画面レンダリング ---
+
+            // 1. イントロ画面
+            if (gameState === 'intro') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center">
+                        <h1 className="text-5xl md:text-7xl font-tech font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 mb-4 tracking-tighter">
+                            TRINITY LOGIC
+                        </h1>
+                        <p className="text-xl text-slate-400 mb-8 font-tech">Deck Loop Ver.</p>
+                        
+                        <div className="max-w-md w-full bg-slate-800/50 p-6 rounded-xl border border-slate-700 mb-8 text-left space-y-4 shadow-2xl">
+                            <h2 className="text-lg font-bold text-indigo-300 border-b border-indigo-500/30 pb-2">Mission Briefing</h2>
+                            <ul className="space-y-2 text-sm text-slate-300">
+                                <li className="flex gap-2"><span className="text-cyan-400">1. Draft:</span> 9枚のカードから3枚を選んでデッキを構築せよ。</li>
+                                <li className="flex gap-2"><span className="text-cyan-400">2. Loop:</span> 同じ3枚の手札で3つの戦場（ルール）を戦い抜け。</li>
+                                <li className="flex gap-2"><span className="text-cyan-400">3. Reversal:</span> 2人の合計値が「10」なら勝敗条件が逆転する。</li>
+                            </ul>
+                        </div>
+
+                        <button 
+                            onClick={startGame}
+                            className="group relative px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-none skew-x-[-10deg] transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.5)]"
+                        >
+                            <span className="block skew-x-[10deg] font-tech text-xl tracking-widest group-hover:scale-105 transition-transform">
+                                SYSTEM START
+                            </span>
+                        </button>
+                    </div>
+                );
+            }
+
+            // 2. ドラフト画面
+            if (gameState === 'draft') {
+                return (
+                    <div className="min-h-screen p-4 flex flex-col items-center bg-slate-900">
+                        <div className="w-full max-w-4xl flex justify-between items-center mb-8 mt-4">
+                            <div className="text-left">
+                                <div className="text-xs text-slate-500 font-tech">YOUR DECK</div>
+                                <div className="flex gap-2 mt-2 h-20">
+                                    {playerDeck.map((n, i) => (
+                                        <div key={i} className="w-14 h-20 bg-indigo-900/50 border border-indigo-500 flex items-center justify-center font-bold text-xl rounded">
+                                            {n}
+                                        </div>
+                                    ))}
+                                    {[...Array(3 - playerDeck.length)].map((_, i) => (
+                                        <div key={`empty-${i}`} className="w-14 h-20 border border-dashed border-slate-600 rounded"></div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <h2 className="text-3xl font-tech text-cyan-400">DRAFT PHASE</h2>
+                                <p className="text-slate-400 text-sm animate-pulse">
+                                    {isProcessing ? 'CPU SELECTION...' : 'SELECT CARD'}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <div className="text-xs text-slate-500 font-tech">CPU DECK</div>
+                                <div className="flex gap-2 mt-2 h-20 justify-end">
+                                    {cpuDeck.map((n, i) => (
+                                        <div key={i} className="w-14 h-20 bg-rose-900/50 border border-rose-500 flex items-center justify-center font-bold text-xl rounded">
+                                            ?
+                                        </div>
+                                    ))}
+                                    {[...Array(3 - cpuDeck.length)].map((_, i) => (
+                                        <div key={`empty-cpu-${i}`} className="w-14 h-20 border border-dashed border-slate-600 rounded"></div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4 md:gap-6 mt-8">
+                            {ALL_CARDS.map(number => {
+                                const isAvailable = availableCards.includes(number);
+                                const isPlayerPick = playerDeck.includes(number);
+                                const isCpuPick = cpuDeck.includes(number);
+
+                                let cardClass = "w-24 h-32 md:w-32 md:h-44 rounded-xl flex items-center justify-center text-4xl font-tech font-bold transition-all duration-300 border-2 ";
+                                
+                                if (isAvailable) {
+                                    cardClass += "bg-slate-800 border-slate-600 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] cursor-pointer text-slate-300";
+                                } else if (isPlayerPick) {
+                                    cardClass += "bg-indigo-900 border-indigo-500 text-indigo-200 opacity-50 scale-95";
+                                } else if (isCpuPick) {
+                                    cardClass += "bg-rose-900 border-rose-500 text-rose-200 opacity-50 scale-95";
+                                } else {
+                                    cardClass += "bg-slate-900 border-slate-800 opacity-20"; // 理論上ここには来ない
+                                }
+
+                                return (
+                                    <button
+                                        key={number}
+                                        disabled={!isAvailable || isProcessing}
+                                        onClick={() => handleDraftPick(number)}
+                                        className={cardClass}
+                                    >
+                                        {number}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            }
+
+            // 3. バトル画面
+            if (gameState === 'battle') {
+                const phaseConfig = PHASES[currentPhase];
+                const totalRounds = 9;
+                const currentTotalRound = (currentPhase - 1) * 3 + roundInPhase;
+
+                return (
+                    <div className={`min-h-screen flex flex-col bg-slate-900 transition-colors duration-500 ${isReversal ? 'bg-yellow-900/20' : ''}`}>
+                        {/* ヘッダー: スコア & フェーズ情報 */}
+                        <div className="w-full bg-slate-800 border-b border-slate-700 p-2 md:p-4 flex justify-between items-center shadow-lg relative z-20">
+                            <div className="flex items-center gap-4">
+                                <div className="text-center">
+                                    <div className="text-xs text-indigo-400 font-bold">PLAYER</div>
+                                    <div className="text-3xl font-tech text-indigo-100">{score.player}</div>
+                                </div>
+                                <div className="text-center px-4">
+                                    <div className="text-xs text-slate-500">ROUND</div>
+                                    <div className="text-xl font-tech text-white">{currentTotalRound}<span className="text-slate-600">/9</span></div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-xs text-rose-400 font-bold">CPU</div>
+                                    <div className="text-3xl font-tech text-rose-100">{score.cpu}</div>
+                                </div>
+                            </div>
+
+                            <div className={`flex flex-col items-end ${phaseConfig.color}`}>
+                                <div className="flex items-center gap-2">
+                                    {phaseConfig.icon}
+                                    <span className="font-tech text-xl font-bold tracking-wider">{phaseConfig.name}</span>
+                                </div>
+                                <div className="text-xs md:text-sm text-slate-300">{phaseConfig.desc}</div>
+                            </div>
+                        </div>
+
+                        {/* バトルフィールド */}
+                        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden p-4">
+                            
+                            {/* Reversal エフェクト */}
+                            {isReversal && (
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 reversal-flash">
+                                    <div className="text-yellow-500 font-tech text-6xl md:text-9xl font-bold opacity-20 rotate-12 tracking-widest border-4 border-yellow-500 p-8">
+                                        REVERSAL
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* CPUの手札 (裏面) */}
+                            <div className="mb-8 flex gap-2">
+                                {cpuHand.map((_, i) => (
+                                    <div key={i} className="w-12 h-16 md:w-16 md:h-24 bg-slate-700 rounded border border-slate-600"></div>
+                                ))}
+                            </div>
+
+                            {/* 中央アリーナ */}
+                            <div className="flex items-center justify-center gap-8 md:gap-16 perspective-container mb-8 min-h-[200px]">
+                                {/* プレイヤーが出したカード */}
+                                <div className="relative">
+                                    {selectedCard ? (
+                                        <div className="card-anim-enter">
+                                            <Card 
+                                                number={selectedCard} 
+                                                owner="player" 
+                                                isWinner={battleResult === 'player'} 
+                                                isLoser={battleResult === 'cpu' || battleResult === 'draw' && false} 
+                                            />
+                                            <div className="absolute -bottom-8 left-0 right-0 text-center text-indigo-300 font-bold text-sm">YOU</div>
+                                        </div>
+                                    ) : (
+                                        <div className="w-20 h-28 md:w-24 md:h-36 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center">
+                                            <span className="text-slate-600 text-xs">PLACE CARD</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* VS / 結果表示 */}
+                                <div className="flex flex-col items-center justify-center w-24">
+                                    {battleResult ? (
+                                        <div className="animate-bounce">
+                                            {battleResult === 'player' && <div className="text-indigo-400 font-bold text-2xl font-tech">WIN</div>}
+                                            {battleResult === 'cpu' && <div className="text-rose-400 font-bold text-2xl font-tech">LOSE</div>}
+                                            {battleResult === 'draw' && <div className="text-slate-400 font-bold text-2xl font-tech">DRAW</div>}
+                                            {isReversal && <div className="text-yellow-500 text-xs font-bold mt-1 bg-yellow-900/50 px-2 py-1 rounded">REVERSAL!</div>}
+                                        </div>
+                                    ) : (
+                                        <div className="text-slate-600 font-tech text-xl">VS</div>
+                                    )}
+                                </div>
+
+                                {/* CPUが出したカード */}
+                                <div className="relative">
+                                    {cpuCard ? (
+                                        <div className="card-anim-enter">
+                                            <Card 
+                                                number={cpuCard} 
+                                                owner="enemy" 
+                                                isWinner={battleResult === 'cpu'} 
+                                                isLoser={battleResult === 'player' || battleResult === 'draw' && false}
+                                            />
+                                            <div className="absolute -bottom-8 left-0 right-0 text-center text-rose-300 font-bold text-sm">CPU</div>
+                                        </div>
+                                    ) : (
+                                        <div className="w-20 h-28 md:w-24 md:h-36 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center">
+                                            <span className="text-slate-600 text-xs">WAITING...</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* プレイヤー手札選択エリア */}
+                            <div className="mt-auto mb-4 w-full max-w-2xl bg-slate-800/80 backdrop-blur rounded-t-2xl border-t border-slate-700 p-6 flex flex-col items-center shadow-2xl transition-transform duration-300 transform translate-y-0">
+                                <div className="text-xs text-slate-400 mb-4 font-tech tracking-widest">SELECT COMMAND CARD</div>
+                                <div className="flex gap-4 md:gap-8 justify-center w-full">
+                                    {playerHand.map((num, i) => (
+                                        <Card 
+                                            key={`${currentPhase}-${roundInPhase}-${i}`}
+                                            number={num} 
+                                            owner="player" 
+                                            onClick={() => !selectedCard && handleBattle(num)}
+                                            disabled={!!selectedCard}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                );
+            }
+
+            // 4. 結果画面
+            if (gameState === 'result') {
+                const isPlayerWin = score.player > score.cpu;
+                const isDraw = score.player === score.cpu;
+
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-center">
+                        <div className="mb-8 scale-150">
+                            {isPlayerWin ? <IconTrophy size={64} className="text-yellow-400" /> : 
+                             isDraw ? <IconRefresh size={64} className="text-slate-400" /> :
+                             <IconSkull size={64} className="text-rose-500" />}
+                        </div>
+                        
+                        <h2 className="text-4xl md:text-6xl font-tech font-bold mb-2">
+                            {isPlayerWin ? <span className="text-yellow-400">VICTORY</span> : 
+                             isDraw ? <span className="text-slate-400">DRAW GAME</span> : 
+                             <span className="text-rose-500">DEFEAT</span>}
+                        </h2>
+
+                        <div className="flex items-center justify-center gap-8 my-8 text-4xl md:text-5xl font-tech font-bold">
+                            <div className="text-indigo-400 flex flex-col items-center">
+                                <span className="text-sm text-indigo-300/70 mb-2">YOU</span>
+                                {score.player}
+                            </div>
+                            <div className="text-slate-600">-</div>
+                            <div className="text-rose-400 flex flex-col items-center">
+                                <span className="text-sm text-rose-300/70 mb-2">CPU</span>
+                                {score.cpu}
+                            </div>
+                        </div>
+
+                        {/* 戦歴ログ簡易表示 */}
+                        <div className="w-full max-w-md bg-slate-800 rounded-lg p-4 mb-8 max-h-48 overflow-y-auto text-sm border border-slate-700 text-left">
+                            <h3 className="text-slate-400 border-b border-slate-600 pb-2 mb-2 sticky top-0 bg-slate-800">BATTLE LOG</h3>
+                            {battleLog.slice().reverse().map((log, i) => (
+                                <div key={i} className="flex justify-between py-1 border-b border-slate-700/50 last:border-0">
+                                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+                                        log.phase === 1 ? 'bg-red-900 text-red-200' :
+                                        log.phase === 2 ? 'bg-blue-900 text-blue-200' : 'bg-green-900 text-green-200'
+                                    }`}>
+                                        {log.phase === 1 ? 'P' : log.phase === 2 ? 'S' : 'B'}
+                                    </span>
+                                    <span className="text-slate-300">
+                                        {log.pVal} vs {log.cVal}
+                                    </span>
+                                    <span className="font-bold w-12 text-right">
+                                        {log.result === 'player' ? <span className="text-indigo-400">WIN</span> :
+                                         log.result === 'cpu' ? <span className="text-rose-400">LOSE</span> : 
+                                         <span className="text-slate-500">DRAW</span>}
+                                    </span>
+                                    {log.reversal && <span className="text-yellow-500 ml-2">⚠️</span>}
+                                </div>
+                            ))}
+                        </div>
+
+                        <button 
+                            onClick={startGame}
+                            className="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded font-tech tracking-wider border border-slate-500 transition-colors"
+                        >
+                            REBOOT SYSTEM
+                        </button>
+                    </div>
+                );
+            }
+
+            return null;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
