@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：14</title>
+    <title>Resource Strategy Card Battle：15</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
@@ -37,34 +37,35 @@
         
         .cyber-text { color: var(--neon-blue); text-shadow: 0 0 3px var(--neon-blue); }
 
-        /* レイアウト */
+        /* レイアウト修正: 比率を変更 */
         header { flex-shrink: 0; z-index: 50; }
         
+        /* カードエリアを縮小 (flex: 3.5) */
         .arena-panel { 
-            flex: 5; /* 画面の上半分 */
+            flex: 3.5; 
             display: flex; flex-direction: column; justify-content: center; 
             position: relative; border-bottom: 1px solid var(--neon-blue); 
             overflow: hidden; 
         }
         
+        /* 入力エリアを拡張 (flex: 6.5) */
         .input-panel { 
-            flex: 4; /* 画面の下半分 */
-            display: flex; flex-direction: row; /* 左右分割 */
+            flex: 6.5; 
+            display: flex; flex-direction: row; 
             background: rgba(8, 12, 20, 0.98); 
             overflow: hidden; 
             padding: 8px;
             gap: 8px;
         }
 
-        /* 左側の入力エリア */
         .input-controls {
             flex: 1;
             display: flex; flex-direction: column;
             overflow-y: auto;
             padding-right: 4px;
+            justify-content: center; /* コンテンツが少ない時も中央寄せ */
         }
 
-        /* 右側の決定ボタンエリア */
         .action-area {
             width: 80px;
             display: flex; flex-direction: column;
@@ -72,8 +73,7 @@
             flex-shrink: 0;
         }
 
-        /* カードデザイン */
-        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 98%; max-width: 400px; margin: 0 auto; }
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 98%; max-width: 360px; margin: 0 auto; }
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 8px; letter-spacing: 1px; color: #64748b; }
         
         .battle-card {
@@ -113,29 +113,27 @@
         }
         .anim-float { animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Input Controls */
         .control-block { 
-            display: flex; flex-direction: column; gap: 4px; 
-            padding: 6px; 
+            display: flex; flex-direction: column; gap: 2px; 
+            padding: 4px 8px; 
             background: rgba(255,255,255,0.03); 
             border-radius: 6px; 
-            margin-bottom: 6px; 
+            margin-bottom: 4px; 
             border-left-width: 3px;
+            flex-shrink: 0; /* 縮小防止 */
         }
         
-        .control-row { display: flex; align-items: center; justify-content: space-between; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; height: 26px; }
         .control-label { font-family: 'Rajdhani'; font-weight: bold; font-size: 14px; width: 60px; flex-shrink: 0; }
         .control-val { font-family: 'Black Ops One'; font-size: 20px; text-align: right; width: 60px; flex-shrink: 0; }
         
-        /* Slider */
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 24px; margin: 4px 0; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 24px; margin: 2px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #334155; border-radius: 3px; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; background: var(--neon-blue); margin-top: -7px; border-radius: 50%; box-shadow: 0 0 5px var(--neon-blue); border: 2px solid #fff; }
 
-        /* Buttons Row */
-        .btn-row { display: flex; gap: 6px; justify-content: space-between; margin-top: 2px; }
+        .btn-row { display: flex; gap: 6px; justify-content: space-between; margin-top: 2px; height: 32px; }
         .btn-mini {
-            flex: 1; height: 36px; /* Larger touch target */
+            flex: 1; height: 100%;
             background: rgba(30, 41, 59, 0.8); border: 1px solid #475569;
             color: #fff; font-family: 'Rajdhani'; font-weight: bold; font-size: 14px;
             display: flex; align-items: center; justify-content: center;
@@ -143,14 +141,13 @@
         }
         .btn-mini:active { background: var(--neon-blue); color: #000; border-color: #fff; }
 
-        /* Main Action Button (Right Side) */
         .btn-action-side {
             height: 100%; width: 100%;
             background: linear-gradient(180deg, rgba(0,247,255,0.1) 0%, rgba(0,247,255,0.05) 100%);
             border: 2px solid var(--neon-blue); 
             color: var(--neon-blue); 
             font-family: 'Black Ops One'; font-size: 18px;
-            writing-mode: vertical-rl; /* 縦書き */
+            writing-mode: vertical-rl;
             text-orientation: mixed;
             display: flex; align-items: center; justify-content: center; 
             text-shadow: 0 0 5px var(--neon-blue);
@@ -163,7 +160,7 @@
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
         
         .phase-title-text {
-            font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 4px; text-align: center;
+            font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 2px; text-align: center;
         }
 
     </style>
@@ -172,7 +169,6 @@
 
     <!-- Header -->
     <header class="flex justify-between items-center px-4 py-2 border-b border-blue-900/50 bg-gray-900/50 h-12">
-        <!-- Left: Info -->
         <div class="flex flex-col">
             <div class="text-[10px] text-gray-400 font-bold tracking-widest">
                 ROUND <span id="current-round" class="text-yellow-500 text-sm">1</span>/5
@@ -183,8 +179,6 @@
                 <span class="text-red-400">CPU: <span id="cpu-resource">1000</span></span>
             </div>
         </div>
-        
-        <!-- Right: Score -->
         <div class="flex items-center gap-3">
             <div class="text-center leading-none">
                 <div class="text-[8px] text-blue-400 font-bold">WIN</div>
@@ -198,7 +192,7 @@
         </div>
     </header>
 
-    <!-- Arena (Top) -->
+    <!-- Arena (Top) - Reduced Flex -->
     <main id="main-arena" class="arena-panel">
         <div class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto">
             <!-- CPU Row -->
@@ -212,8 +206,7 @@
                 </div>
             </div>
             
-            <!-- VS Divider / Message -->
-            <div class="h-6 flex items-center justify-center relative">
+            <div class="h-4 flex items-center justify-center relative">
                 <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-[10px] px-4 py-0.5 rounded-full border border-white shadow-xl animate-pulse absolute z-30">INITIATIVE WIN!</div>
             </div>
 
@@ -233,14 +226,13 @@
         <div id="p-dmg-float" class="dmg-float text-red-500" style="top:75%"></div>
     </main>
 
-    <!-- Input Panel (Bottom) - SPLIT LAYOUT -->
+    <!-- Input Panel (Bottom) - Expanded Flex -->
     <section id="input-panel" class="input-panel">
         
-        <!-- LEFT: Controls -->
         <div class="input-controls">
             <div class="phase-title-text" id="phase-title">PHASE 1: SPEED INPUT</div>
             
-            <!-- Phase 1: SPD -->
+            <!-- Phase 1 -->
             <div id="input-group-spd" class="w-full">
                 <div class="control-block border-purple-500">
                     <div class="control-row">
@@ -260,8 +252,9 @@
                 </div>
             </div>
 
-            <!-- Phase 2: HP/ATK/DEF -->
-            <div id="input-group-build" class="hidden w-full flex flex-col gap-1">
+            <!-- Phase 2: Expanded, No Scroll -->
+            <div id="input-group-build" class="hidden w-full flex flex-col gap-1 justify-center h-full">
+                
                 <!-- HP -->
                 <div class="control-block border-green-500">
                     <div class="control-row">
@@ -310,7 +303,7 @@
             </div>
         </div>
 
-        <!-- RIGHT: Action Button -->
+        <!-- RIGHT: Action -->
         <div class="action-area">
             <div class="text-[9px] text-center mb-1 text-gray-400">REMAIN</div>
             <div id="sheet-resource" class="text-center font-tech font-bold text-blue-400 text-lg mb-2">1000</div>
@@ -322,7 +315,7 @@
 
     </section>
 
-    <!-- OVERLAYS -->
+    <!-- Overlays -->
     <div id="result-overlay" class="fixed inset-0 bg-black/95 z-[200] hidden flex flex-col items-center justify-center p-6 text-center">
         <h1 id="res-title" class="text-4xl font-gaming text-white mb-6 cyber-text">VICTORY</h1>
         <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
@@ -384,7 +377,6 @@
             const cost = state.inputs.spd + state.inputs.hp + state.inputs.atk + state.inputs.def;
             const remaining = state.p.total - cost;
             
-            // 整数表示を徹底
             const displayRem = Math.floor(remaining);
             ui.res.innerText = displayRem;
             ui.topRes.innerText = displayRem;
