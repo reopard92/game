@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：19</title>
+    <title>Resource Strategy Card Battle：20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
@@ -298,11 +298,24 @@
         import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Config & Init ---
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
+        // ★★★ 以下の設定をご自身のFirebaseプロジェクトの設定に書き換えてください ★★★
+        const firebaseConfig = {
+          apiKey: "AIzaSyDBLlMDGCT3IO-tgIJkeFJIta6r-XB3zgs",
+          authDomain: "card-battle-game-415d1.firebaseapp.com",
+          projectId: "card-battle-game-415d1",
+          storageBucket: "card-battle-game-415d1.firebasestorage.app",
+          messagingSenderId: "355402716950",
+          appId: "1:355402716950:web:a9861080ba53bcdcba2237"
+        };
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+        // AIプレビュー環境用の自動フォールバック（削除可）
+        const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+
+        const app = initializeApp(configToUse);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'resource-strategy-card-battle';
         let userId = null;
         let roomId = null;
         let unsubscribeRoom = null;
@@ -451,9 +464,6 @@
                     initRound(); // Host start
                 }
                 if (role === 'guest' && data.status === 'playing' && state.round === 1 && state.phase === 1 && state.p.submitted === false && ui.wait.classList.contains('hidden')) {
-                    // Guest start logic implicitly handled by initRound call on join? 
-                    // Actually we need to init round once UI is ready.
-                    // Doing a simple check:
                     if(el('main-arena').children.length > 0) { /* UI exists */ }
                     else { initRound(); }
                 }
@@ -463,8 +473,6 @@
                     const myInput = role === 'host' ? data.hostInput : data.guestInput;
                     const oppInput = role === 'host' ? data.guestInput : data.hostInput;
 
-                    // Sync round info mainly handled locally but check
-                    
                     // Check Phase Resolution
                     if (myInput && oppInput) {
                         // Both submitted!
