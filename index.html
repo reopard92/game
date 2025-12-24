@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：16</title>
+    <title>Resource Strategy Card Battle：17</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
@@ -344,6 +344,21 @@
 
     </section>
 
+    <!-- Home Screen Overlay -->
+    <div id="home-screen" class="fixed inset-0 z-[300] bg-black/95 flex flex-col items-center justify-center p-6 text-center">
+        <h1 class="text-5xl font-gaming cyber-text mb-8">RESOURCE BATTLE</h1>
+        <div class="bg-gray-900/80 border border-blue-500/30 p-6 rounded-xl max-w-md w-full mb-8 text-left space-y-4">
+            <h2 class="text-xl font-bold text-yellow-500 border-b border-gray-700 pb-2">RULES</h2>
+            <ul class="text-sm text-gray-300 space-y-2 list-disc list-inside">
+                <li>総資産 <span class="text-blue-400">1000 PTS</span> を5ラウンドで配分して戦う</li>
+                <li><span class="text-purple-400">SPEED PHASE</span>: 速度で勝つと攻撃力1.5倍 & コスト30%還元</li>
+                <li><span class="text-green-400">BUILD PHASE</span>: 残りコストをHP・攻撃・防御に配分</li>
+                <li>HPが多い方がラウンド勝利 (3勝で勝利)</li>
+            </ul>
+        </div>
+        <button onclick="startGame()" class="w-full max-w-xs h-16 bg-blue-600 text-white font-bold text-2xl rounded-xl font-gaming shadow-[0_0_20px_#3b82f6] hover:bg-blue-500 transition-colors">GAME START</button>
+    </div>
+
     <!-- Overlays -->
     <div id="result-overlay" class="fixed inset-0 bg-black/95 z-[200] hidden flex flex-col items-center justify-center p-6 text-center">
         <h1 id="res-title" class="text-4xl font-gaming text-white mb-6 cyber-text">VICTORY</h1>
@@ -385,6 +400,11 @@
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
         };
+
+        function startGame() {
+            el('home-screen').classList.add('hidden');
+            initRound();
+        }
 
         function onInput(key, val) {
             state.inputs[key] = parseInt(val) || 0;
@@ -622,8 +642,20 @@
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             el('res-content').innerHTML = `
-                <div class="flex justify-between w-64 mx-auto border-b border-blue-900/50 pb-2"><span>YOU</span> <span class="font-bold cyber-text">${Math.floor(pHp)} HP</span></div>
-                <div class="flex justify-between w-64 mx-auto pt-2"><span>CPU</span> <span class="font-bold text-red-500">${Math.floor(cHp)} HP</span></div>
+                <div class="flex justify-between w-64 mx-auto border-b border-blue-900/50 pb-2">
+                    <span>YOU</span> 
+                    <div class="text-right">
+                        <span class="font-bold cyber-text block text-lg">${Math.floor(pHp)} HP</span>
+                        <span class="text-xs text-gray-400">REM: ${Math.floor(state.p.total)} PTS</span>
+                    </div>
+                </div>
+                <div class="flex justify-between w-64 mx-auto pt-2">
+                    <span>CPU</span> 
+                    <div class="text-right">
+                        <span class="font-bold text-red-500 block text-lg">${Math.floor(cHp)} HP</span>
+                        <span class="text-xs text-gray-400">REM: ${Math.floor(state.c.total)} PTS</span>
+                    </div>
+                </div>
             `;
             el('result-overlay').classList.remove('hidden');
         }
@@ -643,7 +675,7 @@
             initRound();
         }
 
-        window.onload = initRound;
+        // window.onload = initRound; // Removed to allow Home Screen start
     </script>
 </body>
 </html>
