@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：17</title>
+    <title>Resource Strategy Card Battle：18</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
@@ -423,8 +423,15 @@
             });
             el('real-hp').innerText = Math.ceil(state.inputs.hp * 0.5);
 
-            const cost = state.inputs.spd + state.inputs.hp + state.inputs.atk + state.inputs.def;
-            const remaining = state.p.total - cost;
+            // Cost Calculation Fix: Depends on phase
+            let currentCost = 0;
+            if (state.phase === 1) {
+                currentCost = state.inputs.spd;
+            } else {
+                currentCost = state.inputs.hp + state.inputs.atk + state.inputs.def;
+            }
+
+            const remaining = state.p.total - currentCost;
             
             const displayRem = Math.floor(remaining);
             ui.res.innerText = displayRem;
