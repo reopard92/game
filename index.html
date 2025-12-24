@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：21</title>
+    <title>Resource Strategy Card Battle：24</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -44,20 +44,29 @@
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; justify-content: center; }
         .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
-        /* カード */
-        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 310px; margin: 0 auto; position: relative; z-index: 10;} /* z-index added */
+        /* カード修正: 縦幅縮小 */
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} /* max-width縮小 */
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 7px; letter-spacing: 1px; color: #64748b; }
-        .battle-card { aspect-ratio: 4/5; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; }
+        .battle-card { aspect-ratio: 1/1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; } /* アスペクト比を4/5から1/1に変更 */
         .card-spd { border-color: var(--color-spd); } .card-hp { border-color: var(--color-hp); } .card-atk { border-color: var(--color-atk); } .card-def { border-color: var(--color-def); }
         .card-label { position: absolute; top: 1px; font-size: 7px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
-        .card-val { font-family: 'Black Ops One', cursive; font-size: 1.3rem; z-index: 10; text-shadow: 0 0 3px currentColor; transition: transform 0.2s; margin-top: 4px; }
-        .card-icon { position: absolute; bottom: 1px; font-size: 0.8rem; opacity: 0.5; }
+        .card-val { font-family: 'Black Ops One', cursive; font-size: 1.1rem; z-index: 10; text-shadow: 0 0 3px currentColor; transition: transform 0.2s; margin-top: 2px; } /* フォント微調整 */
+        .card-icon { position: absolute; bottom: 1px; font-size: 0.7rem; opacity: 0.5; } /* アイコンサイズ微調整 */
+        
         .battle-card.hidden-card { background: #0f172a; border-color: #475569; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.3) 5px, rgba(0,0,0,0.3) 10px); }
         .battle-card.hidden-card .card-val, .battle-card.hidden-card .card-label, .battle-card.hidden-card .card-icon { opacity: 0; }
         .battle-card.hidden-card::after { content: '?'; position: absolute; font-family: 'Black Ops One'; font-size: 1.5rem; color: #64748b; }
         .battle-card.active-turn { transform: scale(1.1); z-index: 20; box-shadow: 0 0 15px var(--neon-blue); border-color: var(--neon-blue); }
         .val-boost { color: #ffff00; text-shadow: 0 0 10px #ffff00; transform: scale(1.3); transition: transform 0.2s; }
 
+        /* 4P Mode Specifics */
+        .opp-container-4p { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; padding: 0 4px; }
+        .opp-card-4p { background: #0f172a; border: 1px solid #334155; border-radius: 4px; padding: 4px; display: flex; flex-direction: column; align-items: center; position: relative; transition: all 0.2s; }
+        .opp-card-4p.targetable { border-color: var(--neon-blue); cursor: pointer; animation: pulse-blue 1s infinite; box-shadow: 0 0 10px rgba(0,247,255,0.3); }
+        .opp-card-4p.targeted { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .opp-card-4p.my-target { border: 2px solid var(--neon-blue); background: rgba(0, 247, 255, 0.1); }
+        @keyframes pulse-blue { 0%,100% { box-shadow: 0 0 5px var(--neon-blue); } 50% { box-shadow: 0 0 15px var(--neon-blue); } }
+        
         /* Animation */
         @keyframes floatUp { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -100%) scale(1.5); opacity: 1; } 100% { transform: translate(-50%, -200%) scale(1); opacity: 0; } }
         .dmg-float { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: 'Black Ops One'; font-size: 2.5rem; color: var(--neon-blue); text-shadow: 0 0 10px currentColor; pointer-events: none; z-index: 100; white-space: nowrap; }
@@ -108,6 +117,8 @@
             100% { transform: scale(1.0); opacity: 1; }
         }
         .adv-anim { animation: flash-win 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards; }
+        
+        .name-input { background: transparent; border: 2px solid var(--neon-blue); color: white; font-family: 'Black Ops One'; font-size: 1.5rem; text-align: center; padding: 10px; border-radius: 8px; margin-bottom: 20px; width: 80%; max-width: 300px; }
     </style>
 </head>
 <body class="select-none">
@@ -121,7 +132,7 @@
             <div class="text-[10px] font-tech font-bold tracking-wider">
                 <span class="text-blue-400">YOU: <span id="top-resource">1000</span></span>
                 <span class="text-gray-500 mx-1">|</span>
-                <span class="text-red-400">OPP: <span id="cpu-resource">1000</span></span>
+                <span class="text-red-400" id="header-opp-label">OPP: <span id="cpu-resource">1000</span></span>
             </div>
         </div>
         <div class="flex items-center gap-3">
@@ -140,8 +151,10 @@
     <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
         <div id="phase-timer" class="phase-timer hidden">15</div>
+        <div id="notice-msg" class="absolute top-2 w-full text-center text-[10px] text-yellow-400 font-bold z-50"></div>
 
-        <div class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10">
+        <!-- 1vs1 / CPU Arena -->
+        <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10">
             <!-- CPU Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
@@ -165,6 +178,25 @@
                     <div class="battle-card card-hp hidden-card" id="card-p-hp-wrap"><div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="card-p-hp">-</div><div class="card-icon">♥</div></div>
                     <div class="battle-card card-atk hidden-card" id="card-p-atk-wrap"><div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="card-p-atk">-</div><div class="card-icon">⚔</div></div>
                     <div class="battle-card card-def hidden-card" id="card-p-def-wrap"><div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="card-p-def">-</div><div class="card-icon">🛡</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4P Arena -->
+        <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
+            <!-- Opponents Container -->
+            <div class="opp-container-4p" id="opp-list-4p">
+                <!-- Opponent cards will be injected here -->
+            </div>
+
+            <!-- Self Player (Simplified) -->
+            <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
+                <div class="card-row-label text-blue-500 w-4">YOU</div>
+                <div class="card-grid">
+                    <div class="battle-card card-spd"><div class="card-label text-purple-300">SPD</div><div class="card-val text-purple-300" id="4p-p-spd">-</div><div class="card-icon">⚡</div></div>
+                    <div class="battle-card card-hp"><div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="4p-p-hp">-</div><div class="card-icon">♥</div></div>
+                    <div class="battle-card card-atk"><div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="4p-p-atk">-</div><div class="card-icon">⚔</div></div>
+                    <div class="battle-card card-def"><div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="4p-p-def">-</div><div class="card-icon">🛡</div></div>
                 </div>
             </div>
         </div>
@@ -253,6 +285,13 @@
         </div>
     </section>
 
+    <!-- Name Entry Screen (New) -->
+    <div id="name-screen" class="overlay p-6 text-center">
+        <h1 class="text-4xl font-gaming cyber-text mb-8">IDENTITY</h1>
+        <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
+        <button onclick="submitName()" class="lobby-btn">CONFIRM</button>
+    </div>
+
     <!-- Wait Overlay (Online) -->
     <div id="wait-overlay" class="overlay hidden">
         <div class="text-2xl font-gaming cyber-text animate-pulse mb-4">OPPONENT DECIDING...</div>
@@ -260,7 +299,7 @@
     </div>
 
     <!-- Home Screen -->
-    <div id="home-screen" class="overlay p-6 text-center">
+    <div id="home-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-5xl font-gaming cyber-text mb-8">RESOURCE BATTLE</h1>
         <div class="w-full max-w-sm space-y-4">
             <button onclick="startCpuGame()" class="lobby-btn">CPU BATTLE</button>
@@ -277,7 +316,7 @@
                 <li><b class="text-green-400">フェーズ2 (BUILD)</b>：
                     <br><span class="pl-4">残りを <b class="text-green-500">HP</b>・<b class="text-red-500">攻撃</b>・<b class="text-blue-500">防御</b> に配分</span>
                 </li>
-                <li><b class="text-gray-500">注</b>：HPコストは <b class="text-white">50%</b> の効率で変換されます</li>
+                <li><b class="text-gray-500">注</b>：4人対戦では速度順にターゲット指定</li>
             </ul>
         </div>
     </div>
@@ -286,11 +325,14 @@
     <div id="lobby-screen" class="overlay hidden p-6">
         <h2 class="text-3xl font-gaming cyber-text mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
+            <div class="flex gap-2 mb-4">
+                <button onclick="createRoom(2)" class="lobby-btn text-sm">CREATE 1vs1</button>
+                <button onclick="createRoom(4)" class="lobby-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
+            </div>
             <div class="text-xs text-gray-400 mb-2">WAITING ROOMS</div>
             <div id="room-list" class="scroll-list">
                 <div class="text-center text-gray-600 py-4">Scanning...</div>
             </div>
-            <button onclick="createRoom()" class="lobby-btn mt-4">CREATE NEW ROOM</button>
             <button onclick="backToHome()" class="text-gray-500 text-sm mt-4 underline">BACK</button>
         </div>
     </div>
@@ -298,8 +340,10 @@
     <!-- Waiting for Guest Screen -->
     <div id="host-wait-screen" class="overlay hidden p-6 text-center">
         <h2 class="text-2xl font-gaming cyber-text mb-2">ROOM CREATED</h2>
-        <div class="text-4xl font-bold text-white mb-8 tracking-widest" id="room-id-disp">...</div>
-        <div class="text-gray-400 animate-pulse">WAITING FOR CHALLENGER...</div>
+        <div class="text-4xl font-bold text-white mb-2 tracking-widest" id="room-id-disp">...</div>
+        <div class="text-sm text-blue-300 mb-8 font-mono" id="room-type-disp">TYPE: 1vs1</div>
+        <div class="text-gray-400 animate-pulse mb-4">WAITING FOR PLAYERS...</div>
+        <div id="joined-count" class="text-xl font-bold text-white">1 / ?</div>
         <button onclick="location.reload()" class="mt-12 text-red-500 text-sm border border-red-900 px-4 py-2 rounded">CANCEL</button>
     </div>
 
@@ -321,7 +365,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Config & Init ---
         const firebaseConfig = {
@@ -338,6 +382,7 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'resource-strategy-card-battle';
         let userId = null;
+        let userName = "PLAYER";
         let roomId = null;
         let unsubscribeRoom = null;
 
@@ -351,14 +396,23 @@
         const MAX_ROUNDS = 5;
         const START_PTS = 1000;
         let isOnline = false;
-        let role = 'host'; 
+        let role = 'host'; // host, guest, or cpu
+        let maxPlayers = 2; // 2 or 4
         let timerInterval = null;
 
+        // Shared State
         let state = {
             round: 1,
-            phase: 1, 
+            phase: 1, // 1: Speed, 1.5: TargetPick(4P), 2: Build, 3: Battle
+            // 1v1 Data
             p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
             c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
+            // 4P Data
+            players: {}, // { uid: { name, spd, hp, atk, def, total, wins, ready } }
+            targets: {}, // { attackerId: targetId }
+            pickOrder: [], // [uid1, uid2, uid3, uid4] sorted by speed
+            pickIndex: 0,
+            
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 }
         };
 
@@ -376,13 +430,27 @@
             wait: el('wait-overlay'),
             timer: el('phase-timer'),
             
+            // 1v1 refs
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
             
+            // 4P refs
+            oppContainer: el('opp-list-4p'),
+            
             blocks: {
                 spd: el('blk-spd'), hp: el('blk-hp'), atk: el('blk-atk'), def: el('blk-def')
+            }
+        };
+
+        // --- Name Input ---
+        window.submitName = () => {
+            const input = el('player-name-input').value.trim();
+            if (input) {
+                userName = input.toUpperCase().substr(0, 8);
+                el('name-screen').classList.add('hidden');
+                el('home-screen').classList.remove('hidden');
             }
         };
 
@@ -390,7 +458,10 @@
         window.startCpuGame = () => {
             isOnline = false;
             role = 'cpu';
+            maxPlayers = 2;
             el('home-screen').classList.add('hidden');
+            el('arena-1v1').classList.remove('hidden');
+            el('arena-4p').classList.add('hidden');
             initRound();
         };
 
@@ -411,17 +482,24 @@
             const listEl = el('room-list');
             listEl.innerHTML = '<div class="text-center text-gray-500">Searching...</div>';
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
-            const q = query(roomsRef);
+            const q = query(roomsRef); // Get all, filter client side for simplicity/cleanup
             try {
                 const snapshot = await getDocs(q);
                 let html = '';
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.status === 'waiting') {
+                        const cur = data.players ? data.players.length : 1;
+                        const max = data.maxPlayers || 2;
+                        const typeLabel = max === 4 ? '<span class="text-purple-400 font-bold">4P</span>' : '<span class="text-blue-400">1v1</span>';
                         html += `
                             <div class="room-item">
-                                <span class="text-xs text-blue-300 font-mono">ROOM #${doc.id.substr(0,4)}</span>
-                                <button onclick="joinRoom('${doc.id}')" class="join-btn">JOIN</button>
+                                <div>
+                                    <span class="text-xs text-gray-400 font-mono">#${doc.id.substr(0,4)}</span>
+                                    ${typeLabel}
+                                    <span class="text-xs ml-2">${cur}/${max}</span>
+                                </div>
+                                <button onclick="joinRoom('${doc.id}', ${max})" class="join-btn">JOIN</button>
                             </div>
                         `;
                     }
@@ -433,39 +511,67 @@
             }
         }
 
-        window.createRoom = async () => {
+        window.createRoom = async (max = 2) => {
             role = 'host';
             isOnline = true;
+            maxPlayers = max;
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
             const newRoomRef = doc(roomsRef);
             roomId = newRoomRef.id;
+            
             const roomData = {
                 hostId: userId,
-                guestId: null,
+                maxPlayers: max,
                 status: 'waiting',
+                players: [userId],
+                playerData: {
+                    [userId]: { name: userName, ready: false }
+                },
                 round: 1,
                 phase: 1,
-                hostInput: null,
-                guestInput: null,
+                targets: {},
                 updatedAt: serverTimestamp()
             };
+            
             await setDoc(newRoomRef, roomData);
             el('lobby-screen').classList.add('hidden');
             el('host-wait-screen').classList.remove('hidden');
             el('room-id-disp').innerText = roomId.substr(0,4);
+            el('room-type-disp').innerText = `TYPE: ${max} PLAYERS`;
+            el('joined-count').innerText = `1 / ${max}`;
             subscribeRoom(roomId);
         };
 
-        window.joinRoom = async (id) => {
+        window.joinRoom = async (id, max) => {
             role = 'guest';
             isOnline = true;
             roomId = id;
+            maxPlayers = max;
+            
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            await updateDoc(roomRef, {
-                guestId: userId,
-                status: 'playing',
-                guestInput: null 
-            });
+            // Transaction-like update would be better but keeping simple:
+            // Fetch first to append
+            const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+            if (snap.empty) return alert("Room gone");
+            
+            const data = snap.docs[0].data();
+            if (data.players.includes(userId)) {
+                 // Already in
+            } else if (data.players.length < data.maxPlayers) {
+                const newPlayers = [...data.players, userId];
+                const newPD = { ...data.playerData, [userId]: { name: userName, ready: false } };
+                const updates = { players: newPlayers, playerData: newPD };
+                if (newPlayers.length >= data.maxPlayers) {
+                    updates.status = 'playing';
+                    // init 4p state if needed
+                    updates.round = 1;
+                    updates.phase = 1;
+                }
+                await updateDoc(roomRef, updates);
+            } else {
+                return alert("Room Full");
+            }
+            
             el('lobby-screen').classList.add('hidden');
             subscribeRoom(roomId);
         };
@@ -475,51 +581,189 @@
             unsubscribeRoom = onSnapshot(roomRef, (doc) => {
                 const data = doc.data();
                 if (!data) return;
-                if (data.status === 'playing' && el('host-wait-screen').classList.contains('hidden') === false) {
-                    el('host-wait-screen').classList.add('hidden');
-                    initRound(); 
-                }
-                if (role === 'guest' && data.status === 'playing' && state.round === 1 && state.phase === 1 && state.p.submitted === false && ui.wait.classList.contains('hidden')) {
-                    if(el('main-arena').children.length > 0) { } else { initRound(); }
-                }
-                if (isOnline && data.status === 'playing') {
-                    const myInput = role === 'host' ? data.hostInput : data.guestInput;
-                    const oppInput = role === 'host' ? data.guestInput : data.hostInput;
-                    if (myInput && oppInput) {
-                        if (!state.p.resolved) {
-                            state.p.resolved = true; 
-                            ui.wait.classList.add('hidden');
-                            state.c.spd = oppInput.spd;
-                            state.c.hp = oppInput.hp;
-                            state.c.atk = oppInput.atk;
-                            state.c.def = oppInput.def;
-                            state.c.total = oppInput.total; 
-                            if (state.phase === 1) resolvePhase1();
-                            else resolvePhase2();
+                
+                // Lobby Wait Logic
+                if (el('host-wait-screen').classList.contains('hidden') === false) {
+                    el('joined-count').innerText = `${data.players.length} / ${data.maxPlayers}`;
+                    if (data.status === 'playing') {
+                        el('host-wait-screen').classList.add('hidden');
+                        
+                        // Switch UI Mode
+                        if (maxPlayers === 4) {
+                            el('arena-1v1').classList.add('hidden');
+                            el('arena-4p').classList.remove('hidden');
+                            state.players = {}; // Init local mirror
+                            data.players.forEach(pid => {
+                                state.players[pid] = { 
+                                    name: data.playerData[pid].name, 
+                                    total: START_PTS, wins: 0,
+                                    spd: 0, hp: 0, atk: 0, def: 0
+                                };
+                            });
+                        } else {
+                            el('arena-1v1').classList.remove('hidden');
+                            el('arena-4p').classList.add('hidden');
                         }
-                    } else if (myInput) {
-                        ui.wait.classList.remove('hidden');
-                        toggleInputs(false); // Lock input while waiting
+                        
+                        initRound(); 
+                    }
+                    return;
+                }
+
+                // In-Game Logic
+                if (data.status === 'playing') {
+                    if (maxPlayers === 2) {
+                        handle1v1Update(data);
                     } else {
-                        state.p.resolved = false;
-                        ui.wait.classList.add('hidden');
+                        handle4pUpdate(data);
                     }
                 }
             });
         }
 
+        // --- 1vs1 Logic ---
+        function handle1v1Update(data) {
+            const oppId = data.players.find(id => id !== userId);
+            const myData = data.playerData[userId];
+            const oppData = data.playerData[oppId];
+            
+            // Name Update
+            if (oppData && oppData.name) el('header-opp-label').innerHTML = `OPP: ${oppData.name} <span id="cpu-resource"></span>`;
+
+            // Sync Phase
+            if (myData && oppData && myData.input && oppData.input) {
+                if (!state.p.resolved) {
+                    state.p.resolved = true;
+                    ui.wait.classList.add('hidden');
+                    // Sync Opponent Local State
+                    state.c.spd = oppData.input.spd || 0;
+                    state.c.hp = oppData.input.hp || 0;
+                    state.c.atk = oppData.input.atk || 0;
+                    state.c.def = oppData.input.def || 0;
+                    state.c.total = oppData.input.total || state.c.total;
+                    
+                    if (state.phase === 1) resolvePhase1();
+                    else resolvePhase2();
+                }
+            } else if (myData && myData.input) {
+                ui.wait.classList.remove('hidden');
+                toggleInputs(false);
+            } else {
+                state.p.resolved = false;
+                ui.wait.classList.add('hidden');
+            }
+        }
+
+        // --- 4P Logic ---
+        function handle4pUpdate(data) {
+            // Update local players state (except Self inputs usually)
+            data.players.forEach(pid => {
+                if (!state.players[pid]) state.players[pid] = {};
+                // Sync public data
+                const pd = data.playerData[pid];
+                if (pd) {
+                    state.players[pid].name = pd.name;
+                    state.players[pid].wins = pd.wins || 0;
+                    state.players[pid].total = pd.total || state.players[pid].total; // Total might be updated at end of round
+                    if (pd.phase1) state.players[pid].spd = pd.phase1.spd;
+                    if (pd.phase2) {
+                        state.players[pid].hp = pd.phase2.hp;
+                        state.players[pid].atk = pd.phase2.atk;
+                        state.players[pid].def = pd.phase2.def;
+                    }
+                }
+            });
+
+            state.targets = data.targets || {};
+            state.pickOrder = data.pickOrder || [];
+            state.pickIndex = data.pickIndex || 0;
+
+            render4PArena();
+
+            // Phase Control
+            // 1. Waiting for Speed Inputs
+            const allPhase1 = data.players.every(pid => data.playerData[pid].phase1);
+            if (state.phase === 1 && allPhase1 && !state.p.resolved) {
+                state.p.resolved = true;
+                ui.wait.classList.add('hidden');
+                resolvePhase1_4P(data);
+            }
+
+            // 2. Target Picking Phase
+            if (state.phase === 1.5) {
+                ui.title.innerText = "PHASE 1.5: TARGET ACQUISITION";
+                ui.btn.innerText = "WAITING...";
+                ui.btn.disabled = true;
+                
+                const currentPicker = state.pickOrder[state.pickIndex];
+                if (currentPicker === userId) {
+                    el('notice-msg').innerText = "YOUR TURN: SELECT TARGET";
+                    // Interaction is handled by clicks on cards
+                } else {
+                    const pickerName = state.players[currentPicker]?.name || '???';
+                    el('notice-msg').innerText = `${pickerName} IS SELECTING...`;
+                }
+
+                if (state.pickIndex >= 4) {
+                    state.phase = 2;
+                    state.p.submitted = false;
+                    state.p.resolved = false;
+                    el('notice-msg').innerText = "";
+                    ui.p1.classList.add('hidden');
+                    ui.p2.classList.remove('hidden');
+                    ui.title.innerText = "PHASE 2: BUILD UNIT";
+                    ui.btn.innerText = "ENGAGE";
+                    ui.btn.disabled = false;
+                    toggleInputs(true);
+                    updateUI();
+                    startTimer(15);
+                }
+            }
+
+            // 3. Waiting for Build Inputs
+            const allPhase2 = data.players.every(pid => data.playerData[pid].phase2);
+            if (state.phase === 2 && allPhase2 && !state.p.resolved) {
+                state.p.resolved = true;
+                ui.wait.classList.add('hidden');
+                resolvePhase2_4P(data);
+            }
+        }
+
         async function sendInput(inputData) {
             if (!isOnline) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            const payload = { ...inputData, total: state.p.total };
-            if (role === 'host') await updateDoc(roomRef, { hostInput: payload });
-            else await updateDoc(roomRef, { guestInput: payload });
+            
+            if (maxPlayers === 2) {
+                // Legacy 1v1 structure logic adapted
+                const updateKey = `playerData.${userId}.input`;
+                await updateDoc(roomRef, { [updateKey]: { ...inputData, total: state.p.total } });
+            } else {
+                // 4P Logic
+                let updateKey = "";
+                let payload = {};
+                if (state.phase === 1) {
+                    updateKey = `playerData.${userId}.phase1`;
+                    payload = { spd: inputData.spd };
+                } else {
+                    updateKey = `playerData.${userId}.phase2`;
+                    payload = { ...inputData, total: state.p.total };
+                }
+                await updateDoc(roomRef, { [updateKey]: payload });
+            }
         }
 
-        async function clearRoomInputs() {
-            if (!isOnline || role !== 'host') return; 
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            await updateDoc(roomRef, { hostInput: null, guestInput: null });
+        // --- Helper: Disable/Enable Inputs ---
+        function toggleInputs(enable) {
+            const pointerEvent = enable ? 'auto' : 'none';
+            const opacity = enable ? '1' : '0.5';
+            
+            ['spd', 'hp', 'atk', 'def'].forEach(k => {
+                if(ui.blocks[k]) {
+                    ui.blocks[k].style.pointerEvents = pointerEvent;
+                    ui.blocks[k].style.opacity = opacity;
+                }
+            });
+            ui.btn.disabled = !enable;
         }
 
         // --- Timer Logic ---
@@ -546,20 +790,6 @@
         function stopTimer() {
             clearInterval(timerInterval);
             ui.timer.classList.add('hidden');
-        }
-
-        // --- Helper: Disable/Enable Inputs ---
-        function toggleInputs(enable) {
-            const pointerEvent = enable ? 'auto' : 'none';
-            const opacity = enable ? '1' : '0.5';
-            
-            ['spd', 'hp', 'atk', 'def'].forEach(k => {
-                if(ui.blocks[k]) {
-                    ui.blocks[k].style.pointerEvents = pointerEvent;
-                    ui.blocks[k].style.opacity = opacity;
-                }
-            });
-            ui.btn.disabled = !enable;
         }
 
         // --- Game Logic ---
@@ -590,7 +820,7 @@
             const displayRem = Math.floor(remaining);
             ui.res.innerText = displayRem;
             ui.topRes.innerText = displayRem;
-            ui.cpuRes.innerText = Math.floor(state.c.total); 
+            if (maxPlayers === 2) ui.cpuRes.innerText = Math.floor(state.c.total); 
             
             if (remaining < 0) {
                 ui.res.classList.add('text-red-500');
@@ -599,7 +829,7 @@
                 return false;
             } else {
                 ui.res.classList.remove('text-red-500');
-                ui.btn.disabled = false;
+                if (state.phase !== 1.5) ui.btn.disabled = false;
                 ui.err.innerText = "";
                 return true;
             }
@@ -620,6 +850,21 @@
             toggleInputs(true); 
 
             if(!isOnline) generateCPU();
+            if (maxPlayers === 4) {
+                 // Clear old inputs on server for new round?
+                 // Usually handled by incrementing round and ignoring old data, but explicit clear is safer
+                 if (role === 'host' && isOnline) {
+                     // Cleanup 4P specific round data
+                     const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                     // We need to keep 'total' and 'wins' but clear phase1/phase2 inputs
+                     // This is complex in Firestore 'update'. We will rely on overwriting.
+                 }
+                 render4PArena();
+            } else {
+                 // 1v1 Init
+                 if (isOnline && role === 'host') clearRoomInputs();
+            }
+
             updateUI();
             startTimer(15);
         }
@@ -664,8 +909,9 @@
             }
         }
 
+        // --- 1v1 Resolve ---
         function resolvePhase1() {
-            // Reset visuals
+            // Visual Reset
             ['spd','hp','atk','def'].forEach(k => {
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
@@ -684,15 +930,12 @@
 
             if(!isOnline) state.c.total -= state.c.spd;
 
-            // Dramatic Reveal
+            // Reveal
             ui.btn.innerText = "REVEALING...";
-            
-            // Step 1: Open Cards
             setTimeout(() => {
                 ui.cP.spd.innerText = state.p.spd;
                 ui.cC.spd.innerText = state.c.spd;
                 
-                // Logic
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
                     state.pAdv = true;
@@ -702,7 +945,6 @@
                     state.c.total += Math.ceil(state.c.spd * 0.3);
                 }
 
-                // Step 2: Show Advantage
                 setTimeout(() => {
                     if (state.pAdv || state.cAdv) {
                         el('adv-badge').classList.remove('hidden');
@@ -710,17 +952,14 @@
                         el('adv-badge').className = state.pAdv ? 
                             "bg-blue-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim" :
                             "bg-red-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim";
-                        
                         setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
                     }
                 }, 600);
-
             }, 500);
 
             state.phase = 2;
             state.p.submitted = false;
             state.p.resolved = false;
-            
             if(isOnline && role === 'host') clearRoomInputs();
 
             setTimeout(() => {
@@ -731,12 +970,30 @@
                 toggleInputs(true); 
                 updateUI();
                 startTimer(15);
-            }, 3000); // More time to see result
+            }, 3000);
+        }
+
+        async function clearRoomInputs() {
+             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+             if (maxPlayers === 2) {
+                 await updateDoc(roomRef, { 'playerData': { [userId]: { input: null }, [Object.keys(state.players || {}).find(k=>k!==userId) || 'guest']: { input: null } } }); 
+                 // Actually this is tricky for 2P structure. 
+                 // Simplified: Resetting inputs in 1v1 is done by writing null to the fields
+                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                 if(!snap.empty) {
+                     const d = snap.docs[0].data();
+                     const updates = {};
+                     d.players.forEach(p => updates[`playerData.${p}.input`] = null);
+                     await updateDoc(roomRef, updates);
+                 }
+             } else {
+                 // 4P cleanup if needed, but we separate phase1/phase2 fields so less collision
+             }
         }
 
         function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
-            if(isOnline && role === 'host') clearRoomInputs();
+            // 1v1 cleanup handled above or naturally
             startBattleSequence();
         }
 
@@ -747,11 +1004,6 @@
             const cMult = state.cAdv ? 1.5 : 1.0;
             const pAtkFinal = Math.ceil(state.p.atk * pMult);
             const cAtkFinal = Math.ceil(state.c.atk * cMult);
-
-            if(state.pAdv || state.cAdv) {
-                el('adv-badge').classList.remove('hidden');
-                el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.5" : "OPP: ATK x1.5";
-            }
 
             const seq = [
                 { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
@@ -786,6 +1038,221 @@
             seq.forEach(s => setTimeout(s.f, s.t));
         }
 
+        // --- 4P Resolve ---
+        async function resolvePhase1_4P(data) {
+            // Sort by Speed
+            const pIds = data.players;
+            const speeds = pIds.map(pid => ({ id: pid, spd: state.players[pid].spd }));
+            // Sort descending. Random tie break.
+            speeds.sort((a,b) => b.spd - a.spd || Math.random() - 0.5);
+            
+            // Refund Bonus
+            // In 4P, if your speed is high, you get refund logic? 
+            // Rule says: "Higher number -> Attack x1.5 & 30% Refund".
+            // Since target is unknown, let's apply refund if you are in top 50%? 
+            // OR: Wait until target is picked. If Spd > Target.Spd -> Refund.
+            
+            if (role === 'host') {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                await updateDoc(roomRef, {
+                    pickOrder: speeds.map(s => s.id),
+                    pickIndex: 0,
+                    targets: {}
+                });
+            }
+
+            state.phase = 1.5; // Trigger Target Pick UI
+            render4PArena(); // Show speeds
+        }
+
+        window.pickTarget = async (targetId) => {
+            if (state.phase !== 1.5) return;
+            const currentPicker = state.pickOrder[state.pickIndex];
+            if (currentPicker !== userId) return;
+            
+            // Validate: Can't pick if already targeted
+            const alreadyTargeted = Object.values(state.targets).includes(targetId);
+            if (alreadyTargeted) return; // Should be handled by UI disabled state, but safety check
+
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+            const newTargets = { ...state.targets, [userId]: targetId };
+            
+            // Calculate Refund Here immediately for self? Or wait for server?
+            // Let's do it on server or next sync.
+            // Check Speed advantage
+            const mySpd = state.players[userId].spd;
+            const tSpd = state.players[targetId].spd;
+            if (mySpd > tSpd) {
+                state.p.total += Math.ceil(mySpd * 0.3); // Refund
+            }
+
+            await updateDoc(roomRef, {
+                targets: newTargets,
+                pickIndex: state.pickIndex + 1
+            });
+        }
+
+        function resolvePhase2_4P(data) {
+            state.phase = 3;
+            // 4P Battle Logic
+            // Calculate damages locally for display
+            // Everyone is both attacker and defender
+            
+            let battleLog = [];
+            
+            data.players.forEach(attackerId => {
+                const targetId = state.targets[attackerId];
+                if (!targetId) return; // Should not happen
+                
+                const atkP = state.players[attackerId];
+                const defP = state.players[targetId];
+                
+                // Bonus Check
+                const hasAdvantage = atkP.spd > defP.spd;
+                const finalAtk = Math.ceil(atkP.atk * (hasAdvantage ? 1.5 : 1.0));
+                const dmg = Math.max(0, finalAtk - defP.def);
+                
+                // Update HP
+                state.players[targetId].currHp = (state.players[targetId].hp) - dmg;
+                
+                battleLog.push({ atk: attackerId, def: targetId, dmg: dmg, adv: hasAdvantage });
+            });
+            
+            // Visualize 4P Battle (Simplified)
+            // 1. Reveal All Stats
+            el('4p-p-spd').innerText = state.players[userId].spd;
+            el('4p-p-hp').innerText = state.players[userId].hp;
+            el('4p-p-atk').innerText = state.players[userId].atk;
+            el('4p-p-def').innerText = state.players[userId].def;
+            render4PArena(true); // Reveal opponents
+
+            // 2. Show Damage floats
+            setTimeout(() => {
+                battleLog.forEach(log => {
+                    // If I took damage
+                    if (log.def === userId) {
+                         const attackerName = state.players[log.atk].name;
+                         hit('p', log.dmg); // Red float on me
+                         el('notice-msg').innerText = `${attackerName} HIT YOU FOR ${log.dmg}!`;
+                    }
+                    // If I dealt damage
+                    if (log.atk === userId) {
+                        // Find the target card and float blue
+                        // Since we don't have individual IDs for dynamic cards easily in this simplified renderer,
+                        // we'll just show a generic float or notice.
+                        const targetName = state.players[log.def].name;
+                        el('notice-msg').innerText = `YOU HIT ${targetName} FOR ${log.dmg}!`;
+                    }
+                });
+            }, 1500);
+
+            // 3. End Round
+            setTimeout(() => {
+                if (role === 'host') {
+                    // Calculate Wins
+                    const pIds = data.players;
+                    // Sort by remaining HP? Or just surviving? 
+                    // Rule: "HPが多い方がラウンド勝利" (Whoever has more HP wins round).
+                    // In 4P, we can give a win to top 2? Or just 1 winner?
+                    // Let's say top HP gets a win point.
+                    
+                    let bestHp = -9999;
+                    pIds.forEach(pid => {
+                        const hp = state.players[pid].currHp !== undefined ? state.players[pid].currHp : state.players[pid].hp;
+                        if (hp > bestHp) bestHp = hp;
+                    });
+                    
+                    const winners = pIds.filter(pid => {
+                        const hp = state.players[pid].currHp !== undefined ? state.players[pid].currHp : state.players[pid].hp;
+                        return hp === bestHp;
+                    });
+                    
+                    // Update Wins in Firestore
+                    const updates = {};
+                    winners.forEach(w => {
+                        updates[`playerData.${w}.wins`] = (data.playerData[w].wins || 0) + 1;
+                        updates[`playerData.${w}.total`] = state.players[w].total; // Persist total changes
+                    });
+                    
+                    // Reset round data
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                    updateDoc(roomRef, {
+                        ...updates,
+                        round: state.round + 1,
+                        phase: 1,
+                        pickIndex: 0,
+                        pickOrder: [],
+                        targets: {},
+                        [`playerData.${userId}.phase1`]: deleteField(),
+                        [`playerData.${userId}.phase2`]: deleteField()
+                        // Ideally delete for all, but only host can easily write multiple fields.
+                        // Simplified: We just increment round. Clients will initRound when they see round change.
+                    });
+                }
+            }, 4000);
+        }
+
+        // --- 4P Rendering ---
+        function render4PArena(reveal = false) {
+            const container = el('opp-list-4p');
+            container.innerHTML = '';
+            
+            const opponentIds = Object.keys(state.players).filter(id => id !== userId);
+            
+            opponentIds.forEach(oppId => {
+                const p = state.players[oppId];
+                const isTargeted = Object.values(state.targets).includes(oppId);
+                const isMyTarget = state.targets[userId] === oppId;
+                
+                // Picking Logic
+                const currentPicker = state.pickOrder[state.pickIndex];
+                const isPicking = state.phase === 1.5 && currentPicker === userId;
+                const canPick = isPicking && !isTargeted;
+                
+                const cardClass = `opp-card-4p ${isTargeted ? 'targeted' : ''} ${isMyTarget ? 'my-target' : ''} ${canPick ? 'targetable' : ''}`;
+                
+                const onClick = canPick ? `pickTarget('${oppId}')` : '';
+                
+                const spdDisp = (state.phase >= 1.5) ? p.spd : '?';
+                
+                let statsHtml = '';
+                if (reveal) {
+                    statsHtml = `
+                        <div class="grid grid-cols-3 gap-1 w-full text-[8px] text-center mt-1">
+                            <div class="text-green-400">H:${p.hp}</div>
+                            <div class="text-red-400">A:${p.atk}</div>
+                            <div class="text-blue-400">D:${p.def}</div>
+                        </div>
+                    `;
+                } else {
+                    statsHtml = `<div class="text-[8px] text-gray-500 mt-1 tracking-widest">BUILDING...</div>`;
+                }
+
+                // Show target status
+                let statusBadge = '';
+                if (isTargeted) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-red-900 text-red-200 px-1">LOCKED</div>';
+                if (isMyTarget) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-blue-500 text-black px-1 font-bold">TARGET</div>';
+
+                const html = `
+                    <div class="${cardClass}" onclick="${onClick}">
+                        ${statusBadge}
+                        <div class="text-xs font-bold text-gray-300 truncate w-full text-center">${p.name}</div>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="text-purple-400 text-[10px]">SPD</span>
+                            <span class="font-gaming text-lg text-purple-300">${spdDisp}</span>
+                        </div>
+                        ${statsHtml}
+                        <div class="mt-1 text-[8px] text-gray-400">WIN: <span class="text-white">${p.wins}</span></div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            
+            // Render Self Stats in 4P mini view
+            el('4p-p-spd').innerText = state.inputs.spd; // Real-time input view
+            // Only update these if inputs change, handled by updateUI
+        }
+
         // --- Visual Helpers ---
         function reveal(wrap, valEl, val) { wrap.classList.remove('hidden-card'); valEl.innerText = val; }
         function highlight(el) { el.classList.add('active-turn'); }
@@ -797,6 +1264,8 @@
         }
 
         function endRound(pHp, cHp) {
+            if (maxPlayers === 4) return; // 4P handled separately
+            
             let title = "DRAW"; let color = "text-yellow-500";
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="cyber-text"; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
@@ -826,6 +1295,8 @@
         }
 
         window.nextRound = () => {
+            if (maxPlayers === 4) return; // 4P auto loops
+            
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
