@@ -3,784 +3,1038 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRINITY LOGIC: 05</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Resource Strategy Card Battle：07</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts for Luxury Casino Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@500;700&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --color-p-main: #3b82f6; /* Blue */
+            --color-c-main: #ef4444; /* Red */
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+        }
+
         body {
-            font-family: 'Playfair Display', serif;
-            background-color: #050505;
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            font-family: 'Roboto', sans-serif;
+            background-color: #020617;
             color: #e2e8f0;
-            overflow-x: hidden;
-            user-select: none;
+            overflow: hidden; /* Prevent body scroll, handle in panels */
         }
 
-        .font-casino {
-            font-family: 'Cinzel', serif;
-        }
-
-        /* Gold Gradient Text */
-        .text-gold {
-            background: linear-gradient(to bottom, #cfc09f 22%, #634f2c 24%, #cfc09f 26%, #cfc09f 27%, #ffecb3 40%, #3a2c0f 78%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            color: #d4af37;
+        .font-gaming {
+            font-family: 'Black Ops One', cursive;
         }
         
-        .border-gold {
-            border-color: #d4af37;
-            box-shadow: 0 0 5px #b8860b;
+        .font-tech {
+            font-family: 'Rajdhani', sans-serif;
         }
 
-        .bg-felt {
-            background-color: #0f2e18; /* Dark Green Felt */
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23133820' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        /* --- UI Components --- */
+
+        /* Step Progress Bar */
+        .step-item { position: relative; z-index: 1; }
+        .step-item.active .step-circle {
+            background-color: #fbbf24;
+            border-color: #fbbf24;
+            color: #000;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+        }
+        .step-line {
+            position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
+            background-color: #334155; z-index: 0; transform: translateY(-50%);
+        }
+        .step-circle {
+            width: 28px; height: 28px; border-radius: 50%; background-color: #1e293b;
+            border: 2px solid #475569; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease;
         }
 
-        .card-shadow {
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 0 1px #333 inset;
+        /* Custom Range Slider */
+        .custom-range {
+            -webkit-appearance: none; width: 100%; height: 12px;
+            background: #334155; border-radius: 6px; outline: none; transition: opacity .2s;
+        }
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
+            border-radius: 50%; background: #fbbf24; cursor: pointer;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
 
-        .card-anim-enter {
-            animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* Number Input Styling */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            opacity: 1;
+        }
+        .num-input {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-align: right;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+        .num-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 5px rgba(251, 191, 36, 0.3);
         }
 
-        .reversal-flash {
-            animation: flash 0.5s ease-in-out;
+        /* Stat Gauge Bar */
+        .stat-bar-bg {
+            width: 100%; height: 8px; background-color: #334155;
+            border-radius: 4px; overflow: hidden; margin-top: 4px;
+        }
+        .stat-bar-fill { height: 100%; width: 0%; transition: width 0.1s ease; }
+
+        /* Cards */
+        .battle-card {
+            width: 85px; height: 120px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid #475569; border-radius: 10px;
+            position: relative; display: flex; flex-direction: column;
+            align-items: center; justify-content: space-between; padding: 8px 4px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
         }
 
-        @keyframes dealCard {
-            from { transform: translateY(50px) scale(0.8); opacity: 0; }
-            to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        @keyframes flash {
-            0% { background-color: transparent; }
-            50% { background-color: rgba(212, 175, 55, 0.2); }
-            100% { background-color: transparent; }
-        }
-
-        .perspective-container {
-            perspective: 1200px;
+        .battle-card.revealed {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            border-color: #94a3b8; transform: rotateY(0deg);
         }
         
-        /* Timer Ring Animation */
-        .timer-ring circle {
-            transition: stroke-dashoffset 1s linear;
+        /* Effects */
+        .battle-card.win-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); border-color: #3b82f6; }
+        .battle-card.lose-glow { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); border-color: #ef4444; opacity: 0.6; }
+        .battle-card.active-turn { box-shadow: 0 0 25px #fbbf24; border-color: #fbbf24; transform: scale(1.1); z-index: 10; }
+
+        .battle-card.hidden-card {
+            background: repeating-linear-gradient(45deg, #1e293b, #1e293b 10px, #0f172a 10px, #0f172a 20px);
+            border-color: #334155;
+        }
+        .battle-card.hidden-card .card-content { opacity: 0; }
+        .battle-card.hidden-card::after {
+            content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2rem; color: #334155; font-family: 'Black Ops One', cursive;
+        }
+
+        .card-icon { width: 24px; height: 24px; margin-bottom: 2px; }
+
+        /* Damage Animation */
+        @keyframes floatDamage {
+            0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -60px) scale(1.5); opacity: 0; }
+        }
+        .float-anim { animation: floatDamage 1.5s ease-out forwards; }
+
+        /* Utility */
+        .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .hidden { display: none !important; }
+        .disabled-area { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+
+        /* Layout Tweaks */
+        .cockpit-panel {
+            box-shadow: 10px 0 20px rgba(0,0,0,0.5);
+            z-index: 20;
         }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="h-screen flex flex-col">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <!-- Top Navigation -->
+    <header class="h-14 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 shrink-0 z-30">
+        <div class="flex items-center gap-2">
+            <div class="text-blue-500 font-gaming text-xl tracking-wider">STRATEGY<span class="text-white">BATTLE</span></div>
+            <div class="bg-gray-800 px-2 py-0.5 rounded text-[10px] text-gray-400 font-mono">VER 07</div>
+        </div>
 
-        // --- Icons (SVG) ---
-        const IconSword = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
-        );
-        const IconWind = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
-        );
-        const IconScale = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
-        );
-        const IconTrophy = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-        );
-        const IconSkull = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 4.9a5.9 5.9 0 0 0-1.8 0"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="M12.5 20v-2.18c0-1.29 1.15-2.22 2.5-1.82 2.94.87 4.54-1.28 4.28-3.57A6.5 6.5 0 0 0 6.58 6.58c-3.14 1.76-4.57 5.25-3.3 8.43.58 1.45 2.38 2.37 3.5 1.82 1.35-.4 2.5.53 2.5 1.82V20"/></svg>
-        );
-        const IconRefresh = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        );
-        const IconHome = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        );
-        const IconUsers = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        );
+        <!-- Step Indicator -->
+        <div class="hidden md:flex items-center w-1/3 relative justify-between">
+            <div class="step-line"></div>
+            <div id="step-1" class="step-item active flex flex-col items-center">
+                <div class="step-circle bg-gray-800 border-gray-600 text-gray-300">1</div>
+                <div class="text-[10px] mt-1 text-gray-400 font-bold tracking-widest">SPD</div>
+            </div>
+            <div id="step-2" class="step-item flex flex-col items-center">
+                <div class="step-circle">2</div>
+                <div class="text-[10px] mt-1 text-gray-500 font-bold tracking-widest">BUILD</div>
+            </div>
+            <div id="step-3" class="step-item flex flex-col items-center">
+                <div class="step-circle">3</div>
+                <div class="text-[10px] mt-1 text-gray-500 font-bold tracking-widest">FIGHT</div>
+            </div>
+        </div>
 
-        // --- Config ---
-        const ALL_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        const ROUND_TIME_LIMIT = 15;
+        <div class="flex items-center gap-4">
+            <div class="text-center">
+                <div class="text-[10px] text-gray-500 tracking-wider">ROUND</div>
+                <div class="text-lg font-gaming text-yellow-500"><span id="current-round">1</span><span class="text-xs text-gray-600">/5</span></div>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-800 py-1 px-3 rounded-lg border border-gray-700">
+                <div class="text-center">
+                    <div class="text-[10px] text-blue-400 font-bold">YOU</div>
+                    <div id="player-score" class="text-lg font-bold leading-none">0</div>
+                </div>
+                <div class="text-gray-600 font-bold">-</div>
+                <div class="text-center">
+                    <div class="text-[10px] text-red-500 font-bold">CPU</div>
+                    <div id="cpu-score" class="text-lg font-bold leading-none">0</div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        // --- Components ---
-        
-        // Luxury Card Component
-        const Card = ({ number, owner, onClick, disabled, isSelected, isWinner, isLoser, showFace = true }) => {
-            // Base Style
-            let cardClasses = "relative w-20 h-28 md:w-24 md:h-36 rounded-lg flex items-center justify-center text-4xl font-bold font-casino transition-all duration-300 transform preserve-3d cursor-default ";
-            let innerStyle = "absolute inset-0 rounded-lg flex items-center justify-center border-2 shadow-2xl ";
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
-            if (!showFace) {
-                // Back of card (Pattern)
-                innerStyle += "bg-zinc-900 border-yellow-700 opacity-90";
-                return (
-                    <div className={`${cardClasses} ${disabled ? '' : 'hover:-translate-y-1'}`} onClick={disabled ? undefined : onClick}>
-                        <div className={innerStyle} style={{backgroundImage: 'repeating-linear-gradient(45deg, #111 0, #111 10px, #222 10px, #222 20px)'}}>
-                            <div className="w-12 h-12 rounded-full border-2 border-yellow-700/30 flex items-center justify-center">
-                                <span className="text-yellow-700/30 font-casino text-xl">TL</span>
-                            </div>
+        <!-- LEFT PANEL: COCKPIT (Input) -->
+        <section class="w-full md:w-4/12 bg-gray-900 border-r border-gray-800 flex flex-col cockpit-panel relative">
+            
+            <!-- Sticky Top: Resource Display -->
+            <div class="bg-gray-800/90 backdrop-blur border-b border-gray-700 p-4 shrink-0 shadow-lg z-20">
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-xs text-blue-300 font-bold tracking-widest">REMAINING RESOURCE</span>
+                    <span class="text-xs text-gray-400">MAX: 1000</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-baseline gap-2">
+                        <!-- Points are now updated in real-time -->
+                        <span id="player-total-pts" class="text-5xl font-tech font-bold text-blue-400 text-shadow">1000</span>
+                        <span class="text-sm text-gray-400 font-bold">PTS</span>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-700 h-2 mt-2 rounded-full overflow-hidden border border-gray-600">
+                    <div id="resource-bar" class="h-full bg-blue-500 w-full transition-all duration-200 shadow-[0_0_10px_#3b82f6]"></div>
+                </div>
+            </div>
+
+            <!-- Scrollable Input Area -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6 pb-24">
+                
+                <!-- Phase 1: Speed Control -->
+                <div id="p1-phase" class="transition-all duration-300">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="p-1 bg-purple-500/20 rounded text-purple-400">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         </div>
+                        <span class="font-bold text-sm text-purple-200">INITIATIVE SPEED</span>
                     </div>
-                );
-            }
-
-            // Face of card
-            if (owner === 'player') {
-                innerStyle += "bg-zinc-100 text-zinc-900 border-yellow-600 ";
-                if (isSelected) cardClasses += " -translate-y-4 ring-4 ring-yellow-400 z-10 ";
-                else if (!disabled) cardClasses += " hover:-translate-y-2 cursor-pointer ";
-                if (disabled && !isSelected) cardClasses += " opacity-50 grayscale ";
-            } else {
-                // Opponent Card (Face Up)
-                innerStyle += "bg-zinc-900 text-yellow-500 border-yellow-600 ";
-                if (disabled) cardClasses += " opacity-70 ";
-            }
-
-            if (isWinner) {
-                cardClasses += " scale-110 z-20 ";
-                innerStyle += " ring-4 ring-yellow-400 bg-yellow-100 text-yellow-900 shadow-[0_0_30px_rgba(234,179,8,0.6)] ";
-            }
-            if (isLoser) {
-                cardClasses += " scale-90 grayscale opacity-40 ";
-            }
-
-            return (
-                <div className={cardClasses} onClick={disabled ? undefined : onClick}>
-                    <div className={innerStyle}>
-                        {number}
-                        {/* Decorative Corners */}
-                        <span className="absolute top-1 left-2 text-xs opacity-50">{number}</span>
-                        <span className="absolute bottom-1 right-2 text-xs opacity-50 rotate-180">{number}</span>
-                        <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-current opacity-30"></div>
-                        <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-current opacity-30"></div>
-                    </div>
-                </div>
-            );
-        };
-
-        // Circular Timer Component
-        const CircularTimer = ({ timeLeft, maxTime }) => {
-            const radius = 36;
-            const stroke = 6;
-            const normalizedRadius = radius - stroke * 2;
-            const circumference = normalizedRadius * 2 * Math.PI;
-            const strokeDashoffset = circumference - (timeLeft / maxTime) * circumference;
-            
-            const isWarning = timeLeft <= 5;
-
-            return (
-                <div className="relative flex items-center justify-center w-24 h-24">
-                    <svg height={radius * 2} width={radius * 2} className="rotate-[-90deg]">
-                        <circle
-                            stroke="rgba(255,255,255,0.1)"
-                            strokeWidth={stroke}
-                            r={normalizedRadius}
-                            cx={radius}
-                            cy={radius}
-                            fill="transparent"
-                        />
-                        <circle
-                            className="timer-ring"
-                            stroke={isWarning ? "#ef4444" : "#d4af37"}
-                            strokeWidth={stroke}
-                            strokeDasharray={circumference + ' ' + circumference}
-                            style={{ strokeDashoffset }}
-                            strokeLinecap="round"
-                            r={normalizedRadius}
-                            cx={radius}
-                            cy={radius}
-                            fill="rgba(0,0,0,0.5)"
-                        />
-                    </svg>
-                    <div className={`absolute text-3xl font-casino font-bold ${isWarning ? 'text-red-500 timer-warning' : 'text-yellow-500'}`}>
-                        {timeLeft}
-                    </div>
-                </div>
-            );
-        };
-
-        // --- Main App ---
-        const App = () => {
-            // Constants within App
-            const PHASES = {
-                1: { name: 'POWER', icon: <IconSword size={20} />, desc: 'High Number Wins', color: 'text-red-500' },
-                2: { name: 'SPEED', icon: <IconWind size={20} />, desc: 'Low Number Wins', color: 'text-blue-400' },
-                3: { name: 'BALANCE', icon: <IconScale size={20} />, desc: 'Close to 5 Wins', color: 'text-green-500' }
-            };
-
-            const [gameState, setGameState] = useState('intro'); // intro, draft, battle, result, intermission
-            const [cpuCount, setCpuCount] = useState(1);
-            
-            // Game Data
-            const [availableCards, setAvailableCards] = useState([...ALL_CARDS]);
-            const [playerDeck, setPlayerDeck] = useState([]);
-            const [cpuDeck, setCpuDeck] = useState([]);
-            const [cpu2Deck, setCpu2Deck] = useState([]);
-            
-            const [currentPhase, setCurrentPhase] = useState(1);
-            const [roundInPhase, setRoundInPhase] = useState(1);
-            
-            const [playerHand, setPlayerHand] = useState([]);
-            const [cpuHand, setCpuHand] = useState([]);
-            const [cpu2Hand, setCpu2Hand] = useState([]);
-            
-            const [selectedCard, setSelectedCard] = useState(null);
-            const [cpuCard, setCpuCard] = useState(null);
-            const [cpu2Card, setCpu2Card] = useState(null);
-            
-            const [battleResult, setBattleResult] = useState(null);
-            const [isReversal, setIsReversal] = useState(false);
-            const [score, setScore] = useState({ player: 0, cpu: 0, cpu2: 0 });
-            const [battleLog, setBattleLog] = useState([]);
-            
-            const [isProcessing, setIsProcessing] = useState(false);
-            const [timeLeft, setTimeLeft] = useState(ROUND_TIME_LIMIT);
-            const timerRef = useRef(null);
-
-            // Helpers
-            const cpuDraft = (currAvail) => currAvail[Math.floor(Math.random() * currAvail.length)];
-            const cpuPlayCard = (hand) => hand[Math.floor(Math.random() * hand.length)];
-
-            // Timer Logic
-            useEffect(() => {
-                if (gameState === 'battle' && !selectedCard && !isProcessing) {
-                    timerRef.current = setInterval(() => {
-                        setTimeLeft((prev) => {
-                            if (prev <= 1) {
-                                clearInterval(timerRef.current);
-                                handleTimeOut();
-                                return 0;
-                            }
-                            return prev - 1;
-                        });
-                    }, 1000);
-                } else {
-                    clearInterval(timerRef.current);
-                }
-                return () => clearInterval(timerRef.current);
-            }, [gameState, selectedCard, isProcessing, roundInPhase]);
-
-            const handleTimeOut = () => {
-                const randomCard = playerHand[Math.floor(Math.random() * playerHand.length)];
-                handleBattle(randomCard);
-            };
-
-            const goHome = () => {
-                setGameState('intro');
-                clearInterval(timerRef.current);
-            };
-
-            const startGame = (count) => {
-                setCpuCount(count);
-                resetGameData();
-                setGameState('draft');
-            };
-
-            const resetGameData = () => {
-                setAvailableCards([...ALL_CARDS]);
-                setPlayerDeck([]);
-                setCpuDeck([]);
-                setCpu2Deck([]);
-                setScore({ player: 0, cpu: 0, cpu2: 0 });
-                setBattleLog([]);
-                setPlayerHand([]);
-                setCpuHand([]);
-                setCpu2Hand([]);
-                setCurrentPhase(1);
-                setRoundInPhase(1);
-                setIsProcessing(false);
-            };
-
-            // Draft Phase
-            const handleDraftPick = (number) => {
-                if (isProcessing) return;
-                const newPlayerDeck = [...playerDeck, number];
-                setPlayerDeck(newPlayerDeck);
-                let nextAvailable = availableCards.filter(n => n !== number);
-                setAvailableCards(nextAvailable);
-                setIsProcessing(true);
-
-                if (newPlayerDeck.length === 3) {
-                    setTimeout(() => {
-                        const cpu1Pick = cpuDraft(nextAvailable);
-                        const finalCpuDeck = [...cpuDeck, cpu1Pick];
-                        setCpuDeck(finalCpuDeck);
-                        nextAvailable = nextAvailable.filter(n => n !== cpu1Pick);
-                        
-                        let finalCpu2Deck = [];
-                        if (cpuCount === 2) {
-                             const cpu2Pick = cpuDraft(nextAvailable);
-                             finalCpu2Deck = [...cpu2Deck, cpu2Pick];
-                             setCpu2Deck(finalCpu2Deck);
-                        }
-                        setTimeout(() => startBattlePhase(1, newPlayerDeck, finalCpuDeck, finalCpu2Deck), 1000);
-                    }, 500);
-                    return;
-                }
-                setTimeout(() => {
-                    const cpu1Pick = cpuDraft(nextAvailable);
-                    setCpuDeck(prev => [...prev, cpu1Pick]);
-                    nextAvailable = nextAvailable.filter(n => n !== cpu1Pick);
-                    if (cpuCount === 2) {
-                        const cpu2Pick = cpuDraft(nextAvailable);
-                        setCpu2Deck(prev => [...prev, cpu2Pick]);
-                        nextAvailable = nextAvailable.filter(n => n !== cpu2Pick);
-                    }
-                    setAvailableCards(nextAvailable);
-                    setIsProcessing(false);
-                }, 600);
-            };
-
-            const startBattlePhase = (phaseNum, pDeck, cDeck, c2Deck) => {
-                setCurrentPhase(phaseNum);
-                setRoundInPhase(1);
-                setPlayerHand([...pDeck]);
-                setCpuHand([...cDeck]);
-                setCpu2Hand(c2Deck && c2Deck.length ? [...c2Deck] : []);
-                resetRoundState();
-                setGameState('battle');
-            };
-
-            const resetRoundState = () => {
-                setSelectedCard(null);
-                setCpuCard(null);
-                setCpu2Card(null);
-                setBattleResult(null);
-                setIsReversal(false);
-                setIsProcessing(false);
-                setTimeLeft(ROUND_TIME_LIMIT);
-            };
-
-            const handleBattle = (pCard) => {
-                if (isProcessing) return;
-                setSelectedCard(pCard);
-                setIsProcessing(true);
-                
-                const cCard = cpuPlayCard(cpuHand);
-                let c2Card = null;
-                if (cpuCount === 2) c2Card = cpuPlayCard(cpu2Hand);
-                
-                // Card Reveal Animation Sequence
-                setTimeout(() => {
-                    setCpuCard(cCard); // CPU 1 Reveal
                     
-                    if (cpuCount === 2) {
-                        setTimeout(() => {
-                            setCpu2Card(c2Card); // CPU 2 Reveal
-                            setTimeout(() => resolveBattle(pCard, cCard, c2Card), 1000);
-                        }, 1000);
-                    } else {
-                        setTimeout(() => resolveBattle(pCard, cCard, null), 1000);
-                    }
-                }, 1000);
-            };
+                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-colors">
+                        <div class="flex justify-between items-center mb-2 text-gray-400">
+                            <span class="text-xs">ALLOCATE</span>
+                            <!-- Number Input for SPD -->
+                            <input type="number" id="num-spd" min="0" max="1000" value="0" class="num-input w-20 text-purple-400 border-purple-900 focus:border-purple-500" oninput="syncInput('spd', this.value)">
+                        </div>
+                        <!-- Slider for SPD -->
+                        <input type="range" id="input-spd" min="0" max="1000" value="0" class="custom-range mb-2" oninput="syncInput('spd', this.value)">
+                        <div class="stat-bar-bg"><div id="bar-spd" class="stat-bar-fill bg-purple-500"></div></div>
+                        <div class="text-[10px] text-gray-500 mt-2 text-right">Win: ATK x1.5 & Return 30%</div>
+                    </div>
+                </div>
 
-            const resolveBattle = (pVal, cVal, c2Val) => {
-                const sum = pVal + cVal + (c2Val || 0);
-                const reversal = sum === 10;
-                setIsReversal(reversal);
+                <!-- Phase 2: Build Controls -->
+                <div id="p2-phase" class="flex flex-col gap-4 transition-all duration-300 disabled-area">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="p-1 bg-green-500/20 rounded text-green-400">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </div>
+                        <span class="font-bold text-sm text-green-200">UNIT BUILD</span>
+                    </div>
 
-                let participants = [{ owner: 'player', val: pVal }, { owner: 'cpu', val: cVal }];
-                if (c2Val) participants.push({ owner: 'cpu2', val: c2Val });
+                    <!-- HP Control -->
+                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-green-500/50 transition-colors">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-gray-400">HP COST</span>
+                            <!-- Number Input for HP -->
+                            <input type="number" id="num-hp" min="0" max="1000" value="0" class="num-input w-20 text-green-400 border-green-900 focus:border-green-500" oninput="syncInput('hp', this.value)">
+                        </div>
+                        <!-- Slider for HP -->
+                        <input type="range" id="input-hp" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('hp', this.value)">
+                        <div class="stat-bar-bg"><div id="bar-hp" class="stat-bar-fill bg-green-500"></div></div>
+                        <div class="text-[10px] text-gray-500 mt-1 flex justify-between">
+                            <span>Efficiency: 50%</span>
+                            <span class="text-green-300 font-bold">Real HP: <span id="real-hp-val">0</span></span>
+                        </div>
+                    </div>
 
-                const determineWinners = () => {
-                    let sorted = [...participants];
-                    if (currentPhase === 1) { // Power
-                        sorted.sort((a, b) => b.val - a.val); 
-                        const max = sorted[0].val; 
-                        return participants.filter(p => p.val === max).map(p => p.owner); 
-                    }
-                    else if (currentPhase === 2) { // Speed
-                        sorted.sort((a, b) => a.val - b.val); 
-                        const min = sorted[0].val; 
-                        return participants.filter(p => p.val === min).map(p => p.owner); 
-                    }
-                    else { // Balance
-                        sorted.sort((a, b) => Math.abs(a.val - 5) - Math.abs(b.val - 5)); 
-                        const closest = Math.abs(sorted[0].val - 5); 
-                        return participants.filter(p => Math.abs(p.val - 5) === closest).map(p => p.owner); 
-                    }
-                };
+                    <!-- ATK Control -->
+                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-red-500/50 transition-colors">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-gray-400">ATTACK</span>
+                            <!-- Number Input for ATK -->
+                            <input type="number" id="num-atk" min="0" max="1000" value="0" class="num-input w-20 text-red-400 border-red-900 focus:border-red-500" oninput="syncInput('atk', this.value)">
+                        </div>
+                        <!-- Slider for ATK -->
+                        <input type="range" id="input-atk" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('atk', this.value)">
+                        <div class="stat-bar-bg"><div id="bar-atk" class="stat-bar-fill bg-red-500"></div></div>
+                    </div>
 
-                let winners = determineWinners();
-                if (reversal) {
-                    const all = participants.map(p => p.owner);
-                    const losers = all.filter(o => !winners.includes(o));
-                    winners = losers.length ? losers : all;
-                }
+                    <!-- DEF Control -->
+                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-blue-500/50 transition-colors">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-gray-400">DEFENSE</span>
+                            <!-- Number Input for DEF -->
+                            <input type="number" id="num-def" min="0" max="1000" value="0" class="num-input w-20 text-blue-400 border-blue-900 focus:border-blue-500" oninput="syncInput('def', this.value)">
+                        </div>
+                        <!-- Slider for DEF -->
+                        <input type="range" id="input-def" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('def', this.value)">
+                        <div class="stat-bar-bg"><div id="bar-def" class="stat-bar-fill bg-blue-500"></div></div>
+                    </div>
+                </div>
+            </div>
 
-                setScore(prev => {
-                    const ns = { ...prev };
-                    winners.forEach(w => ns[w] += 1);
-                    return ns;
-                });
-                setBattleResult(winners);
-                setBattleLog(prev => [{ phase: currentPhase, round: roundInPhase, pVal, cVal, c2Val, winners, reversal }, ...prev]);
-
-                setTimeout(() => nextRound(pVal, cVal, c2Val), 3000);
-            };
-
-            const nextRound = (pVal, cVal, c2Val) => {
-                setPlayerHand(prev => prev.filter(c => c !== pVal));
-                setCpuHand(prev => prev.filter(c => c !== cVal));
-                setCpu2Hand(prev => prev.filter(c => c !== c2Val));
-
-                if (roundInPhase < 3) {
-                    setRoundInPhase(r => r + 1);
-                    resetRoundState();
-                } else {
-                    if (currentPhase < 3) {
-                        setGameState('intermission');
-                        setTimeout(() => startBattlePhase(currentPhase + 1, playerDeck, cpuDeck, cpu2Deck), 4000);
-                    } else {
-                        setGameState('result');
-                    }
-                }
-            };
-
-            // --- Render Screens ---
-
-            // Common: Home Button
-            const HomeButton = () => (
-                <button onClick={goHome} className="fixed top-4 left-4 z-50 text-yellow-600 hover:text-yellow-400 transition-colors">
-                    <IconHome size={28} />
+            <!-- Sticky Footer Action Button -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-800 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] z-20">
+                <div class="flex justify-between text-xs mb-2 px-1">
+                    <span class="text-gray-500">CURRENT ROUND COST</span>
+                    <span id="round-cost" class="text-white font-bold">0</span>
+                </div>
+                <button id="action-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-blue-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2" onclick="handlePhaseAction()">
+                    <span>LOCK IN SPEED</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
-            );
+                <div id="error-msg" class="text-red-500 text-[10px] mt-1 h-4 text-center font-bold"></div>
+            </div>
+        </section>
 
-            // Intro
-            if (gameState === 'intro') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-                        <div className="mb-4">
-                            <IconSword size={48} className="inline text-yellow-600 mx-2" />
-                            <IconScale size={48} className="inline text-yellow-600 mx-2" />
-                            <IconWind size={48} className="inline text-yellow-600 mx-2" />
-                        </div>
-                        <h1 className="text-5xl md:text-8xl font-casino font-black mb-2 text-gold tracking-widest drop-shadow-lg">
-                            TRINITY
-                        </h1>
-                        <h2 className="text-2xl md:text-4xl font-casino text-yellow-700/80 tracking-[0.5em] mb-12">
-                            LOGIC
-                        </h2>
-                        
-                        <div className="flex flex-col gap-6 w-full max-w-xs">
-                            <button onClick={() => startGame(1)} className="group relative px-8 py-4 bg-zinc-900 border border-yellow-700 hover:bg-yellow-900/20 text-yellow-500 font-casino tracking-widest transition-all overflow-hidden">
-                                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1s_infinite]"></div>
-                                <span className="flex items-center justify-center gap-3">
-                                    <IconUsers size={20} /> VS DEALER
-                                </span>
-                            </button>
-                            <button onClick={() => startGame(2)} className="group relative px-8 py-4 bg-zinc-900 border border-yellow-700 hover:bg-yellow-900/20 text-yellow-500 font-casino tracking-widest transition-all">
-                                <span className="flex items-center justify-center gap-3">
-                                    <IconUsers size={20} /><IconUsers size={20} className="-ml-3" /> TRI-BATTLE
-                                </span>
-                            </button>
-                        </div>
-                        <div className="mt-12 text-zinc-600 text-xs font-casino tracking-widest">
-                            CASINO ROYALE EDITION
-                        </div>
+        <!-- RIGHT PANEL: ARENA (Visualization) -->
+        <section class="flex-1 bg-black relative flex flex-col items-center justify-center p-2 overflow-hidden">
+            
+            <!-- Background -->
+            <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(circle at center, #1e293b 0%, #000 70%);"></div>
+            <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 50px 50px;"></div>
+            
+            <!-- CPU Info HUD -->
+            <div class="absolute top-2 right-2 z-10 flex flex-col items-end">
+                <div class="bg-gray-900/80 border border-gray-700 backdrop-blur px-3 py-1.5 rounded mb-2 shadow-lg">
+                    <div class="text-[10px] text-gray-500 tracking-wider">OPPONENT RESOURCE</div>
+                    <div class="text-lg font-tech font-bold text-red-500 text-right"><span id="cpu-total-pts">1000</span> PTS</div>
+                </div>
+                <!-- CPU History -->
+                <div id="cpu-history" class="hidden bg-gray-900/90 border-r-4 border-yellow-500 p-2 w-40 rounded text-right shadow-xl backdrop-blur-sm">
+                    <div class="text-[9px] text-yellow-500 font-bold mb-1 tracking-wider uppercase">Last Round Intel</div>
+                    <div id="history-content" class="text-[10px] space-y-0.5 font-mono text-gray-300"></div>
+                </div>
+            </div>
+
+            <!-- BATTLE FIELD -->
+            <div class="relative z-10 w-full max-w-lg h-full flex flex-col justify-center py-6">
+
+                <!-- CPU CARDS (Top) -->
+                <div class="flex justify-center items-end gap-2 md:gap-4 mb-4 relative pt-12">
+                    <!-- CPU Badge (Top Position) -->
+                    <div id="cpu-adv-badge" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-lg shadow-red-900 animate-pulse border border-red-400 z-20 whitespace-nowrap">
+                        CPU: ATK x1.5 ACTIVE
                     </div>
-                );
-            }
 
-            // Draft
-            if (gameState === 'draft') {
-                return (
-                    <div className="min-h-screen p-4 flex flex-col items-center bg-felt relative">
-                        <HomeButton />
-                        
-                        <div className="w-full max-w-5xl mt-12 mb-8 flex justify-between items-start">
-                            {/* Player Status */}
-                            <div className="text-left">
-                                <div className="text-xs text-yellow-600 font-casino mb-2 tracking-widest">YOUR HAND</div>
-                                <div className="flex gap-2 h-24">
-                                    {playerDeck.map((n, i) => (
-                                        <div key={i} className="w-16 h-24 bg-zinc-100 border-2 border-yellow-600 rounded flex items-center justify-center text-2xl font-casino font-bold text-black shadow-lg">
-                                            {n}
-                                        </div>
-                                    ))}
-                                    {[...Array(3 - playerDeck.length)].map((_, i) => (
-                                        <div key={`e-${i}`} className="w-16 h-24 border-2 border-dashed border-yellow-800/30 rounded"></div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="text-center pt-2">
-                                <h2 className="text-3xl font-casino text-gold drop-shadow-md">DRAFT</h2>
-                                <p className="text-yellow-700/70 text-sm mt-1 tracking-widest animate-pulse">
-                                    {isProcessing ? 'DEALER IS CHOOSING...' : 'CHOOSE YOUR CARD'}
-                                </p>
-                            </div>
-
-                            {/* CPU Status */}
-                            <div className="text-right">
-                                <div className="text-xs text-yellow-600 font-casino mb-2 tracking-widest">DEALER HAND</div>
-                                <div className="flex gap-2 justify-end h-24">
-                                    {cpuDeck.map((n, i) => (
-                                        <div key={i} className="w-16 h-24 bg-zinc-900 border border-yellow-700 rounded flex items-center justify-center text-xl font-casino text-yellow-500 shadow-lg">
-                                            {n}
-                                        </div>
-                                    ))}
-                                    {[...Array(3 - cpuDeck.length)].map((_, i) => (
-                                        <div key={`ce-${i}`} className="w-16 h-24 border-2 border-dashed border-yellow-800/30 rounded"></div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-6 mt-4">
-                            {ALL_CARDS.map(number => {
-                                const isAvailable = availableCards.includes(number);
-                                const isPlayerPick = playerDeck.includes(number);
-                                const isCpuPick = cpuDeck.includes(number) || cpu2Deck.includes(number);
-                                
-                                return (
-                                    <div key={number} className="relative">
-                                        <Card 
-                                            number={number} 
-                                            owner={isPlayerPick ? 'player' : 'cpu'} // Visual style only
-                                            showFace={true}
-                                            onClick={() => handleDraftPick(number)}
-                                            disabled={!isAvailable || isProcessing}
-                                            isSelected={isPlayerPick}
-                                            isLoser={!isAvailable && !isPlayerPick && !isCpuPick} // Fade out unavailable
-                                        />
-                                        {isCpuPick && <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-lg text-yellow-500 font-casino text-xs tracking-widest border border-yellow-500/50">TAKEN</div>}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                    <!-- SPD Card -->
+                    <div class="battle-card" style="border-color: #a855f7;">
+                        <div class="text-[9px] text-purple-400 font-bold mt-1">SPD</div>
+                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-c-spd">?</div>
                     </div>
-                );
-            }
 
-            // Intermission
-            if (gameState === 'intermission') {
-                const nextPhase = PHASES[currentPhase + 1] || PHASES[1];
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center bg-black intermission-enter text-center p-8">
-                        <div className="border-y-2 border-yellow-800/50 py-12 w-full max-w-2xl bg-zinc-900/50 backdrop-blur-sm">
-                            <h2 className="text-sm text-yellow-600 font-casino tracking-[0.5em] mb-6">NEXT STAGE</h2>
-                            <div className={`text-6xl font-casino font-bold ${nextPhase.color} flex flex-col items-center gap-6 mb-4 drop-shadow-lg`}>
-                                {nextPhase.icon}
-                                <span className="text-gold">{nextPhase.name}</span>
-                            </div>
-                            <div className="w-16 h-1 bg-yellow-700 mx-auto mb-6"></div>
-                            <p className="text-xl text-zinc-400 font-serif italic">{nextPhase.desc}</p>
-                        </div>
+                    <!-- HP Card -->
+                    <div class="battle-card hidden-card" id="card-c-hp-container">
+                        <div class="text-[9px] text-green-400 font-bold mt-1">HP</div>
+                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-c-hp">?</div>
+                        <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all"></div>
                     </div>
-                );
-            }
 
-            // Battle
-            if (gameState === 'battle') {
-                const phaseConfig = PHASES[currentPhase];
-                
-                return (
-                    <div className={`min-h-screen flex flex-col bg-felt transition-colors duration-1000 ${isReversal ? 'saturate-150 brightness-110' : ''}`}>
-                        <HomeButton />
-                        
-                        {/* Header Area */}
-                        <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-10 bg-gradient-to-b from-black/80 to-transparent h-32 pointer-events-none">
-                            <div className="text-center pl-12">
-                                <div className="text-[10px] text-yellow-600 font-casino tracking-widest">YOU</div>
-                                <div className="text-4xl font-casino text-white drop-shadow-md">{score.player}</div>
-                            </div>
-                            
-                            <div className="text-center">
-                                <div className={`flex flex-col items-center ${phaseConfig.color} drop-shadow-lg`}>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        {phaseConfig.icon}
-                                        <span className="font-casino text-2xl font-bold tracking-widest text-gold">{phaseConfig.name}</span>
-                                    </div>
-                                    <div className="text-xs text-zinc-300 font-serif italic opacity-80">{phaseConfig.desc}</div>
-                                </div>
-                            </div>
-
-                            <div className="text-center">
-                                <div className="text-[10px] text-yellow-600 font-casino tracking-widest">DEALER</div>
-                                <div className="text-4xl font-casino text-white drop-shadow-md">{score.cpu}</div>
-                            </div>
-                        </div>
-
-                        {/* Game Field */}
-                        <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden w-full max-w-6xl mx-auto">
-                            
-                            {/* Center Timer - Absolute Center */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-80">
-                                <CircularTimer timeLeft={timeLeft} maxTime={ROUND_TIME_LIMIT} />
-                            </div>
-
-                            {/* Reversal Effect */}
-                            {isReversal && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 reversal-flash">
-                                    <div className="text-yellow-400 font-casino text-6xl md:text-9xl font-bold tracking-widest border-y-4 border-yellow-400 bg-black/50 w-full text-center py-4 transform -rotate-6 backdrop-blur-sm">
-                                        REVERSAL
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Opponent Area (Top) */}
-                            <div className="w-full flex justify-around mb-12 z-10">
-                                {/* CPU 1 */}
-                                <div className="flex flex-col items-center gap-4">
-                                    {/* Open Hand Display */}
-                                    <div className="flex gap-1 p-2 bg-black/40 rounded-lg border border-yellow-900/30">
-                                        <span className="text-[10px] text-yellow-700 font-casino mr-1 writing-vertical">HAND</span>
-                                        {cpuHand.map((n, i) => (
-                                            <div key={i} className="w-6 h-8 bg-zinc-800 text-yellow-600 flex items-center justify-center text-xs font-bold border border-yellow-900 rounded">
-                                                {n}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    
-                                    {/* Play Slot */}
-                                    <div className="relative h-36 w-24 flex items-center justify-center">
-                                        {cpuCard ? (
-                                            <div className="card-anim-enter">
-                                                <Card number={cpuCard} owner="cpu" isWinner={battleResult && battleResult.includes('cpu')} isLoser={battleResult && !battleResult.includes('cpu')} />
-                                                {battleResult && battleResult.includes('cpu') && <div className="absolute -top-8 text-yellow-400 font-casino font-bold text-sm tracking-widest animate-bounce">WIN</div>}
-                                            </div>
-                                        ) : (
-                                            <div className="w-20 h-28 border-2 border-dashed border-yellow-800/30 rounded-lg flex items-center justify-center">
-                                                <span className="text-yellow-900/50 font-casino text-xs">DEALER</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* CPU 2 */}
-                                {cpuCount === 2 && (
-                                    <div className="flex flex-col items-center gap-4">
-                                        <div className="flex gap-1 p-2 bg-black/40 rounded-lg border border-yellow-900/30">
-                                            <span className="text-[10px] text-orange-700 font-casino mr-1 writing-vertical">HAND</span>
-                                            {cpu2Hand.map((n, i) => (
-                                                <div key={i} className="w-6 h-8 bg-zinc-800 text-orange-600 flex items-center justify-center text-xs font-bold border border-orange-900 rounded">
-                                                    {n}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="relative h-36 w-24 flex items-center justify-center">
-                                            {cpu2Card ? (
-                                                <div className="card-anim-enter">
-                                                    <Card number={cpu2Card} owner="cpu2" isWinner={battleResult && battleResult.includes('cpu2')} isLoser={battleResult && !battleResult.includes('cpu2')} />
-                                                </div>
-                                            ) : <div className="w-20 h-28 border-2 border-dashed border-orange-800/30 rounded-lg flex items-center justify-center"><span className="text-orange-900/50 font-casino text-xs">RIVAL</span></div>}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Result Text Area */}
-                            <div className="h-8 mb-4 z-20">
-                                {battleResult && (
-                                    <div className="font-casino text-3xl font-bold animate-bounce text-center drop-shadow-lg tracking-widest">
-                                        {battleResult.includes('player') ? <span className="text-emerald-400">YOU WIN</span> : ''}
-                                        {battleResult.length > 0 && !battleResult.includes('player') ? <span className="text-red-500">YOU LOSE</span> : ''}
-                                        {battleResult.length === 0 && <span className="text-zinc-400">DRAW</span>}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Player Area (Bottom) */}
-                            <div className="flex flex-col items-center mt-auto z-10 w-full">
-                                {/* Play Slot */}
-                                <div className="relative h-36 w-24 mb-6 flex items-center justify-center">
-                                    {selectedCard ? (
-                                        <div className="card-anim-enter">
-                                            <Card number={selectedCard} owner="player" isWinner={battleResult && battleResult.includes('player')} isLoser={battleResult && !battleResult.includes('player')} />
-                                            {battleResult && battleResult.includes('player') && <div className="absolute -top-8 left-0 right-0 text-center text-emerald-400 font-casino font-bold text-sm tracking-widest animate-bounce">WIN</div>}
-                                        </div>
-                                    ) : (
-                                        <div className="w-20 h-28 border-2 border-dashed border-yellow-500/20 rounded-lg flex items-center justify-center animate-pulse">
-                                            <span className="text-yellow-500/50 font-casino text-xs">PLACE</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Hand UI */}
-                                <div className="w-full bg-gradient-to-t from-black via-black/90 to-transparent pt-8 pb-4 px-4 flex justify-center">
-                                    <div className="flex gap-4 md:gap-8 items-end h-32">
-                                        {playerHand.map((num, i) => (
-                                            <Card 
-                                                key={`${currentPhase}-${roundInPhase}-${i}`} 
-                                                number={num} 
-                                                owner="player" 
-                                                onClick={() => !selectedCard && handleBattle(num)} 
-                                                disabled={!!selectedCard} 
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- ATK Card -->
+                    <div class="battle-card hidden-card" id="card-c-atk-container">
+                        <div class="text-[9px] text-red-400 font-bold mt-1">ATK</div>
+                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-c-atk">?</div>
                     </div>
-                );
-            }
 
-            // Result Screen
-            if (gameState === 'result') {
-                const scores = [
-                    { name: 'YOU', val: score.player, isPlayer: true },
-                    { name: 'DEALER', val: score.cpu, isPlayer: false }
-                ];
-                if (cpuCount === 2) scores.push({ name: 'RIVAL', val: score.cpu2, isPlayer: false });
-                scores.sort((a, b) => b.val - a.val);
-                const isWinner = scores[0].isPlayer;
-                const isDraw = scores[0].val === score.player && !scores[0].isPlayer;
-
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-black relative overflow-hidden">
-                        {/* Background Effect */}
-                        {isWinner && !isDraw && <div className="absolute inset-0 bg-gradient-to-b from-yellow-900/20 to-black animate-pulse"></div>}
-                        
-                        <div className="mb-8 scale-150 relative z-10">
-                            {isWinner && !isDraw ? <IconTrophy size={80} className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" /> : 
-                             isDraw ? <IconRefresh size={80} className="text-zinc-500" /> :
-                             <IconSkull size={80} className="text-red-900" />}
-                        </div>
-                        
-                        <h2 className="text-5xl md:text-7xl font-casino font-bold mb-12 relative z-10 tracking-widest">
-                            {isWinner && !isDraw ? <span className="text-gold">VICTORY</span> : 
-                             isDraw ? <span className="text-zinc-400">DRAW</span> : 
-                             <span className="text-red-800">DEFEAT</span>}
-                        </h2>
-
-                        <div className="flex flex-col gap-4 mb-12 w-full max-w-md relative z-10">
-                            {scores.map((s, i) => (
-                                <div key={i} className={`flex justify-between items-center p-6 rounded border ${s.isPlayer ? 'bg-zinc-800 border-yellow-600' : 'bg-zinc-900 border-zinc-800'}`}>
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-2xl font-casino text-zinc-500">#{i + 1}</span>
-                                        <span className={`text-xl font-bold font-casino tracking-widest ${s.isPlayer ? 'text-yellow-400' : 'text-zinc-400'}`}>{s.name}</span>
-                                    </div>
-                                    <span className="text-4xl font-casino font-bold text-white">{s.val}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button onClick={goHome} className="relative z-10 px-10 py-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded font-casino tracking-widest border border-zinc-600 transition-colors flex items-center gap-3">
-                            <IconRefresh size={20} /> PLAY AGAIN
-                        </button>
+                    <!-- DEF Card -->
+                    <div class="battle-card hidden-card" id="card-c-def-container">
+                        <div class="text-[9px] text-blue-400 font-bold mt-1">DEF</div>
+                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-c-def">?</div>
                     </div>
-                );
-            }
 
-            return null;
+                    <!-- Damage Float -->
+                    <div id="c-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-blue-400 opacity-0 pointer-events-none text-shadow z-50"></div>
+                </div>
+
+                <!-- Center Divider -->
+                <div class="flex items-center justify-center my-2">
+                    <div class="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent w-full"></div>
+                </div>
+
+                <!-- PLAYER CARDS (Bottom) -->
+                <div class="flex justify-center items-start gap-2 md:gap-4 mt-4 relative pb-12">
+                    <!-- Player Badge (Bottom Position) -->
+                    <div id="player-adv-badge" class="hidden absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-lg shadow-blue-900 animate-pulse border border-blue-400 z-20 whitespace-nowrap">
+                        PLAYER: ATK x1.5 ACTIVE
+                    </div>
+
+                    <!-- SPD Card -->
+                    <div class="battle-card" style="border-color: #a855f7;">
+                        <div class="text-[9px] text-purple-400 font-bold mt-1">SPD</div>
+                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-p-spd">-</div>
+                    </div>
+
+                    <!-- HP Card -->
+                    <div class="battle-card hidden-card" id="card-p-hp-container">
+                        <div class="text-[9px] text-green-400 font-bold mt-1">HP</div>
+                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-p-hp">-</div>
+                        <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all"></div>
+                    </div>
+
+                    <!-- ATK Card -->
+                    <div class="battle-card hidden-card" id="card-p-atk-container">
+                        <div class="text-[9px] text-red-400 font-bold mt-1">ATK</div>
+                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-p-atk">-</div>
+                    </div>
+
+                    <!-- DEF Card -->
+                    <div class="battle-card hidden-card" id="card-p-def-container">
+                        <div class="text-[9px] text-blue-400 font-bold mt-1">DEF</div>
+                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                        <div class="card-content font-gaming text-xl text-white" id="card-p-def">-</div>
+                    </div>
+
+                    <!-- Damage Float -->
+                    <div id="p-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-red-500 opacity-0 pointer-events-none text-shadow z-50"></div>
+                </div>
+
+                <!-- Messages Area -->
+                <div id="status-message" class="absolute bottom-20 left-0 right-0 text-center pointer-events-none z-40">
+                    <span class="bg-black/90 text-white px-8 py-2 rounded border border-gray-600 text-sm tracking-widest uppercase shadow-[0_0_15px_rgba(0,0,0,0.8)] font-bold" id="game-status">PHASE 1: SET SPEED</span>
+                </div>
+            </div>
+
+            <!-- RESULT OVERLAY -->
+            <div id="result-overlay" class="absolute inset-0 bg-black/95 flex flex-col items-center justify-center z-50 hidden backdrop-blur-md">
+                <div class="bg-gray-900 border border-gray-700 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
+                    <h1 id="result-title" class="text-3xl font-gaming text-white mb-6">ROUND COMPLETE</h1>
+                    <div id="result-detail" class="text-sm text-gray-300 space-y-4 mb-8"></div>
+                    <button onclick="nextRound()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 rounded-lg shadow-lg uppercase tracking-widest text-lg">
+                        NEXT ROUND
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME OVER OVERLAY -->
+            <div id="game-over-overlay" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 hidden">
+                 <div class="text-center">
+                    <h1 id="final-result-title" class="text-6xl md:text-8xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
+                    <p class="text-gray-500 tracking-[0.5em] mb-8">SIMULATION ENDED</p>
+                    <button onclick="location.reload()" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-12 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all">
+                        REBOOT SYSTEM
+                    </button>
+                 </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        // --- GAME CONSTANTS ---
+        const MAX_ROUNDS = 5;
+        const WIN_CONDITION = 3;
+        const START_POINTS = 1000;
+        
+        let gameState = {
+            round: 1,
+            phase: 1, 
+            player: { totalPts: START_POINTS, wins: 0, currentStats: {}, advantage: false },
+            cpu: { totalPts: START_POINTS, wins: 0, currentStats: {}, advantage: false },
+            cpuHistory: [] 
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        const els = {
+            pScore: document.getElementById('player-score'),
+            cScore: document.getElementById('cpu-score'),
+            round: document.getElementById('current-round'),
+            status: document.getElementById('game-status'),
+            pTotal: document.getElementById('player-total-pts'),
+            cTotal: document.getElementById('cpu-total-pts'),
+            
+            inputs: {
+                spd: document.getElementById('input-spd'),
+                hp: document.getElementById('input-hp'),
+                atk: document.getElementById('input-atk'),
+                def: document.getElementById('input-def'),
+                
+                // Number Inputs
+                nSpd: document.getElementById('num-spd'),
+                nHp: document.getElementById('num-hp'),
+                nAtk: document.getElementById('num-atk'),
+                nDef: document.getElementById('num-def'),
+            },
+            bars: {
+                spd: document.getElementById('bar-spd'),
+                hp: document.getElementById('bar-hp'),
+                atk: document.getElementById('bar-atk'),
+                def: document.getElementById('bar-def'),
+            },
+            
+            realHpVal: document.getElementById('real-hp-val'),
+            resourceBar: document.getElementById('resource-bar'),
+            
+            phase1: document.getElementById('p1-phase'),
+            phase2: document.getElementById('p2-phase'),
+            btn: document.getElementById('action-btn'),
+            cost: document.getElementById('round-cost'),
+            error: document.getElementById('error-msg'),
+            
+            steps: [
+                document.getElementById('step-1'),
+                document.getElementById('step-2'),
+                document.getElementById('step-3'),
+            ],
+
+            cardsP: {
+                spd: document.getElementById('card-p-spd'),
+                hp: document.getElementById('card-p-hp'),
+                atk: document.getElementById('card-p-atk'),
+                def: document.getElementById('card-p-def'),
+                hpContainer: document.getElementById('card-p-hp-container'),
+                atkContainer: document.getElementById('card-p-atk-container'),
+                defContainer: document.getElementById('card-p-def-container'),
+            },
+            cardsC: {
+                spd: document.getElementById('card-c-spd'),
+                hp: document.getElementById('card-c-hp'),
+                atk: document.getElementById('card-c-atk'),
+                def: document.getElementById('card-c-def'),
+                hpContainer: document.getElementById('card-c-hp-container'),
+                atkContainer: document.getElementById('card-c-atk-container'),
+                defContainer: document.getElementById('card-c-def-container'),
+            },
+            badges: {
+                p: document.getElementById('player-adv-badge'),
+                c: document.getElementById('cpu-adv-badge')
+            },
+            history: {
+                panel: document.getElementById('cpu-history'),
+                content: document.getElementById('history-content')
+            },
+            overlays: {
+                result: document.getElementById('result-overlay'),
+                gameOver: document.getElementById('game-over-overlay'),
+                resTitle: document.getElementById('result-title'),
+                resDetail: document.getElementById('result-detail'),
+                finalTitle: document.getElementById('final-result-title')
+            },
+            floats: {
+                p: document.getElementById('p-dmg-float'),
+                c: document.getElementById('c-dmg-float')
+            }
+        };
+
+        // --- UI Updates ---
+        function setPhaseStep(stepIdx) {
+            els.steps.forEach((el, i) => {
+                if (i <= stepIdx) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        function syncInput(type, val) {
+            // Update both inputs to match
+            const intVal = parseInt(val) || 0;
+            if (type === 'spd') {
+                els.inputs.spd.value = intVal;
+                els.inputs.nSpd.value = intVal;
+            } else if (type === 'hp') {
+                els.inputs.hp.value = intVal;
+                els.inputs.nHp.value = intVal;
+            } else if (type === 'atk') {
+                els.inputs.atk.value = intVal;
+                els.inputs.nAtk.value = intVal;
+            } else if (type === 'def') {
+                els.inputs.def.value = intVal;
+                els.inputs.nDef.value = intVal;
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const spd = parseInt(els.inputs.spd.value) || 0;
+            const hpCost = parseInt(els.inputs.hp.value) || 0;
+            const atk = parseInt(els.inputs.atk.value) || 0;
+            const def = parseInt(els.inputs.def.value) || 0;
+
+            els.bars.spd.style.width = `${Math.min(100, (spd/500)*100)}%`;
+            els.bars.hp.style.width = `${Math.min(100, (hpCost/500)*100)}%`;
+            els.bars.atk.style.width = `${Math.min(100, (atk/500)*100)}%`;
+            els.bars.def.style.width = `${Math.min(100, (def/500)*100)}%`;
+
+            const realHp = Math.ceil(hpCost * 0.5);
+            els.realHpVal.innerText = realHp;
+            
+            const currentCost = spd + hpCost + atk + def;
+            els.cost.innerText = currentCost;
+
+            const remaining = gameState.player.totalPts - currentCost;
+            
+            // Real-time update of Top Bar resource
+            els.pTotal.innerText = remaining;
+
+            const remainingPct = Math.max(0, (remaining / START_POINTS) * 100);
+            els.resourceBar.style.width = `${remainingPct}%`;
+            
+            if (remaining < 0) {
+                els.error.innerText = "INSUFFICIENT RESOURCES";
+                els.btn.disabled = true;
+                els.btn.classList.add('opacity-50', 'grayscale');
+                els.resourceBar.classList.add('bg-red-500');
+                els.resourceBar.classList.remove('bg-blue-500');
+                els.pTotal.classList.add('text-red-500');
+                els.pTotal.classList.remove('text-blue-400');
+                return false;
+            } else {
+                els.error.innerText = "";
+                els.btn.disabled = false;
+                els.btn.classList.remove('opacity-50', 'grayscale');
+                els.resourceBar.classList.remove('bg-red-500');
+                els.resourceBar.classList.add('bg-blue-500');
+                els.pTotal.classList.remove('text-red-500');
+                els.pTotal.classList.add('text-blue-400');
+                return true;
+            }
+        }
+
+        function initRound() {
+            // Reset Inputs (Range and Number)
+            ['spd', 'hp', 'atk', 'def'].forEach(k => {
+                els.inputs[k].value = 0;
+                // e.g. nSpd
+                const nKey = 'n' + k.charAt(0).toUpperCase() + k.slice(1);
+                els.inputs[nKey].value = 0;
+            });
+            
+            els.inputs.spd.readOnly = false;
+            els.inputs.nSpd.readOnly = false;
+            
+            updateUI(); 
+
+            gameState.player.currentStats = {};
+            gameState.cpu.currentStats = {};
+            gameState.player.advantage = false;
+            gameState.cpu.advantage = false;
+            
+            gameState.phase = 1;
+            setPhaseStep(0);
+            
+            els.phase1.classList.remove('disabled-area');
+            els.phase2.classList.add('disabled-area');
+            
+            els.btn.innerHTML = `<span>LOCK IN SPEED</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+            els.btn.className = "w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-blue-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2";
+            els.btn.classList.remove('hidden');
+
+            els.status.innerText = "PHASE 1: SET SPEED ALLOCATION";
+            
+            generateCPUStats();
+        }
+
+        function resetBattleArena() {
+            [els.cardsP, els.cardsC].forEach(cards => {
+                cards.spd.innerText = cards === els.cardsP ? "-" : "?";
+                cards.hp.innerText = "?";
+                cards.atk.innerText = "?";
+                cards.def.innerText = "?";
+                
+                ['hpContainer', 'atkContainer', 'defContainer'].forEach(k => {
+                    cards[k].classList.add('hidden-card');
+                    cards[k].classList.remove('revealed', 'win-glow', 'lose-glow', 'active-turn');
+                });
+            });
+
+            els.badges.p.classList.add('hidden');
+            els.badges.c.classList.add('hidden');
+            els.floats.p.classList.remove('float-anim');
+            els.floats.c.classList.remove('float-anim');
+            els.floats.p.classList.add('opacity-0');
+            els.floats.c.classList.add('opacity-0');
+        }
+
+        function updateCPUHistoryDisplay() {
+            if (gameState.cpuHistory.length === 0) return;
+            const lastStats = gameState.cpuHistory[gameState.cpuHistory.length - 1];
+            let tendency = "BALANCED";
+            const totalBuild = lastStats.hpCost + lastStats.atk + lastStats.def;
+            if (totalBuild > 0) {
+                if (lastStats.atk > totalBuild * 0.5) tendency = "AGGRO (ATK)";
+                else if (lastStats.def > totalBuild * 0.5) tendency = "DEFENSIVE";
+                else if (lastStats.hpCost > totalBuild * 0.5) tendency = "TANK (HP)";
+                else if (lastStats.spd > 150) tendency = "SPEEDSTER";
+            } else {
+                tendency = "SAVER";
+            }
+            els.history.content.innerHTML = `
+                <div class="flex justify-between"><span>SPD:</span><span class="text-purple-400">${lastStats.spd}</span></div>
+                <div class="flex justify-between"><span>HP:</span><span class="text-green-400">${lastStats.hp}</span></div>
+                <div class="flex justify-between"><span>ATK:</span><span class="text-red-400">${lastStats.atk}</span></div>
+                <div class="flex justify-between"><span>DEF:</span><span class="text-blue-400">${lastStats.def}</span></div>
+                <div class="mt-1 text-yellow-500 border-t border-gray-700 pt-0.5 text-center">${tendency}</div>
+            `;
+            els.history.panel.classList.remove('hidden');
+        }
+
+        function generateCPUStats() {
+            const cpu = gameState.cpu;
+            const roundsLeft = (MAX_ROUNDS - gameState.round) + 1;
+            let budget = 0;
+            if (gameState.round === MAX_ROUNDS) {
+                budget = cpu.totalPts;
+            } else {
+                const avg = Math.floor(cpu.totalPts / roundsLeft);
+                const variance = Math.floor(Math.random() * (avg * 0.4)) - (avg * 0.2); 
+                budget = Math.max(0, Math.min(cpu.totalPts, avg + variance));
+                if (gameState.player.wins > gameState.cpu.wins && Math.random() < 0.3) budget = Math.min(cpu.totalPts, budget * 2);
+            }
+            let remaining = budget;
+            const spd = Math.ceil(Math.random() * (remaining * 0.3)); remaining -= spd;
+            const atk = Math.ceil(Math.random() * (remaining * 0.5)); remaining -= atk;
+            const def = Math.ceil(Math.random() * (remaining * 0.4)); remaining -= def;
+            const hpCost = Math.max(0, remaining);
+            const hp = Math.ceil(hpCost * 0.5); 
+            gameState.cpu.currentStats = { spd, hp, atk, def, hpCost };
+        }
+
+        function handlePhaseAction() {
+            if (!updateUI()) return; 
+            if (gameState.phase === 1) resolveSpeedPhase();
+            else if (gameState.phase === 2) startBattle();
+        }
+
+        function resolveSpeedPhase() {
+            resetBattleArena();
+            els.inputs.spd.readOnly = true;
+            els.inputs.nSpd.readOnly = true;
+            const pSpd = parseInt(els.inputs.spd.value) || 0;
+            gameState.player.currentStats.spd = pSpd;
+            
+            gameState.player.totalPts -= pSpd;
+            gameState.cpu.totalPts -= gameState.cpu.currentStats.spd;
+            
+            els.cardsP.spd.innerText = pSpd;
+            els.cardsC.spd.innerText = gameState.cpu.currentStats.spd;
+            
+            const cSpd = gameState.cpu.currentStats.spd;
+            let msg = "";
+            
+            if (pSpd > cSpd) {
+                gameState.player.advantage = true;
+                els.badges.p.classList.remove('hidden');
+                const returned = Math.ceil(pSpd * 0.3);
+                gameState.player.totalPts += returned;
+                msg = `YOU WON INITIATIVE! +${returned} PTS`;
+            } else if (cSpd > pSpd) {
+                gameState.cpu.advantage = true;
+                els.badges.c.classList.remove('hidden');
+                const returned = Math.ceil(cSpd * 0.3);
+                gameState.cpu.totalPts += returned;
+                msg = "ENEMY WON INITIATIVE!";
+            } else {
+                msg = "SPEED TIED";
+            }
+
+            updateTopBar();
+            els.status.innerText = msg;
+            
+            gameState.phase = 2;
+            setPhaseStep(1);
+            els.phase1.classList.add('disabled-area');
+            
+            setTimeout(() => {
+                 els.phase2.classList.remove('disabled-area');
+                 els.btn.innerHTML = `<span>ENGAGE BATTLE</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+                 els.btn.className = "w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-red-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2";
+                 els.status.innerText = "PHASE 2: BUILD YOUR UNIT";
+            }, 800);
+        }
+
+        function startBattle() {
+            els.phase2.classList.add('disabled-area');
+            els.btn.classList.add('hidden');
+            setPhaseStep(2);
+            
+            const pStats = gameState.player.currentStats;
+            const hpCost = parseInt(els.inputs.hp.value) || 0;
+            pStats.hp = Math.ceil(hpCost * 0.5); 
+            pStats.atk = parseInt(els.inputs.atk.value) || 0;
+            pStats.def = parseInt(els.inputs.def.value) || 0;
+            pStats.hpCost = hpCost;
+            
+            gameState.player.totalPts -= (hpCost + pStats.atk + pStats.def);
+            const cStats = gameState.cpu.currentStats;
+            gameState.cpu.totalPts -= (cStats.hpCost + cStats.atk + cStats.def);
+            
+            updateTopBar();
+            gameState.cpuHistory.push({...cStats});
+            updateCPUHistoryDisplay();
+
+            startBattleSequence(pStats, cStats);
+        }
+
+        function revealCard(container, valueEl, value) {
+            container.classList.remove('hidden-card');
+            container.classList.add('revealed');
+            valueEl.innerText = value;
+        }
+
+        // --- NEW BATTLE SEQUENCE LOGIC ---
+        function startBattleSequence(pStats, cStats) {
+            // Determine turn order
+            // Tie = Player goes first
+            const playerGoesFirst = (pStats.spd >= cStats.spd);
+            
+            // Stats with multipliers applied
+            const pMult = gameState.player.advantage ? 1.5 : 1.0;
+            const cMult = gameState.cpu.advantage ? 1.5 : 1.0;
+            
+            const pFinalAtk = Math.ceil(pStats.atk * pMult);
+            const cFinalAtk = Math.ceil(cStats.atk * cMult);
+
+            const sequence = [
+                // 1. Reveal Both HP
+                { action: () => {
+                    els.status.innerText = "REVEALING HULL INTEGRITY...";
+                    revealCard(els.cardsP.hpContainer, els.cardsP.hp, pStats.hp);
+                    revealCard(els.cardsC.hpContainer, els.cardsC.hp, cStats.hp);
+                }, delay: 1000 },
+
+                // --- TURN 1 (FASTER) ---
+                { action: () => {
+                    const attacker = playerGoesFirst ? "PLAYER" : "CPU";
+                    els.status.innerText = `${attacker} ATTACKS! (SPEED ADVANTAGE)`;
+                    if(playerGoesFirst) {
+                        els.cardsP.atkContainer.classList.add('active-turn');
+                        revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
+                    } else {
+                        els.cardsC.atkContainer.classList.add('active-turn');
+                        revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
+                    }
+                }, delay: 2000 },
+
+                { action: () => {
+                    const defender = playerGoesFirst ? "CPU" : "PLAYER";
+                    els.status.innerText = `${defender} DEFENDS...`;
+                    if(playerGoesFirst) {
+                        els.cardsC.defContainer.classList.add('active-turn');
+                        revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
+                    } else {
+                        els.cardsP.defContainer.classList.add('active-turn');
+                        revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
+                    }
+                }, delay: 3000 },
+
+                // Damage 1
+                { action: () => {
+                    let dmg = 0;
+                    if(playerGoesFirst) {
+                        dmg = Math.max(0, pFinalAtk - cStats.def);
+                        animateDamage(0, dmg); // 0 to player, dmg to cpu
+                        updateHpVisuals(pStats.hp, cStats.hp - dmg);
+                        cStats.remainingHp = cStats.hp - dmg; // Store temp
+                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE!`;
+                    } else {
+                        dmg = Math.max(0, cFinalAtk - pStats.def);
+                        animateDamage(dmg, 0); 
+                        updateHpVisuals(pStats.hp - dmg, cStats.hp);
+                        pStats.remainingHp = pStats.hp - dmg;
+                        els.status.innerText = `PLAYER TOOK ${dmg} DAMAGE!`;
+                    }
+                    
+                    // Clear Active Highlights
+                    document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
+                }, delay: 4500 },
+
+                // --- TURN 2 (SLOWER) ---
+                { action: () => {
+                    const attacker = playerGoesFirst ? "CPU" : "PLAYER";
+                    els.status.innerText = `${attacker} COUNTER ATTACKS!`;
+                    if(!playerGoesFirst) {
+                        els.cardsP.atkContainer.classList.add('active-turn');
+                        revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
+                    } else {
+                        els.cardsC.atkContainer.classList.add('active-turn');
+                        revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
+                    }
+                }, delay: 6000 },
+
+                { action: () => {
+                    const defender = playerGoesFirst ? "PLAYER" : "CPU";
+                    els.status.innerText = `${defender} DEFENDS...`;
+                    if(!playerGoesFirst) {
+                        els.cardsC.defContainer.classList.add('active-turn');
+                        revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
+                    } else {
+                        els.cardsP.defContainer.classList.add('active-turn');
+                        revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
+                    }
+                }, delay: 7000 },
+
+                // Damage 2
+                { action: () => {
+                    let dmg = 0;
+                    // Note: Logic inverted from turn 1
+                    if(!playerGoesFirst) {
+                        dmg = Math.max(0, pFinalAtk - cStats.def);
+                        animateDamage(0, dmg);
+                        // Use stored remaining HP or fresh HP if first hit
+                        const currentCHp = (cStats.remainingHp !== undefined) ? cStats.remainingHp : cStats.hp;
+                        updateHpVisuals(pStats.remainingHp || pStats.hp, currentCHp - dmg);
+                        cStats.remainingHp = currentCHp - dmg;
+                         els.status.innerText = `CPU TOOK ${dmg} DAMAGE!`;
+                    } else {
+                        dmg = Math.max(0, cFinalAtk - pStats.def);
+                        animateDamage(dmg, 0);
+                        const currentPHp = (pStats.remainingHp !== undefined) ? pStats.remainingHp : pStats.hp;
+                        updateHpVisuals(currentPHp - dmg, cStats.remainingHp || cStats.hp);
+                        pStats.remainingHp = currentPHp - dmg;
+                        els.status.innerText = `PLAYER TOOK ${dmg} DAMAGE!`;
+                    }
+                    document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
+                }, delay: 8500 },
+
+                // Final Result
+                { action: () => {
+                    const finalPHp = pStats.remainingHp !== undefined ? pStats.remainingHp : pStats.hp;
+                    const finalCHp = cStats.remainingHp !== undefined ? cStats.remainingHp : cStats.hp;
+                    
+                    // Total Damage Calculation for display
+                    const pDmgTotal = pStats.hp - finalPHp;
+                    const cDmgTotal = cStats.hp - finalCHp;
+
+                    showRoundResult(finalPHp, finalCHp, pDmgTotal, cDmgTotal);
+                }, delay: 10000 }
+            ];
+
+            // Execute Sequence
+            sequence.forEach(step => {
+                setTimeout(step.action, step.delay);
+            });
+        }
+
+        function updateHpVisuals(pHp, cHp) {
+             els.cardsP.hp.innerText = Math.max(0, pHp); 
+             els.cardsC.hp.innerText = Math.max(0, cHp);
+             if(pHp <= 0) els.cardsP.hpContainer.classList.add('lose-glow');
+             if(cHp <= 0) els.cardsC.hpContainer.classList.add('lose-glow');
+        }
+
+        function animateDamage(pDmg, cDmg) {
+            if (pDmg > 0) {
+                els.floats.p.innerText = `-${pDmg}`;
+                els.floats.p.classList.remove('opacity-0');
+                els.floats.p.classList.add('float-anim');
+            }
+            if (cDmg > 0) {
+                els.floats.c.innerText = `-${cDmg}`;
+                els.floats.c.classList.remove('opacity-0');
+                els.floats.c.classList.add('float-anim');
+            }
+            setTimeout(() => {
+                els.floats.p.classList.remove('float-anim'); els.floats.p.classList.add('opacity-0');
+                els.floats.c.classList.remove('float-anim'); els.floats.c.classList.add('opacity-0');
+            }, 1000);
+        }
+
+        function showRoundResult(pHp, cHp, pDmg, cDmg) {
+            let resultText = "";
+            let pClass = "text-gray-400";
+            let cClass = "text-gray-400";
+            
+            if (pHp > cHp) {
+                gameState.player.wins++;
+                resultText = "<span class='text-blue-500'>ROUND WON</span>";
+                pClass = "text-blue-500";
+            } else if (cHp > pHp) {
+                gameState.cpu.wins++;
+                resultText = "<span class='text-red-500'>ROUND LOST</span>";
+                cClass = "text-red-500";
+            } else {
+                resultText = "<span class='text-yellow-500'>DRAW</span>";
+            }
+            
+            updateTopBar();
+            
+            els.overlays.resTitle.innerHTML = resultText;
+            els.overlays.resDetail.innerHTML = `
+                <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
+                    <span class="text-xs text-gray-500">UNIT STATUS</span>
+                    <span class="text-xs text-gray-500">INTEGRITY</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="text-left">
+                        <div class="text-blue-400 font-bold">PLAYER</div>
+                        <div class="text-[10px] text-gray-500">DMG TAKEN: -${pDmg}</div>
+                    </div>
+                    <div class="text-2xl font-bold font-tech ${pClass}">${Math.max(0, pHp)}</div>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <div class="text-left">
+                        <div class="text-red-500 font-bold">CPU</div>
+                        <div class="text-[10px] text-gray-500">DMG TAKEN: -${cDmg}</div>
+                    </div>
+                    <div class="text-2xl font-bold font-tech ${cClass}">${Math.max(0, cHp)}</div>
+                </div>
+            `;
+            
+            els.overlays.result.classList.remove('hidden');
+        }
+
+        function nextRound() {
+            if (gameState.player.wins >= WIN_CONDITION) return endGame(true);
+            if (gameState.cpu.wins >= WIN_CONDITION) return endGame(false);
+            if (gameState.round >= MAX_ROUNDS) {
+                return endGame(gameState.player.wins > gameState.cpu.wins);
+            }
+
+            gameState.round++;
+            els.overlays.result.classList.add('hidden');
+            initRound();
+            updateTopBar();
+        }
+
+        function endGame(playerWon) {
+            els.overlays.result.classList.add('hidden');
+            els.overlays.gameOver.classList.remove('hidden');
+            
+            const title = els.overlays.finalTitle;
+            if (playerWon) {
+                title.innerText = "VICTORY";
+                title.classList.add('text-blue-500');
+            } else {
+                title.innerText = "DEFEAT";
+                title.classList.add('text-red-600');
+            }
+        }
+
+        function updateTopBar() {
+            els.pScore.innerText = gameState.player.wins;
+            els.cScore.innerText = gameState.cpu.wins;
+            els.round.innerText = gameState.round;
+            els.pTotal.innerText = gameState.player.totalPts;
+            els.cTotal.innerText = gameState.cpu.totalPts;
+            updateUI(); 
+        }
+
+        window.onload = () => {
+            initRound();
+            updateTopBar();
+        }
+
     </script>
 </body>
 </html>
