@@ -3,918 +3,824 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：08</title>
+    <title>Resource Strategy Card Battle：09</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@500;700&family=Roboto:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
 
         :root {
-            --color-p-main: #3b82f6;
-            --color-c-main: #ef4444;
+            --color-spd: #a855f7;
+            --color-hp: #22c55e;
+            --color-atk: #ef4444;
+            --color-def: #3b82f6;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #020617;
-            color: #e2e8f0;
-            overflow: hidden; /* App-like feel */
-            touch-action: manipulation;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            touch-action: none; /* Prevent scroll bounce */
         }
 
         .font-gaming { font-family: 'Black Ops One', cursive; }
         .font-tech { font-family: 'Rajdhani', sans-serif; }
 
-        /* --- UI Components --- */
-        
-        /* Custom Range Slider */
-        .custom-range {
-            -webkit-appearance: none; width: 100%; height: 6px;
-            background: #334155; border-radius: 3px; outline: none;
-        }
-        .custom-range::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
-            border-radius: 50%; background: #fbbf24; cursor: pointer;
-            border: 2px solid #1e293b;
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-        }
-
-        /* Number Input */
-        .num-input {
-            background-color: transparent;
-            border: none; border-bottom: 1px solid #475569;
-            color: white; width: 50px; text-align: center;
-            font-family: 'Rajdhani', sans-serif; font-weight: bold; font-size: 1.2rem;
-        }
-        .num-input:focus { outline: none; border-color: #fbbf24; }
-
-        /* Stat Gauge Bar */
-        .stat-bar-bg {
-            width: 100%; height: 6px; background-color: #1e293b;
-            border-radius: 3px; overflow: hidden; margin-top: 4px;
-        }
-        .stat-bar-fill { height: 100%; width: 0%; transition: width 0.1s ease; }
-
-        /* Stepper Buttons */
-        .step-btn {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: #334155; color: white; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; cursor: pointer; user-select: none;
-            transition: active 0.1s;
-        }
-        .step-btn:active { background: #475569; transform: scale(0.95); }
-
-        /* Cards (Grid Layout Optimized) */
+        /* --- VISUALS: BIG CARDS --- */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            width: 180px; /* Compact width for mobile */
+            gap: 12px;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
         }
 
         .battle-card {
-            width: 100%; aspect-ratio: 3/4;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid #475569; border-radius: 8px;
-            position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
+            aspect-ratio: 1 / 1.1;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+            background: #1e293b;
+            border: 4px solid #334155;
+            overflow: hidden;
         }
 
-        .battle-card.revealed {
-            background: linear-gradient(135deg, #334155, #1e293b);
-            border-color: #94a3b8; transform: rotateY(0deg);
+        /* Type Variations */
+        .card-spd { background: #581c87; border-color: #a855f7; }
+        .card-hp  { background: #14532d; border-color: #22c55e; }
+        .card-atk { background: #7f1d1d; border-color: #ef4444; }
+        .card-def { background: #1e3a8a; border-color: #3b82f6; }
+
+        /* Content inside card */
+        .card-label {
+            position: absolute; top: 6px; left: 0; right: 0;
+            text-align: center; font-size: 12px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            opacity: 0.9;
         }
         
-        .battle-card.win-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); border-color: #3b82f6; }
-        .battle-card.lose-glow { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); border-color: #ef4444; opacity: 0.6; }
-        .battle-card.active-turn { box-shadow: 0 0 20px #fbbf24; border-color: #fbbf24; z-index: 10; transform: scale(1.05); }
+        .card-val {
+            font-family: 'Black Ops One', cursive;
+            font-size: 3rem; /* Huge text */
+            line-height: 1;
+            z-index: 10;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+        }
 
+        .card-icon-bg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* Hidden State */
         .battle-card.hidden-card {
-            background: repeating-linear-gradient(45deg, #1e293b, #1e293b 10px, #0f172a 10px, #0f172a 20px);
-            border-color: #334155;
+            background: #334155;
+            border-color: #475569;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px);
         }
-        .battle-card.hidden-card .card-content { opacity: 0; }
+        .battle-card.hidden-card .card-val { opacity: 0; }
         .battle-card.hidden-card::after {
-            content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 1.5rem; color: #334155; font-family: 'Black Ops One', cursive;
+            content: '?'; position: absolute; font-family: 'Black Ops One';
+            font-size: 3rem; color: #64748b;
         }
 
-        .card-label { position: absolute; top: 2px; left: 4px; font-size: 0.6rem; font-weight: bold; opacity: 0.7; }
-        .card-icon { position: absolute; top: 2px; right: 4px; width: 14px; height: 14px; opacity: 0.7; }
-        .card-content { font-size: 1.5rem; font-weight: bold; font-family: 'Black Ops One', cursive; z-index: 2; }
+        /* FX */
+        .battle-card.win-glow { box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.6); transform: scale(1.05); z-index: 5; }
+        .battle-card.lose-glow { filter: grayscale(1) brightness(0.5); opacity: 0.8; }
+        .battle-card.active-turn { 
+            transform: scale(1.15); 
+            z-index: 20; 
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            border-color: #fff;
+        }
 
-        /* Bottom Sheet UI */
+        /* Damage Float */
+        @keyframes floatUp {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -100%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -200%) scale(1); opacity: 0; }
+        }
+        .dmg-float {
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Black Ops One'; font-size: 4rem;
+            color: #fff; text-shadow: 0 0 10px #ef4444, 4px 4px 0 #000;
+            pointer-events: none; z-index: 100;
+            white-space: nowrap;
+        }
+        .anim-float { animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+
+        /* --- UI CONTROLS: BOTTOM SHEET --- */
         .bottom-sheet {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #334155;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 100;
-            max-height: 80vh;
+            background: #1e293b;
+            border-top: 2px solid #475569;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
+            transform: translateY(0);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 50;
             display: flex; flex-direction: column;
+            max-height: 85vh;
         }
-        .bottom-sheet.closed { transform: translateY(110%); }
+        .bottom-sheet.minimized { transform: translateY(100%); }
+
+        /* Handle Area */
+        .sheet-header {
+            padding: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            background: #0f172a;
+            border-radius: 24px 24px 0 0;
+            cursor: pointer;
+            border-bottom: 1px solid #334155;
+        }
         .sheet-handle {
-            width: 40px; height: 4px; background: #475569; border-radius: 2px;
-            margin: 12px auto;
+            width: 48px; height: 6px; background: #64748b; border-radius: 10px; margin-bottom: 8px;
         }
 
-        /* Animations */
-        @keyframes floatDamage {
-            0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -60px) scale(1.5); opacity: 0; }
+        /* Inputs */
+        .control-group {
+            background: #0f172a; border-radius: 12px; padding: 12px;
+            margin-bottom: 12px; border: 1px solid #334155;
         }
-        .float-anim { animation: floatDamage 1.5s ease-out forwards; }
-        .hidden { display: none !important; }
+        .control-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+        }
+        
+        /* Big Buttons */
+        .btn-stepper {
+            height: 48px; width: 60px;
+            background: #334155; border-radius: 8px;
+            color: #fff; font-size: 24px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            touch-action: manipulation;
+            transition: background 0.1s;
+        }
+        .btn-stepper:active { background: #94a3b8; color: #000; }
+
+        /* Custom Slider */
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; background: transparent; height: 40px; /* larger touch area */
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px; background: #334155; border-radius: 4px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%;
+            background: #fbbf24; margin-top: -10px; border: 3px solid #1e293b;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* FAB (Floating Action Button) */
+        .fab-btn {
+            position: fixed; bottom: 24px; right: 24px;
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #fbbf24; color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-family: 'Rajdhani'; font-size: 14px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 40;
+            transform: scale(0); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 4px solid #fff;
+        }
+        .fab-btn.visible { transform: scale(1); }
+
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col bg-black">
+<body class="h-screen w-full select-none">
 
-    <!-- Top Bar -->
-    <header class="h-14 bg-gray-900/80 backdrop-blur border-b border-gray-800 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50">
-        <div class="flex items-center gap-2">
-            <div class="text-[10px] text-gray-500 font-bold tracking-widest">ROUND <span id="current-round" class="text-yellow-500 text-lg font-gaming">1</span>/5</div>
+    <!-- TOP HUD -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-start p-4 pointer-events-none">
+        <div>
+            <div class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">ROUND</div>
+            <div class="text-3xl font-gaming text-yellow-500 leading-none"><span id="current-round">1</span><span class="text-sm">/5</span></div>
         </div>
-        <div class="flex items-center gap-3 bg-gray-800/50 py-1 px-3 rounded-full border border-gray-700">
-            <div class="flex flex-col items-center leading-none">
-                <span class="text-[8px] text-blue-400 font-bold">YOU</span>
-                <span id="player-score" class="text-base font-bold text-white">0</span>
+        
+        <!-- Score Board -->
+        <div class="flex items-center gap-4 bg-gray-900/80 px-4 py-1 rounded-full border border-gray-700 backdrop-blur pointer-events-auto">
+            <div class="text-center">
+                <div class="text-[8px] text-blue-400 font-bold">YOU</div>
+                <div id="player-score" class="text-xl font-bold">0</div>
             </div>
-            <div class="text-gray-600 font-bold text-xs">VS</div>
-            <div class="flex flex-col items-center leading-none">
-                <span class="text-[8px] text-red-500 font-bold">CPU</span>
-                <span id="cpu-score" class="text-base font-bold text-white">0</span>
+            <div class="text-gray-600 font-black text-xs">VS</div>
+            <div class="text-center">
+                <div class="text-[8px] text-red-500 font-bold">CPU</div>
+                <div id="cpu-score" class="text-xl font-bold">0</div>
             </div>
         </div>
     </header>
 
-    <!-- Main Arena (Background) -->
-    <main class="flex-1 relative w-full h-full pt-16 pb-32 flex flex-col items-center justify-center overflow-hidden">
+    <!-- MAIN ARENA (Click background to close sheet) -->
+    <main id="main-arena" class="absolute inset-0 flex flex-col items-center justify-center pt-10 pb-20" onclick="toggleSheet(false)">
         
-        <!-- BG Effects -->
-        <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(circle at center, #1e293b 0%, #000 80%);"></div>
-        <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
-
-        <!-- CPU Stats & History (Top Right) -->
-        <div class="absolute top-16 right-4 z-10 flex flex-col items-end pointer-events-none">
-            <div class="bg-gray-900/60 backdrop-blur px-2 py-1 rounded border border-red-900/50 mb-1">
-                <span class="text-[8px] text-gray-400">ENEMY RESOURCE</span>
-                <div class="text-sm font-tech font-bold text-red-500 text-right"><span id="cpu-total-pts">1000</span></div>
+        <!-- CPU AREA (Top) -->
+        <div class="w-full flex flex-col items-center mb-6 relative">
+            <!-- CPU Intel -->
+            <div id="cpu-intel" class="absolute -right-2 top-0 bg-gray-900/90 text-right px-3 py-1 rounded-l-lg border-l-2 border-red-500 text-[10px] text-gray-300 pointer-events-none opacity-80">
+                <div>ENEMY RES: <span id="cpu-total-pts" class="text-red-400 font-bold text-sm">1000</span></div>
+                <div id="history-content" class="text-[9px] text-yellow-500 mt-1 hidden">PREV: BALANCED</div>
             </div>
-            <div id="cpu-history" class="hidden bg-gray-900/80 border-r-2 border-yellow-500 p-2 rounded text-right shadow-sm backdrop-blur">
-                <div class="text-[8px] text-yellow-500 font-bold mb-0.5 uppercase">Intel</div>
-                <div id="history-content" class="text-[9px] space-y-0.5 font-mono text-gray-300"></div>
+
+            <!-- CPU Cards -->
+            <div class="card-grid">
+                <!-- SPD -->
+                <div class="battle-card card-spd" id="card-c-spd-wrap">
+                    <div class="card-label text-purple-200">SPD</div>
+                    <div class="card-val text-white" id="card-c-spd">?</div>
+                    <div class="card-icon-bg">⚡</div>
+                </div>
+                <!-- HP -->
+                <div class="battle-card card-hp hidden-card" id="card-c-hp-wrap">
+                    <div class="card-label text-green-200">HP</div>
+                    <div class="card-val text-white" id="card-c-hp">?</div>
+                    <div class="card-icon-bg">♥</div>
+                    <!-- HP Bar -->
+                    <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-2 bg-green-400 transition-all"></div>
+                </div>
+                <!-- ATK -->
+                <div class="battle-card card-atk hidden-card" id="card-c-atk-wrap">
+                    <div class="card-label text-red-200">ATK</div>
+                    <div class="card-val text-white" id="card-c-atk">?</div>
+                    <div class="card-icon-bg">⚔</div>
+                </div>
+                <!-- DEF -->
+                <div class="battle-card card-def hidden-card" id="card-c-def-wrap">
+                    <div class="card-label text-blue-200">DEF</div>
+                    <div class="card-val text-white" id="card-c-def">?</div>
+                    <div class="card-icon-bg">🛡</div>
+                </div>
+            </div>
+            
+            <!-- CPU Damage Float -->
+            <div id="c-dmg-float" class="dmg-float text-blue-400"></div>
+        </div>
+
+        <!-- PLAYER AREA (Bottom) -->
+        <div class="w-full flex flex-col items-center mt-2">
+            
+            <div class="card-grid">
+                <!-- SPD -->
+                <div class="battle-card card-spd" id="card-p-spd-wrap">
+                    <div class="card-label text-purple-200">SPD</div>
+                    <div class="card-val text-white" id="card-p-spd">-</div>
+                    <div class="card-icon-bg">⚡</div>
+                </div>
+                <!-- HP -->
+                <div class="battle-card card-hp hidden-card" id="card-p-hp-wrap">
+                    <div class="card-label text-green-200">HP</div>
+                    <div class="card-val text-white" id="card-p-hp">-</div>
+                    <div class="card-icon-bg">♥</div>
+                    <!-- HP Bar -->
+                    <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-2 bg-green-400 transition-all"></div>
+                </div>
+                <!-- ATK -->
+                <div class="battle-card card-atk hidden-card" id="card-p-atk-wrap">
+                    <div class="card-label text-red-200">ATK</div>
+                    <div class="card-val text-white" id="card-p-atk">-</div>
+                    <div class="card-icon-bg">⚔</div>
+                </div>
+                <!-- DEF -->
+                <div class="battle-card card-def hidden-card" id="card-p-def-wrap">
+                    <div class="card-label text-blue-200">DEF</div>
+                    <div class="card-val text-white" id="card-p-def">-</div>
+                    <div class="card-icon-bg">🛡</div>
+                </div>
+            </div>
+
+            <!-- Player Damage Float -->
+            <div id="p-dmg-float" class="dmg-float text-red-500"></div>
+        </div>
+
+        <!-- Status / Advantage Badges -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+            <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl animate-bounce">
+                INITIATIVE WIN! (ATK x1.5)
             </div>
         </div>
 
-        <!-- BATTLE AREA -->
-        <div class="relative z-10 w-full max-w-md h-full flex flex-col justify-evenly py-4">
-
-            <!-- CPU CARDS (Top) -->
-            <div class="flex flex-col items-center relative">
-                <div id="cpu-adv-badge" class="hidden mb-2 bg-red-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-lg border border-red-400 animate-pulse">
-                    ATK x1.5 ACTIVE
-                </div>
-                
-                <div class="card-grid">
-                    <!-- SPD -->
-                    <div class="battle-card" style="border-color: #a855f7;">
-                        <div class="card-label text-purple-400">SPD</div>
-                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                        <div class="card-content text-white" id="card-c-spd">?</div>
-                    </div>
-                    <!-- HP -->
-                    <div class="battle-card hidden-card" id="card-c-hp-container">
-                        <div class="card-label text-green-400">HP</div>
-                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                        <div class="card-content text-white" id="card-c-hp">?</div>
-                        <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all rounded-b"></div>
-                    </div>
-                    <!-- ATK -->
-                    <div class="battle-card hidden-card" id="card-c-atk-container">
-                        <div class="card-label text-red-400">ATK</div>
-                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
-                        <div class="card-content text-white" id="card-c-atk">?</div>
-                    </div>
-                    <!-- DEF -->
-                    <div class="battle-card hidden-card" id="card-c-def-container">
-                        <div class="card-label text-blue-400">DEF</div>
-                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                        <div class="card-content text-white" id="card-c-def">?</div>
-                    </div>
-                </div>
-
-                <!-- Damage Float -->
-                <div id="c-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-blue-400 opacity-0 pointer-events-none text-shadow z-50"></div>
-            </div>
-
-            <!-- VS Divider -->
-            <div class="flex items-center justify-center my-2 opacity-30">
-                <div class="h-px bg-white w-20"></div>
-                <div class="mx-2 font-gaming text-white">VS</div>
-                <div class="h-px bg-white w-20"></div>
-            </div>
-
-            <!-- PLAYER CARDS (Bottom) -->
-            <div class="flex flex-col items-center relative">
-                <div class="card-grid">
-                    <!-- SPD -->
-                    <div class="battle-card" style="border-color: #a855f7;">
-                        <div class="card-label text-purple-400">SPD</div>
-                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                        <div class="card-content text-white" id="card-p-spd">-</div>
-                    </div>
-                    <!-- HP -->
-                    <div class="battle-card hidden-card" id="card-p-hp-container">
-                        <div class="card-label text-green-400">HP</div>
-                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                        <div class="card-content text-white" id="card-p-hp">-</div>
-                        <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all rounded-b"></div>
-                    </div>
-                    <!-- ATK -->
-                    <div class="battle-card hidden-card" id="card-p-atk-container">
-                        <div class="card-label text-red-400">ATK</div>
-                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
-                        <div class="card-content text-white" id="card-p-atk">-</div>
-                    </div>
-                    <!-- DEF -->
-                    <div class="battle-card hidden-card" id="card-p-def-container">
-                        <div class="card-label text-blue-400">DEF</div>
-                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                        <div class="card-content text-white" id="card-p-def">-</div>
-                    </div>
-                </div>
-
-                <div id="player-adv-badge" class="hidden mt-2 bg-blue-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-lg border border-blue-400 animate-pulse">
-                    ATK x1.5 ACTIVE
-                </div>
-
-                <!-- Damage Float -->
-                <div id="p-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-red-500 opacity-0 pointer-events-none text-shadow z-50"></div>
-            </div>
-
-            <!-- Game Status Toast -->
-            <div class="absolute bottom-4 left-0 right-0 text-center pointer-events-none z-0">
-                <span id="game-status" class="bg-black/60 text-white text-xs px-4 py-1 rounded-full border border-gray-700 backdrop-blur">WAITING FOR INPUT...</span>
-            </div>
-        </div>
     </main>
 
-    <!-- INPUT COCKPIT (Bottom Sheet) -->
-    <div id="cockpit-sheet" class="bottom-sheet">
-        <div class="sheet-handle"></div>
+    <!-- FAB: Open Input -->
+    <button id="fab-edit" class="fab-btn" onclick="toggleSheet(true)">
+        EDIT
+    </button>
+
+    <!-- BOTTOM SHEET: INPUT -->
+    <div id="cockpit-sheet" class="bottom-sheet" onclick="event.stopPropagation()">
         
-        <!-- Header: Resource -->
-        <div class="px-6 pb-2 pt-1 flex justify-between items-end border-b border-gray-800">
-            <div>
-                <div class="text-[10px] text-gray-500 tracking-wider">YOUR RESOURCES</div>
-                <div class="flex items-baseline gap-1">
-                    <span id="sheet-resource-val" class="text-3xl font-tech font-bold text-blue-400">1000</span>
-                    <span class="text-xs text-gray-400">PTS</span>
+        <!-- Header (Tap to close) -->
+        <div class="sheet-header" onclick="toggleSheet(false)">
+            <div class="sheet-handle"></div>
+            <div class="flex justify-between items-center w-full px-4">
+                <div id="phase-title" class="font-gaming text-xl text-gray-200">PHASE 1: SPEED</div>
+                <div class="text-right">
+                    <div class="text-[10px] text-gray-500">REMAINING</div>
+                    <div id="sheet-resource" class="text-2xl font-tech font-bold text-blue-400">1000</div>
                 </div>
-            </div>
-            <div class="text-right">
-                <div class="text-[10px] text-gray-500">COST</div>
-                <div class="text-xl font-bold text-white" id="round-cost">0</div>
             </div>
         </div>
 
         <!-- Scrollable Inputs -->
-        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             
-            <!-- Phase 1 Content -->
-            <div id="p1-inputs">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-purple-400 font-bold text-sm">SPEED</span>
-                    <span class="text-[10px] text-gray-500">Win for 1.5x ATK & 30% Refund</span>
-                </div>
-                <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="step-btn" onclick="stepVal('spd', -10)">-10</div>
-                        <div class="step-btn" onclick="stepVal('spd', -1)">-</div>
-                        <input type="number" id="num-spd" class="num-input flex-1" value="0" oninput="syncInput('spd', this.value)">
-                        <div class="step-btn" onclick="stepVal('spd', 1)">+</div>
-                        <div class="step-btn" onclick="stepVal('spd', 10)">+10</div>
+            <!-- Phase 1: SPD -->
+            <div id="input-group-spd" class="control-group border-purple-900/50">
+                <div class="control-header">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">⚡</span>
+                        <span class="font-bold text-lg text-purple-400">SPEED</span>
                     </div>
-                    <input type="range" id="input-spd" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('spd', this.value)">
-                    <div class="stat-bar-bg"><div id="bar-spd" class="stat-bar-fill bg-purple-500"></div></div>
+                    <div class="font-tech text-3xl font-bold" id="disp-spd">0</div>
                 </div>
+                <div class="flex flex-col gap-2">
+                    <input type="range" id="range-spd" min="0" max="1000" value="0" oninput="onInput('spd', this.value)">
+                    <div class="flex justify-between gap-2">
+                        <button class="btn-stepper" onclick="step('spd', -10)">-</button>
+                        <button class="btn-stepper flex-1 bg-purple-900/50 text-sm" onclick="step('spd', 0, true)">RESET</button>
+                        <button class="btn-stepper" onclick="step('spd', 10)">+</button>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2 text-center">Win for 1.5x ATK & 30% Refund</div>
             </div>
 
-            <!-- Phase 2 Content -->
-            <div id="p2-inputs" class="hidden space-y-4">
+            <!-- Phase 2: HP/ATK/DEF -->
+            <div id="input-group-build" class="space-y-4 hidden">
                 
                 <!-- HP -->
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-green-400 font-bold text-sm">HP COST</span>
-                        <span class="text-[10px] text-green-300">REAL HP: <span id="real-hp-val">0</span></span>
-                    </div>
-                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="step-btn" onclick="stepVal('hp', -10)">-10</div>
-                            <input type="range" id="input-hp" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('hp', this.value)">
-                            <div class="step-btn" onclick="stepVal('hp', 10)">+10</div>
-                            <input type="number" id="num-hp" class="num-input" value="0" oninput="syncInput('hp', this.value)">
+                <div class="control-group border-green-900/50">
+                    <div class="control-header">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">♥</span>
+                            <span class="font-bold text-lg text-green-400">HP</span>
                         </div>
-                        <div class="stat-bar-bg"><div id="bar-hp" class="stat-bar-fill bg-green-500"></div></div>
+                        <div class="text-right">
+                            <div class="font-tech text-3xl font-bold" id="disp-hp">0</div>
+                            <div class="text-[10px] text-green-600">REAL HP: <span id="real-hp">0</span></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <input type="range" id="range-hp" min="0" max="1000" value="0" oninput="onInput('hp', this.value)">
+                        <div class="flex justify-between gap-2">
+                            <button class="btn-stepper" onclick="step('hp', -10)">-</button>
+                            <button class="btn-stepper flex-1 bg-green-900/50 text-sm" onclick="step('hp', 0, true)">RESET</button>
+                            <button class="btn-stepper" onclick="step('hp', 10)">+</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ATK -->
-                <div>
-                    <div class="mb-1"><span class="text-red-400 font-bold text-sm">ATTACK</span></div>
-                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="step-btn" onclick="stepVal('atk', -10)">-10</div>
-                            <input type="range" id="input-atk" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('atk', this.value)">
-                            <div class="step-btn" onclick="stepVal('atk', 10)">+10</div>
-                            <input type="number" id="num-atk" class="num-input" value="0" oninput="syncInput('atk', this.value)">
+                <div class="control-group border-red-900/50">
+                    <div class="control-header">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">⚔</span>
+                            <span class="font-bold text-lg text-red-400">ATK</span>
                         </div>
-                        <div class="stat-bar-bg"><div id="bar-atk" class="stat-bar-fill bg-red-500"></div></div>
+                        <div class="font-tech text-3xl font-bold" id="disp-atk">0</div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <input type="range" id="range-atk" min="0" max="1000" value="0" oninput="onInput('atk', this.value)">
+                        <div class="flex justify-between gap-2">
+                            <button class="btn-stepper" onclick="step('atk', -10)">-</button>
+                            <button class="btn-stepper flex-1 bg-red-900/50 text-sm" onclick="step('atk', 0, true)">RESET</button>
+                            <button class="btn-stepper" onclick="step('atk', 10)">+</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- DEF -->
-                <div>
-                    <div class="mb-1"><span class="text-blue-400 font-bold text-sm">DEFENSE</span></div>
-                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="step-btn" onclick="stepVal('def', -10)">-10</div>
-                            <input type="range" id="input-def" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('def', this.value)">
-                            <div class="step-btn" onclick="stepVal('def', 10)">+10</div>
-                            <input type="number" id="num-def" class="num-input" value="0" oninput="syncInput('def', this.value)">
+                <div class="control-group border-blue-900/50">
+                    <div class="control-header">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🛡</span>
+                            <span class="font-bold text-lg text-blue-400">DEF</span>
                         </div>
-                        <div class="stat-bar-bg"><div id="bar-def" class="stat-bar-fill bg-blue-500"></div></div>
+                        <div class="font-tech text-3xl font-bold" id="disp-def">0</div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <input type="range" id="range-def" min="0" max="1000" value="0" oninput="onInput('def', this.value)">
+                        <div class="flex justify-between gap-2">
+                            <button class="btn-stepper" onclick="step('def', -10)">-</button>
+                            <button class="btn-stepper flex-1 bg-blue-900/50 text-sm" onclick="step('def', 0, true)">RESET</button>
+                            <button class="btn-stepper" onclick="step('def', 10)">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <div id="error-msg" class="text-red-500 text-xs text-center font-bold h-4"></div>
+            <div class="h-20"></div> <!-- Spacer -->
         </div>
 
-        <!-- Action Button -->
-        <div class="p-4 border-t border-gray-800 bg-gray-900">
-            <button id="action-btn" class="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-900/40 active:scale-95 transition-all text-lg tracking-wider" onclick="handlePhaseAction()">
+        <!-- Sticky Footer Button -->
+        <div class="p-4 bg-gray-900 border-t border-gray-800">
+            <button id="action-btn" class="w-full h-14 bg-blue-600 active:bg-blue-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95" onclick="commitPhase()">
                 LOCK IN SPEED
             </button>
+            <div id="error-msg" class="text-center text-red-500 text-xs font-bold mt-1 h-4"></div>
         </div>
     </div>
 
     <!-- RESULT OVERLAY -->
-    <div id="result-overlay" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[150] hidden backdrop-blur-md">
-        <div class="bg-gray-900 border border-gray-700 p-6 rounded-2xl shadow-2xl max-w-xs w-full text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
-            <h1 id="result-title" class="text-2xl font-gaming text-white mb-4">ROUND COMPLETE</h1>
-            <div id="result-detail" class="text-sm text-gray-300 space-y-4 mb-6"></div>
-            <button onclick="nextRound()" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-lg uppercase tracking-widest">
-                NEXT ROUND
-            </button>
-        </div>
+    <div id="result-overlay" class="fixed inset-0 bg-black/95 z-[200] hidden flex flex-col items-center justify-center p-6 text-center">
+        <h1 id="res-title" class="text-4xl font-gaming text-white mb-6">VICTORY</h1>
+        <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
+        <button onclick="nextRound()" class="w-full max-w-xs bg-yellow-500 text-black font-bold h-14 rounded-xl text-xl font-gaming shadow-[0_0_20px_#fbbf24]">
+            NEXT ROUND
+        </button>
     </div>
 
-    <!-- GAME OVER OVERLAY -->
-    <div id="game-over-overlay" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-[200] hidden">
-            <h1 id="final-result-title" class="text-6xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
-            <p class="text-gray-500 tracking-[0.5em] mb-8">SIMULATION ENDED</p>
-            <button onclick="location.reload()" class="bg-white text-black font-bold py-3 px-12 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)]">
-                REBOOT SYSTEM
-            </button>
-    </div>
-
+    <!-- SCRIPTS -->
     <script>
-        // Haptics Helper
-        function pulse(ms = 10) {
-            if (navigator.vibrate) navigator.vibrate(ms);
-        }
-
-        // --- GAME LOGIC ---
+        // --- CONSTANTS ---
         const MAX_ROUNDS = 5;
-        const WIN_CONDITION = 3;
-        const START_POINTS = 1000;
-        
-        let gameState = {
+        const START_PTS = 1000;
+
+        // --- STATE ---
+        let state = {
             round: 1,
-            phase: 1, 
-            player: { totalPts: START_POINTS, wins: 0, currentStats: {}, advantage: false },
-            cpu: { totalPts: START_POINTS, wins: 0, currentStats: {}, advantage: false },
-            cpuHistory: [] 
+            phase: 1, // 1: Speed, 2: Build
+            p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0 },
+            c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0 },
+            history: [],
+            inputs: { spd: 0, hp: 0, atk: 0, def: 0 }
         };
 
-        const els = {
-            pScore: document.getElementById('player-score'),
-            cScore: document.getElementById('cpu-score'),
-            round: document.getElementById('current-round'),
-            status: document.getElementById('game-status'),
-            pTotal: document.getElementById('player-total-pts'),
-            cTotal: document.getElementById('cpu-total-pts'),
+        // --- ELEMENTS ---
+        const el = (id) => document.getElementById(id);
+        const ui = {
+            sheet: el('cockpit-sheet'),
+            fab: el('fab-edit'),
+            p1: el('input-group-spd'),
+            p2: el('input-group-build'),
+            btn: el('action-btn'),
+            title: el('phase-title'),
+            err: el('error-msg'),
+            res: el('sheet-resource'),
             
-            inputs: {
-                spd: document.getElementById('input-spd'),
-                hp: document.getElementById('input-hp'),
-                atk: document.getElementById('input-atk'),
-                def: document.getElementById('input-def'),
-                nSpd: document.getElementById('num-spd'),
-                nHp: document.getElementById('num-hp'),
-                nAtk: document.getElementById('num-atk'),
-                nDef: document.getElementById('num-def'),
-            },
-            bars: {
-                spd: document.getElementById('bar-spd'),
-                hp: document.getElementById('bar-hp'),
-                atk: document.getElementById('bar-atk'),
-                def: document.getElementById('bar-def'),
-            },
-            
-            realHpVal: document.getElementById('real-hp-val'),
-            sheetResource: document.getElementById('sheet-resource-val'),
-            
-            p1Group: document.getElementById('p1-inputs'),
-            p2Group: document.getElementById('p2-inputs'),
-            
-            btn: document.getElementById('action-btn'),
-            cost: document.getElementById('round-cost'),
-            error: document.getElementById('error-msg'),
-            sheet: document.getElementById('cockpit-sheet'),
-            
-            cardsP: {
-                spd: document.getElementById('card-p-spd'),
-                hp: document.getElementById('card-p-hp'),
-                atk: document.getElementById('card-p-atk'),
-                def: document.getElementById('card-p-def'),
-                hpContainer: document.getElementById('card-p-hp-container'),
-                atkContainer: document.getElementById('card-p-atk-container'),
-                defContainer: document.getElementById('card-p-def-container'),
-            },
-            cardsC: {
-                spd: document.getElementById('card-c-spd'),
-                hp: document.getElementById('card-c-hp'),
-                atk: document.getElementById('card-c-atk'),
-                def: document.getElementById('card-c-def'),
-                hpContainer: document.getElementById('card-c-hp-container'),
-                atkContainer: document.getElementById('card-c-atk-container'),
-                defContainer: document.getElementById('card-c-def-container'),
-            },
-            badges: {
-                p: document.getElementById('player-adv-badge'),
-                c: document.getElementById('cpu-adv-badge')
-            },
-            history: {
-                panel: document.getElementById('cpu-history'),
-                content: document.getElementById('history-content')
-            },
-            overlays: {
-                result: document.getElementById('result-overlay'),
-                gameOver: document.getElementById('game-over-overlay'),
-                resTitle: document.getElementById('result-title'),
-                resDetail: document.getElementById('result-detail'),
-                finalTitle: document.getElementById('final-result-title')
-            },
-            floats: {
-                p: document.getElementById('p-dmg-float'),
-                c: document.getElementById('c-dmg-float')
-            }
+            // Cards
+            cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
+            cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
+            wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
+            wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
         };
 
-        // --- UI Interactions ---
-
+        // --- SHEET LOGIC ---
         function toggleSheet(open) {
-            if (open) els.sheet.classList.remove('closed');
-            else els.sheet.classList.add('closed');
+            if (open) {
+                ui.sheet.classList.remove('minimized');
+                ui.fab.classList.remove('visible');
+            } else {
+                ui.sheet.classList.add('minimized');
+                ui.fab.classList.add('visible');
+            }
         }
 
-        function stepVal(type, delta) {
-            pulse(5);
-            let input = els.inputs[type];
-            let current = parseInt(input.value) || 0;
-            let next = Math.max(0, current + delta);
-            syncInput(type, next);
+        // --- INPUT LOGIC ---
+        function onInput(key, val) {
+            state.inputs[key] = parseInt(val) || 0;
+            updateUI();
         }
 
-        function syncInput(type, val) {
-            const intVal = parseInt(val) || 0;
-            const rangeIn = els.inputs[type];
-            const numIn = els.inputs['n' + type.charAt(0).toUpperCase() + type.slice(1)];
+        function step(key, delta, reset=false) {
+            if(reset) state.inputs[key] = 0;
+            else state.inputs[key] = Math.max(0, state.inputs[key] + delta);
             
-            rangeIn.value = intVal;
-            numIn.value = intVal;
+            // Sync range slider
+            el('range-'+key).value = state.inputs[key];
             updateUI();
         }
 
         function updateUI() {
-            const spd = parseInt(els.inputs.spd.value) || 0;
-            const hpCost = parseInt(els.inputs.hp.value) || 0;
-            const atk = parseInt(els.inputs.atk.value) || 0;
-            const def = parseInt(els.inputs.def.value) || 0;
+            // Display Values
+            ['spd', 'hp', 'atk', 'def'].forEach(k => {
+                if(el('disp-'+k)) el('disp-'+k).innerText = state.inputs[k];
+            });
+            el('real-hp').innerText = Math.ceil(state.inputs.hp * 0.5);
 
-            els.bars.spd.style.width = `${Math.min(100, (spd/500)*100)}%`;
-            els.bars.hp.style.width = `${Math.min(100, (hpCost/500)*100)}%`;
-            els.bars.atk.style.width = `${Math.min(100, (atk/500)*100)}%`;
-            els.bars.def.style.width = `${Math.min(100, (def/500)*100)}%`;
-
-            const realHp = Math.ceil(hpCost * 0.5);
-            els.realHpVal.innerText = realHp;
+            // Calc Cost
+            const cost = state.inputs.spd + state.inputs.hp + state.inputs.atk + state.inputs.def;
+            const remaining = state.p.total - cost;
             
-            const currentCost = spd + hpCost + atk + def;
-            els.cost.innerText = currentCost;
-
-            const remaining = gameState.player.totalPts - currentCost;
-            els.sheetResource.innerText = remaining;
-
+            ui.res.innerText = remaining;
+            
             if (remaining < 0) {
-                els.error.innerText = "INSUFFICIENT RESOURCES";
-                els.btn.disabled = true;
-                els.btn.classList.add('opacity-50', 'grayscale');
-                els.sheetResource.classList.add('text-red-500');
-                els.sheetResource.classList.remove('text-blue-400');
+                ui.res.classList.add('text-red-500');
+                ui.res.classList.remove('text-blue-400');
+                ui.btn.disabled = true;
+                ui.btn.classList.add('opacity-50');
+                ui.err.innerText = "INSUFFICIENT RESOURCES";
                 return false;
             } else {
-                els.error.innerText = "";
-                els.btn.disabled = false;
-                els.btn.classList.remove('opacity-50', 'grayscale');
-                els.sheetResource.classList.remove('text-red-500');
-                els.sheetResource.classList.add('text-blue-400');
+                ui.res.classList.remove('text-red-500');
+                ui.res.classList.add('text-blue-400');
+                ui.btn.disabled = false;
+                ui.btn.classList.remove('opacity-50');
+                ui.err.innerText = "";
                 return true;
             }
         }
 
-        // --- GAME LOOP ---
+        // --- GAME FLOW ---
 
         function initRound() {
-            // Reset Inputs
-            ['spd', 'hp', 'atk', 'def'].forEach(k => {
-                syncInput(k, 0);
+            state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
+            ['spd','hp','atk','def'].forEach(k => {
+                 if(el('range-'+k)) el('range-'+k).value = 0;
             });
-            els.inputs.spd.readOnly = false;
-            els.inputs.nSpd.readOnly = false;
             
-            // State
-            gameState.player.currentStats = {};
-            gameState.cpu.currentStats = {};
-            gameState.player.advantage = false;
-            gameState.cpu.advantage = false;
+            state.phase = 1;
+            ui.p1.classList.remove('hidden');
+            ui.p2.classList.add('hidden');
+            ui.title.innerText = "PHASE 1: SPEED";
+            ui.btn.innerText = "LOCK IN SPEED";
+            ui.btn.className = "w-full h-14 bg-purple-600 active:bg-purple-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95";
+
+            // Reset Cards Visuals
+            resetCards();
             
-            // UI Setup Phase 1
-            gameState.phase = 1;
-            els.p1Group.classList.remove('hidden');
-            els.p2Group.classList.add('hidden');
-            els.btn.innerText = "LOCK IN SPEED";
-            els.btn.classList.remove('bg-red-600', 'hover:bg-red-500');
-            els.btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
-            els.status.innerText = "PHASE 1: SET SPEED";
+            // Generate CPU
+            generateCPU();
             
-            toggleSheet(true); // Open Input Sheet
-            generateCPUStats();
+            updateUI();
+            toggleSheet(true);
         }
 
-        function resetBattleArena() {
-            [els.cardsP, els.cardsC].forEach(cards => {
-                cards.spd.innerText = cards === els.cardsP ? "-" : "?";
-                cards.hp.innerText = "?";
-                cards.atk.innerText = "?";
-                cards.def.innerText = "?";
+        function resetCards() {
+            // Reset text
+            ['spd','hp','atk','def'].forEach(k => {
+                ui.cP[k].innerText = (k==='spd' ? '-' : '-');
+                ui.cC[k].innerText = (k==='spd' ? '?' : '?');
                 
-                ['hpContainer', 'atkContainer', 'defContainer'].forEach(k => {
-                    cards[k].classList.add('hidden-card');
-                    cards[k].classList.remove('revealed', 'win-glow', 'lose-glow', 'active-turn');
-                });
+                // Wrappers
+                if(k!=='spd') {
+                    ui.wrapsP[k].classList.add('hidden-card');
+                    ui.wrapsC[k].classList.add('hidden-card');
+                    ui.wrapsP[k].classList.remove('revealed', 'active-turn', 'win-glow', 'lose-glow');
+                    ui.wrapsC[k].classList.remove('revealed', 'active-turn', 'win-glow', 'lose-glow');
+                }
             });
-
-            els.badges.p.classList.add('hidden');
-            els.badges.c.classList.add('hidden');
-            els.floats.p.classList.remove('float-anim');
-            els.floats.c.classList.remove('float-anim');
-            els.floats.p.classList.add('opacity-0');
-            els.floats.c.classList.add('opacity-0');
+            el('adv-badge').classList.add('hidden');
         }
 
-        function generateCPUStats() {
-            const cpu = gameState.cpu;
-            const roundsLeft = (MAX_ROUNDS - gameState.round) + 1;
-            let budget = 0;
-            if (gameState.round === MAX_ROUNDS) budget = cpu.totalPts;
-            else {
-                const avg = Math.floor(cpu.totalPts / roundsLeft);
+        function generateCPU() {
+            const roundsLeft = (MAX_ROUNDS - state.round) + 1;
+            let budget = state.c.total;
+            if (roundsLeft > 1) {
+                const avg = Math.floor(state.c.total / roundsLeft);
                 const variance = Math.floor(Math.random() * (avg * 0.4)) - (avg * 0.2); 
-                budget = Math.max(0, Math.min(cpu.totalPts, avg + variance));
-                if (gameState.player.wins > gameState.cpu.wins && Math.random() < 0.3) budget = Math.min(cpu.totalPts, budget * 2);
+                budget = Math.max(0, Math.min(state.c.total, avg + variance));
             }
-            let remaining = budget;
-            const spd = Math.ceil(Math.random() * (remaining * 0.3)); remaining -= spd;
-            const atk = Math.ceil(Math.random() * (remaining * 0.5)); remaining -= atk;
-            const def = Math.ceil(Math.random() * (remaining * 0.4)); remaining -= def;
-            const hpCost = Math.max(0, remaining);
-            const hp = Math.ceil(hpCost * 0.5); 
-            gameState.cpu.currentStats = { spd, hp, atk, def, hpCost };
             
-            // History
-            if(gameState.cpuHistory.length > 0) {
-                 const last = gameState.cpuHistory[gameState.cpuHistory.length - 1];
-                 let t = "BALANCED";
-                 const tot = last.hpCost + last.atk + last.def;
-                 if(tot>0) {
-                    if(last.atk > tot*0.5) t="AGGRO";
-                    else if(last.def > tot*0.5) t="DEFENSE";
-                    else if(last.hpCost > tot*0.5) t="TANK";
-                    else if(last.spd > 150) t="SPEED";
-                 } else t="SAVER";
-                 els.history.content.innerText = `TYPE: ${t} | S:${last.spd} A:${last.atk} D:${last.def} H:${last.hp}`;
-                 els.history.panel.classList.remove('hidden');
+            let rem = budget;
+            const spd = Math.ceil(Math.random() * (rem * 0.3)); rem -= spd;
+            const atk = Math.ceil(Math.random() * (rem * 0.5)); rem -= atk;
+            const def = Math.ceil(Math.random() * (rem * 0.4)); rem -= def;
+            const hpCost = Math.max(0, rem);
+            const hp = Math.ceil(hpCost * 0.5);
+
+            state.c.spd = spd;
+            state.c.hp = hp; state.c.hpCost = hpCost;
+            state.c.atk = atk;
+            state.c.def = def;
+            
+            // Update CPU Intel
+            el('cpu-total-pts').innerText = state.c.total;
+            if(state.history.length > 0) {
+                el('history-content').classList.remove('hidden');
+                // Simple logic for display
+                const last = state.history[state.history.length-1];
+                let t = "BALANCED";
+                if(last.atk > 100) t="AGGRO";
+                else if(last.def > 100) t="DEFENSIVE";
+                el('history-content').innerText = `LAST: ${t}`;
             }
         }
 
-        function handlePhaseAction() {
-            pulse(20);
-            if (!updateUI()) return; 
-            
-            if (gameState.phase === 1) {
-                // Phase 1 -> Phase 2
-                resetBattleArena();
-                els.inputs.spd.readOnly = true;
-                els.inputs.nSpd.readOnly = true;
-                const pSpd = parseInt(els.inputs.spd.value) || 0;
-                gameState.player.currentStats.spd = pSpd;
-                gameState.player.totalPts -= pSpd;
-                gameState.cpu.totalPts -= gameState.cpu.currentStats.spd;
+        function commitPhase() {
+            if(!updateUI()) return;
+
+            if (state.phase === 1) {
+                // Commit Speed
+                state.p.spd = state.inputs.spd;
+                state.p.total -= state.p.spd;
+                state.c.total -= state.c.spd;
                 
-                // Show Speed Result
-                els.cardsP.spd.innerText = pSpd;
-                els.cardsC.spd.innerText = gameState.cpu.currentStats.spd;
-                
-                const cSpd = gameState.cpu.currentStats.spd;
-                if (pSpd > cSpd) {
-                    gameState.player.advantage = true;
-                    els.badges.p.classList.remove('hidden');
-                    const returned = Math.ceil(pSpd * 0.3);
-                    gameState.player.totalPts += returned;
-                    els.status.innerText = `INITIATIVE WON! +${returned} PTS`;
-                } else if (cSpd > pSpd) {
-                    gameState.cpu.advantage = true;
-                    els.badges.c.classList.remove('hidden');
-                    const returned = Math.ceil(cSpd * 0.3);
-                    gameState.cpu.totalPts += returned;
-                    els.status.innerText = "OPPONENT WON INITIATIVE";
+                // Show Speed
+                ui.cP.spd.innerText = state.p.spd;
+                ui.cC.spd.innerText = state.c.spd;
+
+                // Calc Advantage
+                state.pAdv = false; state.cAdv = false;
+                if (state.p.spd > state.c.spd) {
+                    state.pAdv = true;
+                    const refund = Math.ceil(state.p.spd * 0.3);
+                    state.p.total += refund;
+                    showToast(`YOU WIN SPEED! +${refund} PTS`);
+                } else if (state.c.spd > state.p.spd) {
+                    state.cAdv = true;
+                    const refund = Math.ceil(state.c.spd * 0.3);
+                    state.c.total += refund;
+                    showToast(`CPU WINS SPEED!`);
                 } else {
-                    els.status.innerText = "SPEED TIED";
+                    showToast(`SPEED DRAW`);
                 }
 
-                // Switch to Phase 2 Inputs
-                gameState.phase = 2;
-                els.p1Group.classList.add('hidden');
-                els.p2Group.classList.remove('hidden');
-                els.btn.innerText = "ENGAGE BATTLE";
-                els.btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
-                els.btn.classList.add('bg-red-600', 'hover:bg-red-500');
-                updateUI(); // refresh resource view
+                // Setup Phase 2
+                state.phase = 2;
+                ui.p1.classList.add('hidden');
+                ui.p2.classList.remove('hidden');
+                ui.title.innerText = "PHASE 2: BUILD UNIT";
+                ui.btn.innerText = "ENGAGE BATTLE";
+                ui.btn.className = "w-full h-14 bg-red-600 active:bg-red-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95";
+                
+                updateUI(); // refresh resource
 
-            } else if (gameState.phase === 2) {
-                // Phase 2 -> Battle
-                toggleSheet(false); // Hide Input
+            } else {
+                // Commit Build -> Battle
+                state.p.hpCost = state.inputs.hp;
+                state.p.hp = Math.ceil(state.inputs.hp * 0.5);
+                state.p.atk = state.inputs.atk;
+                state.p.def = state.inputs.def;
                 
-                const pStats = gameState.player.currentStats;
-                const hpCost = parseInt(els.inputs.hp.value) || 0;
-                pStats.hp = Math.ceil(hpCost * 0.5); 
-                pStats.atk = parseInt(els.inputs.atk.value) || 0;
-                pStats.def = parseInt(els.inputs.def.value) || 0;
-                pStats.hpCost = hpCost;
+                state.p.total -= (state.p.hpCost + state.p.atk + state.p.def);
+                state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
                 
-                gameState.player.totalPts -= (hpCost + pStats.atk + pStats.def);
-                const cStats = gameState.cpu.currentStats;
-                gameState.cpu.totalPts -= (cStats.hpCost + cStats.atk + cStats.def);
+                state.history.push({...state.c});
                 
-                updateTopBar();
-                gameState.cpuHistory.push({...cStats});
+                // Hide Sheet
+                toggleSheet(false);
+                ui.fab.classList.remove('visible'); // Hide FAB during battle
                 
-                startBattleSequence(pStats, cStats);
+                startBattleSequence();
             }
         }
 
         // --- BATTLE SEQUENCE ---
-        function startBattleSequence(pStats, cStats) {
-            const playerGoesFirst = (pStats.spd >= cStats.spd);
-            const pMult = gameState.player.advantage ? 1.5 : 1.0;
-            const cMult = gameState.cpu.advantage ? 1.5 : 1.0;
-            const pFinalAtk = Math.ceil(pStats.atk * pMult);
-            const cFinalAtk = Math.ceil(cStats.atk * cMult);
+        function startBattleSequence() {
+            const pFirst = state.p.spd >= state.c.spd;
+            const pMult = state.pAdv ? 1.5 : 1.0;
+            const cMult = state.cAdv ? 1.5 : 1.0;
+            const pAtkFinal = Math.ceil(state.p.atk * pMult);
+            const cAtkFinal = Math.ceil(state.c.atk * cMult);
 
-            const sequence = [
-                { action: () => {
-                    els.status.innerText = "SCANNING INTEGRITY...";
-                    revealCard(els.cardsP.hpContainer, els.cardsP.hp, pStats.hp);
-                    revealCard(els.cardsC.hpContainer, els.cardsC.hp, cStats.hp);
-                }, delay: 800 },
-                
-                // Turn 1
-                { action: () => {
-                    const attacker = playerGoesFirst ? "YOU" : "CPU";
-                    els.status.innerText = `${attacker} ATTACK!`;
-                    if(playerGoesFirst) {
-                        els.cardsP.atkContainer.classList.add('active-turn');
-                        revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
-                    } else {
-                        els.cardsC.atkContainer.classList.add('active-turn');
-                        revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
-                    }
-                }, delay: 1800 },
-                
-                { action: () => {
-                    const defender = playerGoesFirst ? "CPU" : "YOU";
-                    els.status.innerText = `${defender} DEFEND...`;
-                    if(playerGoesFirst) {
-                        els.cardsC.defContainer.classList.add('active-turn');
-                        revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
-                    } else {
-                        els.cardsP.defContainer.classList.add('active-turn');
-                        revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
-                    }
-                }, delay: 2800 },
+            // Show Badge
+            if(state.pAdv) {
+                el('adv-badge').classList.remove('hidden');
+                el('adv-badge').innerText = "YOU: ATK x1.5";
+                el('adv-badge').className = "bg-blue-600 text-white font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl absolute z-50";
+            } else if (state.cAdv) {
+                el('adv-badge').classList.remove('hidden');
+                el('adv-badge').innerText = "CPU: ATK x1.5";
+                el('adv-badge').className = "bg-red-600 text-white font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl absolute z-50";
+            }
 
-                { action: () => {
-                    let dmg = 0;
-                    pulse(50);
-                    if(playerGoesFirst) {
-                        dmg = Math.max(0, pFinalAtk - cStats.def);
-                        animateDamage(0, dmg);
-                        updateHpVisuals(pStats.hp, cStats.hp - dmg);
-                        cStats.remainingHp = cStats.hp - dmg;
-                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE`;
+            const seq = [
+                // Reveal HP
+                { t: 500, f: () => {
+                    reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp);
+                    reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp);
+                }},
+                // Attack 1
+                { t: 1500, f: () => {
+                    if(pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); }
+                    else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }
+                }},
+                // Defend 1
+                { t: 2500, f: () => {
+                    if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); }
+                    else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }
+                }},
+                // Resolve 1
+                { t: 3500, f: () => {
+                    if(pFirst) {
+                        const dmg = Math.max(0, pAtkFinal - state.c.def);
+                        hit('c', dmg);
+                        state.c.currHp = state.c.hp - dmg;
+                        updateHpBar('cpu', state.c.currHp, state.c.hp);
                     } else {
-                        dmg = Math.max(0, cFinalAtk - pStats.def);
-                        animateDamage(dmg, 0); 
-                        updateHpVisuals(pStats.hp - dmg, cStats.hp);
-                        pStats.remainingHp = pStats.hp - dmg;
-                        els.status.innerText = `YOU TOOK ${dmg} DAMAGE`;
+                        const dmg = Math.max(0, cAtkFinal - state.p.def);
+                        hit('p', dmg);
+                        state.p.currHp = state.p.hp - dmg;
+                        updateHpBar('player', state.p.currHp, state.p.hp);
                     }
-                    document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
-                }, delay: 4000 },
-
-                // Turn 2
-                { action: () => {
-                    const attacker = playerGoesFirst ? "CPU" : "YOU";
-                    els.status.innerText = `${attacker} COUNTER!`;
-                    if(!playerGoesFirst) {
-                        els.cardsP.atkContainer.classList.add('active-turn');
-                        revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
+                    clearHighlights();
+                }},
+                // Attack 2
+                { t: 5000, f: () => {
+                    if(!pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); }
+                    else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }
+                }},
+                // Defend 2
+                { t: 6000, f: () => {
+                    if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); }
+                    else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }
+                }},
+                // Resolve 2
+                { t: 7000, f: () => {
+                    if(!pFirst) {
+                        const dmg = Math.max(0, pAtkFinal - state.c.def);
+                        hit('c', dmg);
+                        state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
+                        updateHpBar('cpu', state.c.currHp, state.c.hp);
                     } else {
-                        els.cardsC.atkContainer.classList.add('active-turn');
-                        revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
+                        const dmg = Math.max(0, cAtkFinal - state.p.def);
+                        hit('p', dmg);
+                        state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg;
+                        updateHpBar('player', state.p.currHp, state.p.hp);
                     }
-                }, delay: 5500 },
-
-                { action: () => {
-                    const defender = playerGoesFirst ? "YOU" : "CPU";
-                    els.status.innerText = `${defender} DEFEND...`;
-                    if(!playerGoesFirst) {
-                        els.cardsC.defContainer.classList.add('active-turn');
-                        revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
-                    } else {
-                        els.cardsP.defContainer.classList.add('active-turn');
-                        revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
-                    }
-                }, delay: 6500 },
-
-                { action: () => {
-                    let dmg = 0;
-                    pulse(50);
-                    if(!playerGoesFirst) {
-                        dmg = Math.max(0, pFinalAtk - cStats.def);
-                        animateDamage(0, dmg);
-                        const currentCHp = (cStats.remainingHp !== undefined) ? cStats.remainingHp : cStats.hp;
-                        updateHpVisuals(pStats.remainingHp || pStats.hp, currentCHp - dmg);
-                        cStats.remainingHp = currentCHp - dmg;
-                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE`;
-                    } else {
-                        dmg = Math.max(0, cFinalAtk - pStats.def);
-                        animateDamage(dmg, 0);
-                        const currentPHp = (pStats.remainingHp !== undefined) ? pStats.remainingHp : pStats.hp;
-                        updateHpVisuals(currentPHp - dmg, cStats.remainingHp || cStats.hp);
-                        pStats.remainingHp = currentPHp - dmg;
-                        els.status.innerText = `YOU TOOK ${dmg} DAMAGE`;
-                    }
-                    document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
-                }, delay: 7700 },
-
-                { action: () => {
-                    const finalPHp = pStats.remainingHp !== undefined ? pStats.remainingHp : pStats.hp;
-                    const finalCHp = cStats.remainingHp !== undefined ? cStats.remainingHp : cStats.hp;
-                    const pDmgTotal = pStats.hp - finalPHp;
-                    const cDmgTotal = cStats.hp - finalCHp;
-                    showRoundResult(finalPHp, finalCHp, pDmgTotal, cDmgTotal);
-                }, delay: 9000 }
+                    clearHighlights();
+                }},
+                // End
+                { t: 8500, f: () => {
+                    const pHp = Math.max(0, state.p.currHp!==undefined ? state.p.currHp : state.p.hp);
+                    const cHp = Math.max(0, state.c.currHp!==undefined ? state.c.currHp : state.c.hp);
+                    endRound(pHp, cHp);
+                }}
             ];
-
-            sequence.forEach(step => setTimeout(step.action, step.delay));
-        }
-
-        function revealCard(container, valueEl, value) {
-            container.classList.remove('hidden-card');
-            container.classList.add('revealed');
-            valueEl.innerText = value;
-        }
-
-        function updateHpVisuals(pHp, cHp) {
-             els.cardsP.hp.innerText = Math.max(0, pHp); 
-             els.cardsC.hp.innerText = Math.max(0, cHp);
-             if(pHp <= 0) els.cardsP.hpContainer.classList.add('lose-glow');
-             if(cHp <= 0) els.cardsC.hpContainer.classList.add('lose-glow');
-        }
-
-        function animateDamage(pDmg, cDmg) {
-            if (pDmg > 0) {
-                els.floats.p.innerText = `-${pDmg}`;
-                els.floats.p.classList.remove('opacity-0');
-                els.floats.p.classList.add('float-anim');
-            }
-            if (cDmg > 0) {
-                els.floats.c.innerText = `-${cDmg}`;
-                els.floats.c.classList.remove('opacity-0');
-                els.floats.c.classList.add('float-anim');
-            }
-            setTimeout(() => {
-                els.floats.p.classList.remove('float-anim'); els.floats.p.classList.add('opacity-0');
-                els.floats.c.classList.remove('float-anim'); els.floats.c.classList.add('opacity-0');
-            }, 1000);
-        }
-
-        function showRoundResult(pHp, cHp, pDmg, cDmg) {
-            let resultText = "";
-            let pClass = "text-gray-400";
-            let cClass = "text-gray-400";
             
-            if (pHp > cHp) {
-                gameState.player.wins++;
-                resultText = "<span class='text-blue-500'>ROUND WON</span>";
-                pClass = "text-blue-500";
-                pulse(100);
-            } else if (cHp > pHp) {
-                gameState.cpu.wins++;
-                resultText = "<span class='text-red-500'>ROUND LOST</span>";
-                cClass = "text-red-500";
-                pulse([50, 50, 50]);
-            } else {
-                resultText = "<span class='text-yellow-500'>DRAW</span>";
-            }
+            seq.forEach(s => setTimeout(s.f, s.t));
+        }
+
+        // --- VISUAL HELPERS ---
+        function reveal(wrap, valEl, val) {
+            wrap.classList.remove('hidden-card');
+            valEl.innerText = val;
+        }
+        function highlight(el) { el.classList.add('active-turn'); }
+        function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
+        
+        function hit(target, dmg) {
+            const float = el(target+'-dmg-float');
+            float.innerText = `-${dmg}`;
+            float.classList.remove('anim-float');
+            void float.offsetWidth; // trigger reflow
+            float.classList.add('anim-float');
+            if (navigator.vibrate && dmg > 0) navigator.vibrate(50);
+        }
+
+        function updateHpBar(who, curr, max) {
+            const pct = Math.max(0, (curr/max)*100);
+            el(who+'-hp-bar').style.width = pct + '%';
+        }
+
+        function showToast(msg) {
+            // Simple toast logic if needed, currently using badges/overlays
+        }
+
+        function endRound(pHp, cHp) {
+            let title = "DRAW";
+            let color = "text-yellow-500";
+            if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-blue-500"; }
+            else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
             
-            updateTopBar();
+            el('player-score').innerText = state.p.wins;
+            el('cpu-score').innerText = state.c.wins;
             
-            els.overlays.resTitle.innerHTML = resultText;
-            els.overlays.resDetail.innerHTML = `
-                <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
-                    <span class="text-xs text-gray-500">UNIT</span>
-                    <span class="text-xs text-gray-500">HP</span>
+            el('res-title').innerText = title;
+            el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
+            el('res-content').innerHTML = `
+                <div class="flex justify-between w-64 mx-auto border-b border-gray-700 pb-2">
+                    <span>YOU</span> <span class="font-bold text-white">${pHp} HP</span>
                 </div>
-                <div class="flex justify-between items-center">
-                    <div class="text-left text-blue-400 font-bold">YOU</div>
-                    <div class="text-xl font-bold font-tech ${pClass}">${Math.max(0, pHp)}</div>
-                </div>
-                <div class="flex justify-between items-center mt-2">
-                    <div class="text-left text-red-500 font-bold">CPU</div>
-                    <div class="text-xl font-bold font-tech ${cClass}">${Math.max(0, cHp)}</div>
+                <div class="flex justify-between w-64 mx-auto pt-2">
+                    <span>CPU</span> <span class="font-bold text-white">${cHp} HP</span>
                 </div>
             `;
             
-            els.overlays.result.classList.remove('hidden');
+            el('result-overlay').classList.remove('hidden');
         }
 
         function nextRound() {
-            if (gameState.player.wins >= WIN_CONDITION) return endGame(true);
-            if (gameState.cpu.wins >= WIN_CONDITION) return endGame(false);
-            if (gameState.round >= MAX_ROUNDS) return endGame(gameState.player.wins > gameState.cpu.wins);
-
-            gameState.round++;
-            els.overlays.result.classList.add('hidden');
-            initRound();
-            updateTopBar();
-        }
-
-        function endGame(playerWon) {
-            els.overlays.result.classList.add('hidden');
-            els.overlays.gameOver.classList.remove('hidden');
-            const title = els.overlays.finalTitle;
-            if (playerWon) {
-                title.innerText = "VICTORY";
-                title.classList.add('text-blue-500');
-            } else {
-                title.innerText = "DEFEAT";
-                title.classList.add('text-red-600');
+            if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
+                // Game Over
+                el('result-overlay').classList.add('hidden');
+                el('game-over-overlay').classList.remove('hidden');
+                const win = state.p.wins > state.c.wins;
+                el('final-result-title').innerText = win ? "YOU WIN" : "YOU LOSE";
+                el('final-result-title').className = win ? "text-6xl font-gaming mb-4 text-blue-500" : "text-6xl font-gaming mb-4 text-red-500";
+                return;
             }
-        }
-
-        function updateTopBar() {
-            els.pScore.innerText = gameState.player.wins;
-            els.cScore.innerText = gameState.cpu.wins;
-            els.round.innerText = gameState.round;
-        }
-
-        window.onload = () => {
+            
+            state.round++;
+            el('current-round').innerText = state.round;
+            el('result-overlay').classList.add('hidden');
             initRound();
-            updateTopBar();
         }
+
+        // Start
+        window.onload = initRound;
+
     </script>
 </body>
 </html>
