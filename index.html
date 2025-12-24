@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：09</title>
+    <title>Resource Strategy Card Battle：10</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
@@ -13,96 +13,121 @@
             --color-hp: #22c55e;
             --color-atk: #ef4444;
             --color-def: #3b82f6;
+            --bg-cyber: #0a0f1a; /* Dark cyber blue */
+            --neon-blue: #00f7ff;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #000;
+            background-color: var(--bg-cyber);
             color: #fff;
             overflow: hidden;
-            touch-action: none; /* Prevent scroll bounce */
+            touch-action: none;
+            background-image: 
+                linear-gradient(rgba(10, 15, 26, 0.8), rgba(10, 15, 26, 0.9)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l7.9-7.9h-.828zm5.656 0L19.515 8.485 18.1 9.9l-7.9-7.9h.828zm5.656 0L25.172 8.485 26.586 9.9l7.9-7.9h-.828zm5.656 0L30.828 8.485 32.242 9.9l7.9-7.9h-.828zM32 0l-7.9 7.9-1.415-1.415L30.586 0H32zM28 0l7.9 7.9 1.415-1.415L29.414 0H28z' fill='%231a2538' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
         .font-gaming { font-family: 'Black Ops One', cursive; }
         .font-tech { font-family: 'Rajdhani', sans-serif; }
-
-        /* --- VISUALS: BIG CARDS --- */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto;
+        
+        /* --- CYBERPUNK UI --- */
+        .cyber-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 10px var(--neon-blue);
+            background: rgba(13, 20, 36, 0.8);
+            clip-path: polygon(
+                0 10px, 10px 0, 
+                calc(100% - 10px) 0, 100% 10px, 
+                100% calc(100% - 10px), calc(100% - 10px) 100%, 
+                10px 100%, 0 calc(100% - 10px)
+            );
+        }
+        
+        .cyber-text {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
         }
 
+        /* --- LAYOUT: SPLIT SCREEN --- */
+        .arena-panel {
+            height: 55vh;
+            display: flex; flex-direction: column;
+            padding: 16px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+        .input-panel {
+            height: 45vh;
+            display: flex; flex-direction: column;
+            padding: 16px;
+            background: rgba(10, 15, 26, 0.95);
+        }
+
+        /* --- VISUALS: CARDS --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+        .card-row-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #64748b;
+        }
+        
         .battle-card {
-            aspect-ratio: 1 / 1.1;
-            border-radius: 16px;
+            aspect-ratio: 3/4;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             background: #1e293b;
-            border: 4px solid #334155;
+            border: 2px solid;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
             overflow: hidden;
         }
 
         /* Type Variations */
-        .card-spd { background: #581c87; border-color: #a855f7; }
-        .card-hp  { background: #14532d; border-color: #22c55e; }
-        .card-atk { background: #7f1d1d; border-color: #ef4444; }
-        .card-def { background: #1e3a8a; border-color: #3b82f6; }
+        .card-spd { border-color: var(--color-spd); box-shadow: 0 0 10px var(--color-spd); }
+        .card-hp  { border-color: var(--color-hp);  box-shadow: 0 0 10px var(--color-hp); }
+        .card-atk { border-color: var(--color-atk); box-shadow: 0 0 10px var(--color-atk); }
+        .card-def { border-color: var(--color-def); box-shadow: 0 0 10px var(--color-def); }
 
         /* Content inside card */
         .card-label {
-            position: absolute; top: 6px; left: 0; right: 0;
-            text-align: center; font-size: 12px; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 1px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            opacity: 0.9;
+            position: absolute; top: 4px;
+            font-size: 8px; font-weight: bold; text-transform: uppercase;
+            opacity: 0.8;
         }
-        
         .card-val {
             font-family: 'Black Ops One', cursive;
-            font-size: 3rem; /* Huge text */
-            line-height: 1;
-            z-index: 10;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+            font-size: 1.5rem; z-index: 10;
+            text-shadow: 0 0 5px currentColor;
         }
-
-        .card-icon-bg {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4rem;
-            opacity: 0.2;
-            pointer-events: none;
+        .card-icon {
+            position: absolute; bottom: 4px;
+            font-size: 1.2rem; opacity: 0.5;
         }
-
         /* Hidden State */
         .battle-card.hidden-card {
-            background: #334155;
-            border-color: #475569;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px);
+            background: #0f172a;
+            border-color: #475569; box-shadow: none;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.3) 5px, rgba(0,0,0,0.3) 10px);
         }
-        .battle-card.hidden-card .card-val { opacity: 0; }
+        .battle-card.hidden-card .card-val, .battle-card.hidden-card .card-label, .battle-card.hidden-card .card-icon { opacity: 0; }
         .battle-card.hidden-card::after {
             content: '?'; position: absolute; font-family: 'Black Ops One';
-            font-size: 3rem; color: #64748b;
+            font-size: 2rem; color: #64748b;
         }
-
         /* FX */
-        .battle-card.win-glow { box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.6); transform: scale(1.05); z-index: 5; }
-        .battle-card.lose-glow { filter: grayscale(1) brightness(0.5); opacity: 0.8; }
         .battle-card.active-turn { 
-            transform: scale(1.15); 
-            z-index: 20; 
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
-            border-color: #fff;
+            transform: scale(1.1); z-index: 20; 
+            box-shadow: 0 0 20px var(--neon-blue); border-color: var(--neon-blue);
         }
 
         /* Damage Float */
@@ -114,424 +139,267 @@
         .dmg-float {
             position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
-            font-family: 'Black Ops One'; font-size: 4rem;
-            color: #fff; text-shadow: 0 0 10px #ef4444, 4px 4px 0 #000;
-            pointer-events: none; z-index: 100;
-            white-space: nowrap;
+            font-family: 'Black Ops One'; font-size: 3rem;
+            color: var(--neon-blue); text-shadow: 0 0 10px currentColor;
+            pointer-events: none; z-index: 100; white-space: nowrap;
         }
         .anim-float { animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-
-        /* --- UI CONTROLS: BOTTOM SHEET --- */
-        .bottom-sheet {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #1e293b;
-            border-top: 2px solid #475569;
-            border-radius: 24px 24px 0 0;
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.8);
-            transform: translateY(0);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            z-index: 50;
-            display: flex; flex-direction: column;
-            max-height: 85vh;
+        /* --- UI CONTROLS: INPUT PANEL --- */
+        .control-row {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px;
+            background: rgba(13, 20, 36, 0.6);
+            padding: 8px 12px;
+            border: 1px solid #334155;
+            border-radius: 4px;
         }
-        .bottom-sheet.minimized { transform: translateY(100%); }
-
-        /* Handle Area */
-        .sheet-header {
-            padding: 12px;
-            display: flex; flex-direction: column; align-items: center;
-            background: #0f172a;
-            border-radius: 24px 24px 0 0;
-            cursor: pointer;
-            border-bottom: 1px solid #334155;
+        .control-label {
+            font-family: 'Rajdhani'; font-weight: bold; font-size: 14px;
+            color: var(--neon-blue); width: 60px;
         }
-        .sheet-handle {
-            width: 48px; height: 6px; background: #64748b; border-radius: 10px; margin-bottom: 8px;
+        .control-val {
+            font-family: 'Black Ops One'; font-size: 24px;
+            color: var(--neon-blue); text-align: right; width: 70px;
         }
-
-        /* Inputs */
-        .control-group {
-            background: #0f172a; border-radius: 12px; padding: 12px;
-            margin-bottom: 12px; border: 1px solid #334155;
-        }
-        .control-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-        }
-        
-        /* Big Buttons */
-        .btn-stepper {
-            height: 48px; width: 60px;
-            background: #334155; border-radius: 8px;
-            color: #fff; font-size: 24px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-            touch-action: manipulation;
-            transition: background 0.1s;
-        }
-        .btn-stepper:active { background: #94a3b8; color: #000; }
-
         /* Custom Slider */
         input[type=range] {
-            -webkit-appearance: none; width: 100%; background: transparent; height: 40px; /* larger touch area */
+            -webkit-appearance: none; flex: 1; background: transparent; height: 30px;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 8px; background: #334155; border-radius: 4px;
+            width: 100%; height: 6px; background: #1e293b; border-radius: 3px;
+            border: 1px solid #475569;
         }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%;
-            background: #fbbf24; margin-top: -10px; border: 3px solid #1e293b;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            -webkit-appearance: none; height: 20px; width: 10px;
+            background: var(--neon-blue); margin-top: -8px;
+            box-shadow: 0 0 10px var(--neon-blue);
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
         }
 
-        /* FAB (Floating Action Button) */
-        .fab-btn {
-            position: fixed; bottom: 24px; right: 24px;
-            width: 64px; height: 64px; border-radius: 50%;
-            background: #fbbf24; color: #000;
+        /* Big Buttons */
+        .btn-cyber {
+            height: 48px; width: 100%;
+            background: linear-gradient(180deg, rgba(0,247,255,0.2) 0%, rgba(0,247,255,0.05) 100%);
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue); font-family: 'Black Ops One'; font-size: 18px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-family: 'Rajdhani'; font-size: 14px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            z-index: 40;
-            transform: scale(0); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 4px solid #fff;
+            text-shadow: 0 0 5px var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0,247,255,0.3);
+            clip-path: polygon(
+                0 10px, 10px 0, 
+                calc(100% - 10px) 0, 100% 10px, 
+                100% calc(100% - 10px), calc(100% - 10px) 100%, 
+                10px 100%, 0 calc(100% - 10px)
+            );
+            transition: all 0.1s;
         }
-        .fab-btn.visible { transform: scale(1); }
+        .btn-cyber:active { background: rgba(0,247,255,0.4); transform: scale(0.98); }
+        .btn-cyber:disabled { opacity: 0.5; filter: grayscale(1); }
 
     </style>
 </head>
-<body class="h-screen w-full select-none">
+<body class="h-screen w-full select-none flex flex-col">
 
-    <!-- TOP HUD -->
-    <header class="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-start p-4 pointer-events-none">
+    <header class="flex justify-between items-center p-4 border-b border-blue-900/50 bg-gray-900/50">
         <div>
-            <div class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">ROUND</div>
-            <div class="text-3xl font-gaming text-yellow-500 leading-none"><span id="current-round">1</span><span class="text-sm">/5</span></div>
+            <div class="text-xs text-gray-400 font-bold tracking-widest cyber-text">ROUND <span id="current-round">1</span>/5</div>
         </div>
-        
-        <!-- Score Board -->
-        <div class="flex items-center gap-4 bg-gray-900/80 px-4 py-1 rounded-full border border-gray-700 backdrop-blur pointer-events-auto">
+        <div class="flex items-center gap-4 cyber-border px-4 py-1">
             <div class="text-center">
                 <div class="text-[8px] text-blue-400 font-bold">YOU</div>
-                <div id="player-score" class="text-xl font-bold">0</div>
+                <div id="player-score" class="text-xl font-bold cyber-text">0</div>
             </div>
             <div class="text-gray-600 font-black text-xs">VS</div>
             <div class="text-center">
                 <div class="text-[8px] text-red-500 font-bold">CPU</div>
-                <div id="cpu-score" class="text-xl font-bold">0</div>
+                <div id="cpu-score" class="text-xl font-bold cyber-text">0</div>
             </div>
+        </div>
+        <div class="text-right">
+            <div class="text-xs text-gray-400">PTS: <span id="top-resource" class="cyber-text font-bold">1000</span></div>
         </div>
     </header>
 
-    <!-- MAIN ARENA (Click background to close sheet) -->
-    <main id="main-arena" class="absolute inset-0 flex flex-col items-center justify-center pt-10 pb-20" onclick="toggleSheet(false)">
+    <main id="main-arena" class="arena-panel relative items-center justify-center">
+        <h2 class="text-center cyber-text font-gaming text-xl mb-4 tracking-widest">CARD ARENA</h2>
         
-        <!-- CPU AREA (Top) -->
-        <div class="w-full flex flex-col items-center mb-6 relative">
-            <!-- CPU Intel -->
-            <div id="cpu-intel" class="absolute -right-2 top-0 bg-gray-900/90 text-right px-3 py-1 rounded-l-lg border-l-2 border-red-500 text-[10px] text-gray-300 pointer-events-none opacity-80">
-                <div>ENEMY RES: <span id="cpu-total-pts" class="text-red-400 font-bold text-sm">1000</span></div>
-                <div id="history-content" class="text-[9px] text-yellow-500 mt-1 hidden">PREV: BALANCED</div>
+        <div class="flex w-full max-w-md gap-2">
+            <div class="flex flex-col justify-around py-4">
+                <div class="card-row-label text-red-500">OPPONENT</div>
+                <div class="card-row-label text-blue-500">PLAYER</div>
             </div>
 
-            <!-- CPU Cards -->
-            <div class="card-grid">
-                <!-- SPD -->
-                <div class="battle-card card-spd" id="card-c-spd-wrap">
-                    <div class="card-label text-purple-200">SPD</div>
-                    <div class="card-val text-white" id="card-c-spd">?</div>
-                    <div class="card-icon-bg">⚡</div>
+            <div class="flex-1 flex flex-col gap-4">
+                <div class="card-grid">
+                    <div class="battle-card card-spd" id="card-c-spd-wrap">
+                        <div class="card-label text-purple-300">SPD</div><div class="card-val text-purple-300" id="card-c-spd">?</div><div class="card-icon">⚡</div>
+                    </div>
+                    <div class="battle-card card-hp hidden-card" id="card-c-hp-wrap">
+                        <div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="card-c-hp">?</div><div class="card-icon">♥</div>
+                    </div>
+                    <div class="battle-card card-atk hidden-card" id="card-c-atk-wrap">
+                        <div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="card-c-atk">?</div><div class="card-icon">⚔</div>
+                    </div>
+                    <div class="battle-card card-def hidden-card" id="card-c-def-wrap">
+                        <div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="card-c-def">?</div><div class="card-icon">🛡</div>
+                    </div>
                 </div>
-                <!-- HP -->
-                <div class="battle-card card-hp hidden-card" id="card-c-hp-wrap">
-                    <div class="card-label text-green-200">HP</div>
-                    <div class="card-val text-white" id="card-c-hp">?</div>
-                    <div class="card-icon-bg">♥</div>
-                    <!-- HP Bar -->
-                    <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-2 bg-green-400 transition-all"></div>
-                </div>
-                <!-- ATK -->
-                <div class="battle-card card-atk hidden-card" id="card-c-atk-wrap">
-                    <div class="card-label text-red-200">ATK</div>
-                    <div class="card-val text-white" id="card-c-atk">?</div>
-                    <div class="card-icon-bg">⚔</div>
-                </div>
-                <!-- DEF -->
-                <div class="battle-card card-def hidden-card" id="card-c-def-wrap">
-                    <div class="card-label text-blue-200">DEF</div>
-                    <div class="card-val text-white" id="card-c-def">?</div>
-                    <div class="card-icon-bg">🛡</div>
+                <div class="card-grid">
+                    <div class="battle-card card-spd" id="card-p-spd-wrap">
+                        <div class="card-label text-purple-300">SPD</div><div class="card-val text-purple-300" id="card-p-spd">-</div><div class="card-icon">⚡</div>
+                    </div>
+                    <div class="battle-card card-hp hidden-card" id="card-p-hp-wrap">
+                        <div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="card-p-hp">-</div><div class="card-icon">♥</div>
+                    </div>
+                    <div class="battle-card card-atk hidden-card" id="card-p-atk-wrap">
+                        <div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="card-p-atk">-</div><div class="card-icon">⚔</div>
+                    </div>
+                    <div class="battle-card card-def hidden-card" id="card-p-def-wrap">
+                        <div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="card-p-def">-</div><div class="card-icon">🛡</div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- CPU Damage Float -->
-            <div id="c-dmg-float" class="dmg-float text-blue-400"></div>
         </div>
-
-        <!-- PLAYER AREA (Bottom) -->
-        <div class="w-full flex flex-col items-center mt-2">
-            
-            <div class="card-grid">
-                <!-- SPD -->
-                <div class="battle-card card-spd" id="card-p-spd-wrap">
-                    <div class="card-label text-purple-200">SPD</div>
-                    <div class="card-val text-white" id="card-p-spd">-</div>
-                    <div class="card-icon-bg">⚡</div>
-                </div>
-                <!-- HP -->
-                <div class="battle-card card-hp hidden-card" id="card-p-hp-wrap">
-                    <div class="card-label text-green-200">HP</div>
-                    <div class="card-val text-white" id="card-p-hp">-</div>
-                    <div class="card-icon-bg">♥</div>
-                    <!-- HP Bar -->
-                    <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-2 bg-green-400 transition-all"></div>
-                </div>
-                <!-- ATK -->
-                <div class="battle-card card-atk hidden-card" id="card-p-atk-wrap">
-                    <div class="card-label text-red-200">ATK</div>
-                    <div class="card-val text-white" id="card-p-atk">-</div>
-                    <div class="card-icon-bg">⚔</div>
-                </div>
-                <!-- DEF -->
-                <div class="battle-card card-def hidden-card" id="card-p-def-wrap">
-                    <div class="card-label text-blue-200">DEF</div>
-                    <div class="card-val text-white" id="card-p-def">-</div>
-                    <div class="card-icon-bg">🛡</div>
-                </div>
-            </div>
-
-            <!-- Player Damage Float -->
-            <div id="p-dmg-float" class="dmg-float text-red-500"></div>
-        </div>
-
-        <!-- Status / Advantage Badges -->
+        
+        <div id="c-dmg-float" class="dmg-float text-blue-400" style="top:30%"></div>
+        <div id="p-dmg-float" class="dmg-float text-red-500" style="top:70%"></div>
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl animate-bounce">
-                INITIATIVE WIN! (ATK x1.5)
+            <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-xs px-3 py-1 rounded-full border-2 border-white shadow-xl animate-bounce">
+                INITIATIVE WIN!
             </div>
         </div>
 
     </main>
 
-    <!-- FAB: Open Input -->
-    <button id="fab-edit" class="fab-btn" onclick="toggleSheet(true)">
-        EDIT
-    </button>
-
-    <!-- BOTTOM SHEET: INPUT -->
-    <div id="cockpit-sheet" class="bottom-sheet" onclick="event.stopPropagation()">
+    <section id="input-panel" class="input-panel">
+        <h2 id="phase-title" class="text-center cyber-text font-gaming text-xl mb-4 tracking-widest">RESOURCE INPUT</h2>
         
-        <!-- Header (Tap to close) -->
-        <div class="sheet-header" onclick="toggleSheet(false)">
-            <div class="sheet-handle"></div>
-            <div class="flex justify-between items-center w-full px-4">
-                <div id="phase-title" class="font-gaming text-xl text-gray-200">PHASE 1: SPEED</div>
-                <div class="text-right">
-                    <div class="text-[10px] text-gray-500">REMAINING</div>
-                    <div id="sheet-resource" class="text-2xl font-tech font-bold text-blue-400">1000</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Scrollable Inputs -->
-        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-            
-            <!-- Phase 1: SPD -->
-            <div id="input-group-spd" class="control-group border-purple-900/50">
-                <div class="control-header">
-                    <div class="flex items-center gap-2">
-                        <span class="text-2xl">⚡</span>
-                        <span class="font-bold text-lg text-purple-400">SPEED</span>
-                    </div>
-                    <div class="font-tech text-3xl font-bold" id="disp-spd">0</div>
-                </div>
-                <div class="flex flex-col gap-2">
+        <div class="flex-1 overflow-y-auto pr-2">
+            <div id="input-group-spd">
+                <div class="control-row">
+                    <div class="control-label">SPEED</div>
                     <input type="range" id="range-spd" min="0" max="1000" value="0" oninput="onInput('spd', this.value)">
-                    <div class="flex justify-between gap-2">
-                        <button class="btn-stepper" onclick="step('spd', -10)">-</button>
-                        <button class="btn-stepper flex-1 bg-purple-900/50 text-sm" onclick="step('spd', 0, true)">RESET</button>
-                        <button class="btn-stepper" onclick="step('spd', 10)">+</button>
-                    </div>
+                    <div class="control-val" id="disp-spd">0</div>
                 </div>
-                <div class="text-xs text-gray-500 mt-2 text-center">Win for 1.5x ATK & 30% Refund</div>
+                <div class="flex justify-end gap-2 mb-4">
+                    <button class="btn-cyber !w-16 !h-8 text-sm" onclick="step('spd', -10)">-10</button>
+                    <button class="btn-cyber !w-16 !h-8 text-sm" onclick="step('spd', 10)">+10</button>
+                </div>
             </div>
 
-            <!-- Phase 2: HP/ATK/DEF -->
-            <div id="input-group-build" class="space-y-4 hidden">
+            <div id="input-group-build" class="hidden space-y-2">
+                <div class="control-row">
+                    <div class="control-label">HP COST</div>
+                    <input type="range" id="range-hp" min="0" max="1000" value="0" oninput="onInput('hp', this.value)">
+                    <div class="control-val" id="disp-hp">0</div>
+                </div>
+                <div class="text-right text-xs text-green-400 mb-2">REAL HP: <span id="real-hp">0</span></div>
+
+                <div class="control-row">
+                    <div class="control-label">ATTACK</div>
+                    <input type="range" id="range-atk" min="0" max="1000" value="0" oninput="onInput('atk', this.value)">
+                    <div class="control-val" id="disp-atk">0</div>
+                </div>
                 
-                <!-- HP -->
-                <div class="control-group border-green-900/50">
-                    <div class="control-header">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">♥</span>
-                            <span class="font-bold text-lg text-green-400">HP</span>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-tech text-3xl font-bold" id="disp-hp">0</div>
-                            <div class="text-[10px] text-green-600">REAL HP: <span id="real-hp">0</span></div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <input type="range" id="range-hp" min="0" max="1000" value="0" oninput="onInput('hp', this.value)">
-                        <div class="flex justify-between gap-2">
-                            <button class="btn-stepper" onclick="step('hp', -10)">-</button>
-                            <button class="btn-stepper flex-1 bg-green-900/50 text-sm" onclick="step('hp', 0, true)">RESET</button>
-                            <button class="btn-stepper" onclick="step('hp', 10)">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ATK -->
-                <div class="control-group border-red-900/50">
-                    <div class="control-header">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">⚔</span>
-                            <span class="font-bold text-lg text-red-400">ATK</span>
-                        </div>
-                        <div class="font-tech text-3xl font-bold" id="disp-atk">0</div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <input type="range" id="range-atk" min="0" max="1000" value="0" oninput="onInput('atk', this.value)">
-                        <div class="flex justify-between gap-2">
-                            <button class="btn-stepper" onclick="step('atk', -10)">-</button>
-                            <button class="btn-stepper flex-1 bg-red-900/50 text-sm" onclick="step('atk', 0, true)">RESET</button>
-                            <button class="btn-stepper" onclick="step('atk', 10)">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DEF -->
-                <div class="control-group border-blue-900/50">
-                    <div class="control-header">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">🛡</span>
-                            <span class="font-bold text-lg text-blue-400">DEF</span>
-                        </div>
-                        <div class="font-tech text-3xl font-bold" id="disp-def">0</div>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <input type="range" id="range-def" min="0" max="1000" value="0" oninput="onInput('def', this.value)">
-                        <div class="flex justify-between gap-2">
-                            <button class="btn-stepper" onclick="step('def', -10)">-</button>
-                            <button class="btn-stepper flex-1 bg-blue-900/50 text-sm" onclick="step('def', 0, true)">RESET</button>
-                            <button class="btn-stepper" onclick="step('def', 10)">+</button>
-                        </div>
-                    </div>
+                <div class="control-row" style="border-color: var(--neon-blue); box-shadow: 0 0 5px var(--neon-blue);">
+                    <div class="control-label">DEFENSE</div>
+                    <input type="range" id="range-def" min="0" max="1000" value="0" oninput="onInput('def', this.value)">
+                    <div class="control-val" id="disp-def">0</div>
                 </div>
             </div>
-            
-            <div class="h-20"></div> <!-- Spacer -->
         </div>
 
-        <!-- Sticky Footer Button -->
-        <div class="p-4 bg-gray-900 border-t border-gray-800">
-            <button id="action-btn" class="w-full h-14 bg-blue-600 active:bg-blue-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95" onclick="commitPhase()">
+        <div class="mt-auto pt-4">
+             <div class="flex justify-between text-xs mb-2 cyber-text font-bold">
+                <span>REMAINING: <span id="sheet-resource">1000</span></span>
+                <span id="error-msg" class="text-red-500"></span>
+            </div>
+            <button id="action-btn" class="btn-cyber" onclick="commitPhase()">
                 LOCK IN SPEED
             </button>
-            <div id="error-msg" class="text-center text-red-500 text-xs font-bold mt-1 h-4"></div>
         </div>
-    </div>
+    </section>
 
-    <!-- RESULT OVERLAY -->
     <div id="result-overlay" class="fixed inset-0 bg-black/95 z-[200] hidden flex flex-col items-center justify-center p-6 text-center">
-        <h1 id="res-title" class="text-4xl font-gaming text-white mb-6">VICTORY</h1>
+        <h1 id="res-title" class="text-4xl font-gaming text-white mb-6 cyber-text">VICTORY</h1>
         <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
-        <button onclick="nextRound()" class="w-full max-w-xs bg-yellow-500 text-black font-bold h-14 rounded-xl text-xl font-gaming shadow-[0_0_20px_#fbbf24]">
+        <button onclick="nextRound()" class="btn-cyber w-full max-w-xs">
             NEXT ROUND
         </button>
     </div>
 
-    <!-- SCRIPTS -->
+    <div id="game-over-overlay" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-[200] hidden">
+            <h1 id="final-result-title" class="text-6xl font-gaming mb-4 cyber-text animate-pulse">VICTORY</h1>
+            <p class="text-gray-500 tracking-[0.5em] mb-8 font-tech">SIMULATION ENDED</p>
+            <button onclick="location.reload()" class="btn-cyber px-12">
+                REBOOT SYSTEM
+            </button>
+    </div>
+
     <script>
-        // --- CONSTANTS ---
         const MAX_ROUNDS = 5;
         const START_PTS = 1000;
 
-        // --- STATE ---
         let state = {
             round: 1,
-            phase: 1, // 1: Speed, 2: Build
+            phase: 1, 
             p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0 },
             c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0 },
-            history: [],
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 }
         };
 
-        // --- ELEMENTS ---
         const el = (id) => document.getElementById(id);
         const ui = {
-            sheet: el('cockpit-sheet'),
-            fab: el('fab-edit'),
             p1: el('input-group-spd'),
             p2: el('input-group-build'),
             btn: el('action-btn'),
             title: el('phase-title'),
             err: el('error-msg'),
             res: el('sheet-resource'),
+            topRes: el('top-resource'),
             
-            // Cards
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
         };
 
-        // --- SHEET LOGIC ---
-        function toggleSheet(open) {
-            if (open) {
-                ui.sheet.classList.remove('minimized');
-                ui.fab.classList.remove('visible');
-            } else {
-                ui.sheet.classList.add('minimized');
-                ui.fab.classList.add('visible');
-            }
-        }
-
-        // --- INPUT LOGIC ---
         function onInput(key, val) {
             state.inputs[key] = parseInt(val) || 0;
             updateUI();
         }
 
-        function step(key, delta, reset=false) {
-            if(reset) state.inputs[key] = 0;
-            else state.inputs[key] = Math.max(0, state.inputs[key] + delta);
-            
-            // Sync range slider
+        function step(key, delta) {
+            state.inputs[key] = Math.max(0, state.inputs[key] + delta);
             el('range-'+key).value = state.inputs[key];
             updateUI();
         }
 
         function updateUI() {
-            // Display Values
             ['spd', 'hp', 'atk', 'def'].forEach(k => {
                 if(el('disp-'+k)) el('disp-'+k).innerText = state.inputs[k];
             });
             el('real-hp').innerText = Math.ceil(state.inputs.hp * 0.5);
 
-            // Calc Cost
             const cost = state.inputs.spd + state.inputs.hp + state.inputs.atk + state.inputs.def;
             const remaining = state.p.total - cost;
             
             ui.res.innerText = remaining;
+            ui.topRes.innerText = remaining;
             
             if (remaining < 0) {
                 ui.res.classList.add('text-red-500');
-                ui.res.classList.remove('text-blue-400');
                 ui.btn.disabled = true;
-                ui.btn.classList.add('opacity-50');
-                ui.err.innerText = "INSUFFICIENT RESOURCES";
+                ui.err.innerText = "INSUFFICIENT";
                 return false;
             } else {
                 ui.res.classList.remove('text-red-500');
-                ui.res.classList.add('text-blue-400');
                 ui.btn.disabled = false;
-                ui.btn.classList.remove('opacity-50');
                 ui.err.innerText = "";
                 return true;
             }
         }
-
-        // --- GAME FLOW ---
 
         function initRound() {
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
@@ -542,32 +410,23 @@
             state.phase = 1;
             ui.p1.classList.remove('hidden');
             ui.p2.classList.add('hidden');
-            ui.title.innerText = "PHASE 1: SPEED";
             ui.btn.innerText = "LOCK IN SPEED";
-            ui.btn.className = "w-full h-14 bg-purple-600 active:bg-purple-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95";
+            ui.btn.disabled = false;
 
-            // Reset Cards Visuals
             resetCards();
-            
-            // Generate CPU
             generateCPU();
-            
             updateUI();
-            toggleSheet(true);
         }
 
         function resetCards() {
-            // Reset text
             ['spd','hp','atk','def'].forEach(k => {
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
-                
-                // Wrappers
                 if(k!=='spd') {
                     ui.wrapsP[k].classList.add('hidden-card');
                     ui.wrapsC[k].classList.add('hidden-card');
-                    ui.wrapsP[k].classList.remove('revealed', 'active-turn', 'win-glow', 'lose-glow');
-                    ui.wrapsC[k].classList.remove('revealed', 'active-turn', 'win-glow', 'lose-glow');
+                    ui.wrapsP[k].classList.remove('active-turn');
+                    ui.wrapsC[k].classList.remove('active-turn');
                 }
             });
             el('adv-badge').classList.add('hidden');
@@ -581,7 +440,6 @@
                 const variance = Math.floor(Math.random() * (avg * 0.4)) - (avg * 0.2); 
                 budget = Math.max(0, Math.min(state.c.total, avg + variance));
             }
-            
             let rem = budget;
             const spd = Math.ceil(Math.random() * (rem * 0.3)); rem -= spd;
             const atk = Math.ceil(Math.random() * (rem * 0.5)); rem -= atk;
@@ -589,65 +447,37 @@
             const hpCost = Math.max(0, rem);
             const hp = Math.ceil(hpCost * 0.5);
 
-            state.c.spd = spd;
-            state.c.hp = hp; state.c.hpCost = hpCost;
-            state.c.atk = atk;
-            state.c.def = def;
-            
-            // Update CPU Intel
-            el('cpu-total-pts').innerText = state.c.total;
-            if(state.history.length > 0) {
-                el('history-content').classList.remove('hidden');
-                // Simple logic for display
-                const last = state.history[state.history.length-1];
-                let t = "BALANCED";
-                if(last.atk > 100) t="AGGRO";
-                else if(last.def > 100) t="DEFENSIVE";
-                el('history-content').innerText = `LAST: ${t}`;
-            }
+            state.c.spd = spd; state.c.hp = hp; state.c.hpCost = hpCost;
+            state.c.atk = atk; state.c.def = def;
         }
 
         function commitPhase() {
             if(!updateUI()) return;
 
             if (state.phase === 1) {
-                // Commit Speed
                 state.p.spd = state.inputs.spd;
                 state.p.total -= state.p.spd;
                 state.c.total -= state.c.spd;
                 
-                // Show Speed
                 ui.cP.spd.innerText = state.p.spd;
                 ui.cC.spd.innerText = state.c.spd;
 
-                // Calc Advantage
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
                     state.pAdv = true;
-                    const refund = Math.ceil(state.p.spd * 0.3);
-                    state.p.total += refund;
-                    showToast(`YOU WIN SPEED! +${refund} PTS`);
+                    state.p.total += Math.ceil(state.p.spd * 0.3);
                 } else if (state.c.spd > state.p.spd) {
                     state.cAdv = true;
-                    const refund = Math.ceil(state.c.spd * 0.3);
-                    state.c.total += refund;
-                    showToast(`CPU WINS SPEED!`);
-                } else {
-                    showToast(`SPEED DRAW`);
+                    state.c.total += Math.ceil(state.c.spd * 0.3);
                 }
 
-                // Setup Phase 2
                 state.phase = 2;
                 ui.p1.classList.add('hidden');
                 ui.p2.classList.remove('hidden');
-                ui.title.innerText = "PHASE 2: BUILD UNIT";
                 ui.btn.innerText = "ENGAGE BATTLE";
-                ui.btn.className = "w-full h-14 bg-red-600 active:bg-red-500 rounded-xl font-gaming text-xl shadow-lg transition-transform active:scale-95";
-                
-                updateUI(); // refresh resource
+                updateUI();
 
             } else {
-                // Commit Build -> Battle
                 state.p.hpCost = state.inputs.hp;
                 state.p.hp = Math.ceil(state.inputs.hp * 0.5);
                 state.p.atk = state.inputs.atk;
@@ -656,17 +486,11 @@
                 state.p.total -= (state.p.hpCost + state.p.atk + state.p.def);
                 state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
                 
-                state.history.push({...state.c});
-                
-                // Hide Sheet
-                toggleSheet(false);
-                ui.fab.classList.remove('visible'); // Hide FAB during battle
-                
+                ui.btn.disabled = true;
                 startBattleSequence();
             }
         }
 
-        // --- BATTLE SEQUENCE ---
         function startBattleSequence() {
             const pFirst = state.p.spd >= state.c.spd;
             const pMult = state.pAdv ? 1.5 : 1.0;
@@ -674,89 +498,37 @@
             const pAtkFinal = Math.ceil(state.p.atk * pMult);
             const cAtkFinal = Math.ceil(state.c.atk * cMult);
 
-            // Show Badge
-            if(state.pAdv) {
+            if(state.pAdv || state.cAdv) {
                 el('adv-badge').classList.remove('hidden');
-                el('adv-badge').innerText = "YOU: ATK x1.5";
-                el('adv-badge').className = "bg-blue-600 text-white font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl absolute z-50";
-            } else if (state.cAdv) {
-                el('adv-badge').classList.remove('hidden');
-                el('adv-badge').innerText = "CPU: ATK x1.5";
-                el('adv-badge').className = "bg-red-600 text-white font-black text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl absolute z-50";
+                el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.5" : "CPU: ATK x1.5";
             }
 
             const seq = [
-                // Reveal HP
-                { t: 500, f: () => {
-                    reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp);
-                    reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp);
-                }},
-                // Attack 1
-                { t: 1500, f: () => {
-                    if(pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); }
-                    else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }
-                }},
-                // Defend 1
-                { t: 2500, f: () => {
-                    if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); }
-                    else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }
-                }},
-                // Resolve 1
+                { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
+                { t: 1500, f: () => { if(pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
+                { t: 2500, f: () => { if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
                 { t: 3500, f: () => {
-                    if(pFirst) {
-                        const dmg = Math.max(0, pAtkFinal - state.c.def);
-                        hit('c', dmg);
-                        state.c.currHp = state.c.hp - dmg;
-                        updateHpBar('cpu', state.c.currHp, state.c.hp);
-                    } else {
-                        const dmg = Math.max(0, cAtkFinal - state.p.def);
-                        hit('p', dmg);
-                        state.p.currHp = state.p.hp - dmg;
-                        updateHpBar('player', state.p.currHp, state.p.hp);
-                    }
+                    if(pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = state.c.hp - dmg; } 
+                    else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = state.p.hp - dmg; }
                     clearHighlights();
                 }},
-                // Attack 2
-                { t: 5000, f: () => {
-                    if(!pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); }
-                    else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }
-                }},
-                // Defend 2
-                { t: 6000, f: () => {
-                    if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); }
-                    else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }
-                }},
-                // Resolve 2
+                { t: 5000, f: () => { if(!pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
+                { t: 6000, f: () => { if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
                 { t: 7000, f: () => {
-                    if(!pFirst) {
-                        const dmg = Math.max(0, pAtkFinal - state.c.def);
-                        hit('c', dmg);
-                        state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
-                        updateHpBar('cpu', state.c.currHp, state.c.hp);
-                    } else {
-                        const dmg = Math.max(0, cAtkFinal - state.p.def);
-                        hit('p', dmg);
-                        state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg;
-                        updateHpBar('player', state.p.currHp, state.p.hp);
-                    }
+                    if(!pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg; }
+                    else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; }
                     clearHighlights();
                 }},
-                // End
                 { t: 8500, f: () => {
                     const pHp = Math.max(0, state.p.currHp!==undefined ? state.p.currHp : state.p.hp);
                     const cHp = Math.max(0, state.c.currHp!==undefined ? state.c.currHp : state.c.hp);
                     endRound(pHp, cHp);
                 }}
             ];
-            
             seq.forEach(s => setTimeout(s.f, s.t));
         }
 
-        // --- VISUAL HELPERS ---
-        function reveal(wrap, valEl, val) {
-            wrap.classList.remove('hidden-card');
-            valEl.innerText = val;
-        }
+        function reveal(wrap, valEl, val) { wrap.classList.remove('hidden-card'); valEl.innerText = val; }
         function highlight(el) { el.classList.add('active-turn'); }
         function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
         
@@ -764,24 +536,13 @@
             const float = el(target+'-dmg-float');
             float.innerText = `-${dmg}`;
             float.classList.remove('anim-float');
-            void float.offsetWidth; // trigger reflow
+            void float.offsetWidth;
             float.classList.add('anim-float');
-            if (navigator.vibrate && dmg > 0) navigator.vibrate(50);
-        }
-
-        function updateHpBar(who, curr, max) {
-            const pct = Math.max(0, (curr/max)*100);
-            el(who+'-hp-bar').style.width = pct + '%';
-        }
-
-        function showToast(msg) {
-            // Simple toast logic if needed, currently using badges/overlays
         }
 
         function endRound(pHp, cHp) {
-            let title = "DRAW";
-            let color = "text-yellow-500";
-            if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-blue-500"; }
+            let title = "DRAW"; let color = "text-yellow-500";
+            if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="cyber-text"; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
             
             el('player-score').innerText = state.p.wins;
@@ -790,37 +551,29 @@
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             el('res-content').innerHTML = `
-                <div class="flex justify-between w-64 mx-auto border-b border-gray-700 pb-2">
-                    <span>YOU</span> <span class="font-bold text-white">${pHp} HP</span>
-                </div>
-                <div class="flex justify-between w-64 mx-auto pt-2">
-                    <span>CPU</span> <span class="font-bold text-white">${cHp} HP</span>
-                </div>
+                <div class="flex justify-between w-64 mx-auto border-b border-blue-900/50 pb-2"><span>YOU</span> <span class="font-bold cyber-text">${pHp} HP</span></div>
+                <div class="flex justify-between w-64 mx-auto pt-2"><span>CPU</span> <span class="font-bold text-red-500">${cHp} HP</span></div>
             `;
-            
             el('result-overlay').classList.remove('hidden');
         }
 
         function nextRound() {
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
-                // Game Over
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
                 const win = state.p.wins > state.c.wins;
                 el('final-result-title').innerText = win ? "YOU WIN" : "YOU LOSE";
-                el('final-result-title').className = win ? "text-6xl font-gaming mb-4 text-blue-500" : "text-6xl font-gaming mb-4 text-red-500";
+                el('final-result-title').className = win ? "text-6xl font-gaming mb-4 cyber-text" : "text-6xl font-gaming mb-4 text-red-500";
                 return;
             }
-            
             state.round++;
             el('current-round').innerText = state.round;
             el('result-overlay').classList.add('hidden');
             initRound();
         }
 
-        // Start
         window.onload = initRound;
-
     </script>
 </body>
 </html>
+```eof
