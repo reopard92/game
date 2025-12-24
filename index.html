@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：20</title>
+    <title>Resource Strategy Card Battle：21</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
 
         :root {
             --color-spd: #a855f7;
@@ -18,7 +18,7 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Roboto', 'Noto Sans JP', sans-serif;
             background-color: var(--bg-cyber);
             color: #fff;
             overflow: hidden;
@@ -45,7 +45,7 @@
         .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
         /* カード */
-        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 310px; margin: 0 auto; }
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 310px; margin: 0 auto; position: relative; z-index: 10;} /* z-index added */
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 7px; letter-spacing: 1px; color: #64748b; }
         .battle-card { aspect-ratio: 4/5; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; }
         .card-spd { border-color: var(--color-spd); } .card-hp { border-color: var(--color-hp); } .card-atk { border-color: var(--color-atk); } .card-def { border-color: var(--color-def); }
@@ -62,9 +62,12 @@
         @keyframes floatUp { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -100%) scale(1.5); opacity: 1; } 100% { transform: translate(-50%, -200%) scale(1); opacity: 0; } }
         .dmg-float { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: 'Black Ops One'; font-size: 2.5rem; color: var(--neon-blue); text-shadow: 0 0 10px currentColor; pointer-events: none; z-index: 100; white-space: nowrap; }
         .anim-float { animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes pulse-red { 0%, 100% { color: rgba(255,255,255,0.3); text-shadow: 0 0 5px white; } 50% { color: rgba(239,68,68,0.6); text-shadow: 0 0 20px #ef4444; transform: translate(-50%, -50%) scale(1.1); } }
+        .timer-urgent { animation: pulse-red 0.5s infinite; color: rgba(239,68,68,0.6) !important; }
 
         /* Inputs */
-        .control-block { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 4px; border-left-width: 3px; flex-shrink: 0; }
+        .control-block { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 4px; border-left-width: 3px; flex-shrink: 0; transition: opacity 0.3s; }
+        .control-block.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
         .control-row { display: flex; align-items: center; justify-content: space-between; height: 26px; }
         .control-label { font-family: 'Rajdhani'; font-weight: bold; font-size: 14px; width: 60px; flex-shrink: 0; }
         .control-val { font-family: 'Black Ops One'; font-size: 20px; text-align: right; width: 60px; flex-shrink: 0; }
@@ -80,6 +83,14 @@
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
         .phase-title-text { font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 2px; text-align: center; }
 
+        /* Timer - Adjusted z-index and opacity */
+        .phase-timer {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Black Ops One'; font-size: 10rem; color: rgba(255,255,255,0.15);
+            pointer-events: none; z-index: 50; /* Above cards */
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
         /* Utility */
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -89,6 +100,14 @@
         .room-item { padding: 12px; background: #0f172a; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
         .join-btn { padding: 4px 12px; background: var(--neon-blue); color: #000; font-weight: bold; border-radius: 4px; font-family: 'Rajdhani'; }
+        
+        /* Advantage Animation */
+        @keyframes flash-win {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1.0); opacity: 1; }
+        }
+        .adv-anim { animation: flash-win 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards; }
     </style>
 </head>
 <body class="select-none">
@@ -120,7 +139,9 @@
 
     <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
-        <div class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto">
+        <div id="phase-timer" class="phase-timer hidden">15</div>
+
+        <div class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10">
             <!-- CPU Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
@@ -132,8 +153,8 @@
                 </div>
             </div>
             
-            <div class="h-4 flex items-center justify-center relative">
-                <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-[10px] px-4 py-0.5 rounded-full border border-white shadow-xl animate-pulse absolute z-30">INITIATIVE WIN!</div>
+            <div class="h-8 flex items-center justify-center relative">
+                <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-[12px] px-6 py-1 rounded-full border-2 border-white shadow-xl absolute z-30 opacity-0">INITIATIVE WIN!</div>
             </div>
 
             <!-- Player Row -->
@@ -159,7 +180,7 @@
             
             <!-- Phase 1 -->
             <div id="input-group-spd" class="w-full">
-                <div class="control-block border-purple-500">
+                <div class="control-block border-purple-500" id="blk-spd">
                     <div class="control-row">
                         <div class="control-label text-purple-400">SPEED</div>
                         <div class="control-val text-purple-400" id="disp-spd">0</div>
@@ -179,7 +200,7 @@
 
             <!-- Phase 2 -->
             <div id="input-group-build" class="hidden w-full flex flex-col gap-1 justify-center h-full">
-                <div class="control-block border-green-500">
+                <div class="control-block border-green-500" id="blk-hp">
                     <div class="control-row">
                         <div class="control-label text-green-400">HP</div>
                         <div class="text-[9px] text-green-600">REAL: <span id="real-hp" class="text-green-400 font-bold text-sm">0</span></div>
@@ -193,7 +214,7 @@
                         <button class="btn-mini" onclick="step('hp', 10)">+10</button>
                     </div>
                 </div>
-                <div class="control-block border-red-500">
+                <div class="control-block border-red-500" id="blk-atk">
                     <div class="control-row">
                         <div class="control-label text-red-400">ATK</div>
                         <div class="control-val text-red-400" id="disp-atk">0</div>
@@ -206,7 +227,7 @@
                         <button class="btn-mini" onclick="step('atk', 10)">+10</button>
                     </div>
                 </div>
-                <div class="control-block border-blue-500">
+                <div class="control-block border-blue-500" id="blk-def">
                     <div class="control-row">
                         <div class="control-label text-blue-400">DEF</div>
                         <div class="control-val text-blue-400" id="disp-def">0</div>
@@ -234,7 +255,7 @@
 
     <!-- Wait Overlay (Online) -->
     <div id="wait-overlay" class="overlay hidden">
-        <div class="text-2xl font-gaming cyber-text animate-pulse mb-4">WAITING FOR OPPONENT...</div>
+        <div class="text-2xl font-gaming cyber-text animate-pulse mb-4">OPPONENT DECIDING...</div>
         <div class="text-sm text-gray-400 font-tech">INPUT LOCKED</div>
     </div>
 
@@ -246,11 +267,17 @@
             <button onclick="showLobby()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
         </div>
         <div class="mt-8 text-left bg-gray-900/80 p-4 rounded border border-gray-700 w-full max-w-sm">
-            <h2 class="text-yellow-500 font-bold border-b border-gray-700 pb-1 mb-2">RULES</h2>
-            <ul class="text-xs text-gray-400 space-y-1 list-disc list-inside">
-                <li>Total 1000 PTS / 5 Rounds</li>
-                <li>Speed Win: ATK x1.5 & 30% Refund</li>
-                <li>HP Build: 50% Efficiency (100 cost = 50 HP)</li>
+            <h2 class="text-yellow-500 font-bold border-b border-gray-700 pb-1 mb-2 font-gaming">GAME RULES</h2>
+            <ul class="text-xs text-gray-400 space-y-2 list-disc list-inside font-sans">
+                <li><b class="text-white">5ラウンド制</b>：HPが多い方がラウンド勝利</li>
+                <li><b class="text-blue-400">1000 PTS</b>：全ラウンド共通の総資産を配分</li>
+                <li><b class="text-purple-400">フェーズ1 (SPEED)</b>：
+                    <br><span class="pl-4">数値が大きいと <b class="text-yellow-400">攻撃1.5倍</b> & <b class="text-green-400">消費30%還元</b></span>
+                </li>
+                <li><b class="text-green-400">フェーズ2 (BUILD)</b>：
+                    <br><span class="pl-4">残りを <b class="text-green-500">HP</b>・<b class="text-red-500">攻撃</b>・<b class="text-blue-500">防御</b> に配分</span>
+                </li>
+                <li><b class="text-gray-500">注</b>：HPコストは <b class="text-white">50%</b> の効率で変換されます</li>
             </ul>
         </div>
     </div>
@@ -261,7 +288,6 @@
         <div class="w-full max-w-sm">
             <div class="text-xs text-gray-400 mb-2">WAITING ROOMS</div>
             <div id="room-list" class="scroll-list">
-                <!-- Rooms will be injected here -->
                 <div class="text-center text-gray-600 py-4">Scanning...</div>
             </div>
             <button onclick="createRoom()" class="lobby-btn mt-4">CREATE NEW ROOM</button>
@@ -298,7 +324,6 @@
         import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Config & Init ---
-        // ★★★ 以下の設定をご自身のFirebaseプロジェクトの設定に書き換えてください ★★★
         const firebaseConfig = {
           apiKey: "AIzaSyDBLlMDGCT3IO-tgIJkeFJIta6r-XB3zgs",
           authDomain: "card-battle-game-415d1.firebaseapp.com",
@@ -307,12 +332,8 @@
           messagingSenderId: "355402716950",
           appId: "1:355402716950:web:a9861080ba53bcdcba2237"
         };
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-        // AIプレビュー環境用の自動フォールバック（削除可）
-        const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-
-        const app = initializeApp(configToUse);
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'resource-strategy-card-battle';
@@ -330,13 +351,14 @@
         const MAX_ROUNDS = 5;
         const START_PTS = 1000;
         let isOnline = false;
-        let role = 'host'; // 'host' or 'guest' or 'cpu'
+        let role = 'host'; 
+        let timerInterval = null;
 
         let state = {
             round: 1,
             phase: 1, 
-            p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false },
-            c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false },
+            p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
+            c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 }
         };
 
@@ -352,11 +374,16 @@
             topRes: el('top-resource'),
             cpuRes: el('cpu-resource'),
             wait: el('wait-overlay'),
+            timer: el('phase-timer'),
             
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
+            
+            blocks: {
+                spd: el('blk-spd'), hp: el('blk-hp'), atk: el('blk-atk'), def: el('blk-def')
+            }
         };
 
         // --- Mode Handlers ---
@@ -383,11 +410,8 @@
         async function refreshRoomList() {
             const listEl = el('room-list');
             listEl.innerHTML = '<div class="text-center text-gray-500">Searching...</div>';
-            
-            // Simple fetch all rooms
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
-            const q = query(roomsRef); // Fetch all, filter in memory for simplicity
-            
+            const q = query(roomsRef);
             try {
                 const snapshot = await getDocs(q);
                 let html = '';
@@ -415,7 +439,6 @@
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
             const newRoomRef = doc(roomsRef);
             roomId = newRoomRef.id;
-
             const roomData = {
                 hostId: userId,
                 guestId: null,
@@ -426,13 +449,10 @@
                 guestInput: null,
                 updatedAt: serverTimestamp()
             };
-
             await setDoc(newRoomRef, roomData);
-            
             el('lobby-screen').classList.add('hidden');
             el('host-wait-screen').classList.remove('hidden');
             el('room-id-disp').innerText = roomId.substr(0,4);
-
             subscribeRoom(roomId);
         };
 
@@ -440,14 +460,12 @@
             role = 'guest';
             isOnline = true;
             roomId = id;
-            
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
             await updateDoc(roomRef, {
                 guestId: userId,
                 status: 'playing',
-                guestInput: null // clear any stale data
+                guestInput: null 
             });
-
             el('lobby-screen').classList.add('hidden');
             subscribeRoom(roomId);
         };
@@ -457,48 +475,32 @@
             unsubscribeRoom = onSnapshot(roomRef, (doc) => {
                 const data = doc.data();
                 if (!data) return;
-
-                // Game Started Check
                 if (data.status === 'playing' && el('host-wait-screen').classList.contains('hidden') === false) {
                     el('host-wait-screen').classList.add('hidden');
-                    initRound(); // Host start
+                    initRound(); 
                 }
                 if (role === 'guest' && data.status === 'playing' && state.round === 1 && state.phase === 1 && state.p.submitted === false && ui.wait.classList.contains('hidden')) {
-                    if(el('main-arena').children.length > 0) { /* UI exists */ }
-                    else { initRound(); }
+                    if(el('main-arena').children.length > 0) { } else { initRound(); }
                 }
-
-                // Check Opponent Action
                 if (isOnline && data.status === 'playing') {
                     const myInput = role === 'host' ? data.hostInput : data.guestInput;
                     const oppInput = role === 'host' ? data.guestInput : data.hostInput;
-
-                    // Check Phase Resolution
                     if (myInput && oppInput) {
-                        // Both submitted!
                         if (!state.p.resolved) {
-                            state.p.resolved = true; // flag to prevent double exec
+                            state.p.resolved = true; 
                             ui.wait.classList.add('hidden');
-                            
-                            // Map opponent input to 'c' state
                             state.c.spd = oppInput.spd;
                             state.c.hp = oppInput.hp;
                             state.c.atk = oppInput.atk;
                             state.c.def = oppInput.def;
-                            state.c.total = oppInput.total; // Opponent total
-                            
-                            // Execute visual sequence
-                            if (state.phase === 1) {
-                                resolvePhase1();
-                            } else {
-                                resolvePhase2();
-                            }
+                            state.c.total = oppInput.total; 
+                            if (state.phase === 1) resolvePhase1();
+                            else resolvePhase2();
                         }
                     } else if (myInput) {
-                        // I submitted, opponent hasn't
                         ui.wait.classList.remove('hidden');
+                        toggleInputs(false); // Lock input while waiting
                     } else {
-                        // New round/phase ready state
                         state.p.resolved = false;
                         ui.wait.classList.add('hidden');
                     }
@@ -509,22 +511,55 @@
         async function sendInput(inputData) {
             if (!isOnline) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            const payload = {
-                ...inputData,
-                total: state.p.total // Send my current total to opponent
-            };
-            
-            if (role === 'host') {
-                await updateDoc(roomRef, { hostInput: payload });
-            } else {
-                await updateDoc(roomRef, { guestInput: payload });
-            }
+            const payload = { ...inputData, total: state.p.total };
+            if (role === 'host') await updateDoc(roomRef, { hostInput: payload });
+            else await updateDoc(roomRef, { guestInput: payload });
         }
 
         async function clearRoomInputs() {
-            if (!isOnline || role !== 'host') return; // Host controls clean up
+            if (!isOnline || role !== 'host') return; 
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
             await updateDoc(roomRef, { hostInput: null, guestInput: null });
+        }
+
+        // --- Timer Logic ---
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            let count = seconds;
+            ui.timer.innerText = count;
+            ui.timer.classList.remove('hidden', 'timer-urgent');
+            
+            timerInterval = setInterval(() => {
+                count--;
+                ui.timer.innerText = count;
+                if (count <= 3) {
+                    ui.timer.classList.add('timer-urgent');
+                }
+                if (count <= 0) {
+                    clearInterval(timerInterval);
+                    ui.timer.classList.add('hidden');
+                    if (!ui.btn.disabled) commitPhase();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            ui.timer.classList.add('hidden');
+        }
+
+        // --- Helper: Disable/Enable Inputs ---
+        function toggleInputs(enable) {
+            const pointerEvent = enable ? 'auto' : 'none';
+            const opacity = enable ? '1' : '0.5';
+            
+            ['spd', 'hp', 'atk', 'def'].forEach(k => {
+                if(ui.blocks[k]) {
+                    ui.blocks[k].style.pointerEvents = pointerEvent;
+                    ui.blocks[k].style.opacity = opacity;
+                }
+            });
+            ui.btn.disabled = !enable;
         }
 
         // --- Game Logic ---
@@ -582,14 +617,14 @@
             ui.p2.classList.add('hidden');
             ui.title.innerText = "PHASE 1: SPEED INPUT";
             ui.btn.innerText = "LOCK IN";
-            ui.btn.disabled = false;
+            toggleInputs(true); 
 
             if(!isOnline) generateCPU();
             updateUI();
+            startTimer(15);
         }
 
         function generateCPU() {
-            // CPU logic same as before...
             const roundsLeft = (MAX_ROUNDS - state.round) + 1;
             let budget = state.c.total;
             if (roundsLeft > 1) {
@@ -609,7 +644,8 @@
 
         window.commitPhase = () => {
             if(!updateUI()) return;
-            ui.btn.disabled = true;
+            toggleInputs(false); 
+            stopTimer();
 
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
@@ -643,27 +679,48 @@
                 }
             });
             el('adv-badge').classList.add('hidden');
+            el('adv-badge').classList.remove('scale-100');
+            el('adv-badge').classList.add('scale-0');
 
-            // Offline CPU cost deduction
             if(!isOnline) state.c.total -= state.c.spd;
 
-            ui.cP.spd.innerText = state.p.spd;
-            ui.cC.spd.innerText = state.c.spd;
+            // Dramatic Reveal
+            ui.btn.innerText = "REVEALING...";
+            
+            // Step 1: Open Cards
+            setTimeout(() => {
+                ui.cP.spd.innerText = state.p.spd;
+                ui.cC.spd.innerText = state.c.spd;
+                
+                // Logic
+                state.pAdv = false; state.cAdv = false;
+                if (state.p.spd > state.c.spd) {
+                    state.pAdv = true;
+                    state.p.total += Math.ceil(state.p.spd * 0.3);
+                } else if (state.c.spd > state.p.spd) {
+                    state.cAdv = true;
+                    state.c.total += Math.ceil(state.c.spd * 0.3);
+                }
 
-            state.pAdv = false; state.cAdv = false;
-            if (state.p.spd > state.c.spd) {
-                state.pAdv = true;
-                state.p.total += Math.ceil(state.p.spd * 0.3);
-            } else if (state.c.spd > state.p.spd) {
-                state.cAdv = true;
-                state.c.total += Math.ceil(state.c.spd * 0.3);
-            }
+                // Step 2: Show Advantage
+                setTimeout(() => {
+                    if (state.pAdv || state.cAdv) {
+                        el('adv-badge').classList.remove('hidden');
+                        el('adv-badge').innerText = state.pAdv ? "INITIATIVE WIN!" : "OPPONENT ADVANTAGE";
+                        el('adv-badge').className = state.pAdv ? 
+                            "bg-blue-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim" :
+                            "bg-red-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim";
+                        
+                        setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
+                    }
+                }, 600);
+
+            }, 500);
 
             state.phase = 2;
             state.p.submitted = false;
             state.p.resolved = false;
             
-            // Clean DB for next phase if host
             if(isOnline && role === 'host') clearRoomInputs();
 
             setTimeout(() => {
@@ -671,16 +728,15 @@
                 ui.p2.classList.remove('hidden');
                 ui.title.innerText = "PHASE 2: BUILD UNIT";
                 ui.btn.innerText = "ENGAGE";
-                ui.btn.disabled = false;
+                toggleInputs(true); 
                 updateUI();
-            }, 1500);
+                startTimer(15);
+            }, 3000); // More time to see result
         }
 
         function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
-            
             if(isOnline && role === 'host') clearRoomInputs();
-            
             startBattleSequence();
         }
 
@@ -697,7 +753,6 @@
                 el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.5" : "OPP: ATK x1.5";
             }
 
-            // ... Animation Sequence (Same as before) ...
             const seq = [
                 { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
                 { t: 1500, f: () => { if(pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
@@ -731,7 +786,7 @@
             seq.forEach(s => setTimeout(s.f, s.t));
         }
 
-        // --- Visual Helpers (Same as before) ---
+        // --- Visual Helpers ---
         function reveal(wrap, valEl, val) { wrap.classList.remove('hidden-card'); valEl.innerText = val; }
         function highlight(el) { el.classList.add('active-turn'); }
         function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
@@ -752,11 +807,19 @@
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             el('res-content').innerHTML = `
-                <div class="flex justify-between w-64 mx-auto border-b border-blue-900/50 pb-2">
-                    <span>YOU</span> <div class="text-right"><span class="font-bold cyber-text block text-lg">${Math.floor(pHp)} HP</span><span class="text-xs text-gray-400">REM: ${Math.floor(state.p.total)} PTS</span></div>
-                </div>
-                <div class="flex justify-between w-64 mx-auto pt-2">
-                    <span>OPP</span> <div class="text-right"><span class="font-bold text-red-500 block text-lg">${Math.floor(cHp)} HP</span><span class="text-xs text-gray-400">REM: ${Math.floor(state.c.total)} PTS</span></div>
+                <div class="grid grid-cols-2 gap-4 text-sm mb-4 border-b border-gray-700 pb-4">
+                    <div class="text-right border-r border-gray-700 pr-4">
+                        <div class="text-blue-400 font-bold mb-1">YOU</div>
+                        <div class="text-2xl font-bold cyber-text">${state.p.wins} WINS</div>
+                        <div class="text-xs text-gray-400 mt-2">HP: ${Math.floor(pHp)}</div>
+                        <div class="text-xs text-gray-400">REM: ${Math.floor(state.p.total)} PTS</div>
+                    </div>
+                    <div class="text-left pl-4">
+                        <div class="text-red-500 font-bold mb-1">OPP</div>
+                        <div class="text-2xl font-bold text-white">${state.c.wins} WINS</div>
+                        <div class="text-xs text-gray-400 mt-2">HP: ${Math.floor(cHp)}</div>
+                        <div class="text-xs text-gray-400">REM: ${Math.floor(state.c.total)} PTS</div>
+                    </div>
                 </div>
             `;
             el('result-overlay').classList.remove('hidden');
