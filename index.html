@@ -2,103 +2,82 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resource Strategy Card Battle：07</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resource Strategy Card Battle：08</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@500;700&family=Roboto:wght@400;700&display=swap');
 
         :root {
-            --color-p-main: #3b82f6; /* Blue */
-            --color-c-main: #ef4444; /* Red */
-            --bg-dark: #0f172a;
-            --bg-panel: #1e293b;
+            --color-p-main: #3b82f6;
+            --color-c-main: #ef4444;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #020617;
             color: #e2e8f0;
-            overflow: hidden; /* Prevent body scroll, handle in panels */
+            overflow: hidden; /* App-like feel */
+            touch-action: manipulation;
         }
 
-        .font-gaming {
-            font-family: 'Black Ops One', cursive;
-        }
-        
-        .font-tech {
-            font-family: 'Rajdhani', sans-serif;
-        }
+        .font-gaming { font-family: 'Black Ops One', cursive; }
+        .font-tech { font-family: 'Rajdhani', sans-serif; }
 
         /* --- UI Components --- */
-
-        /* Step Progress Bar */
-        .step-item { position: relative; z-index: 1; }
-        .step-item.active .step-circle {
-            background-color: #fbbf24;
-            border-color: #fbbf24;
-            color: #000;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
-        }
-        .step-line {
-            position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
-            background-color: #334155; z-index: 0; transform: translateY(-50%);
-        }
-        .step-circle {
-            width: 28px; height: 28px; border-radius: 50%; background-color: #1e293b;
-            border: 2px solid #475569; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease;
-        }
-
+        
         /* Custom Range Slider */
         .custom-range {
-            -webkit-appearance: none; width: 100%; height: 12px;
-            background: #334155; border-radius: 6px; outline: none; transition: opacity .2s;
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: #334155; border-radius: 3px; outline: none;
         }
         .custom-range::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
             border-radius: 50%; background: #fbbf24; cursor: pointer;
+            border: 2px solid #1e293b;
             box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
 
-        /* Number Input Styling */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            opacity: 1;
-        }
+        /* Number Input */
         .num-input {
-            background-color: #0f172a;
-            border: 1px solid #475569;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-align: right;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.2s;
+            background-color: transparent;
+            border: none; border-bottom: 1px solid #475569;
+            color: white; width: 50px; text-align: center;
+            font-family: 'Rajdhani', sans-serif; font-weight: bold; font-size: 1.2rem;
         }
-        .num-input:focus {
-            outline: none;
-            border-color: #fbbf24;
-            box-shadow: 0 0 5px rgba(251, 191, 36, 0.3);
-        }
+        .num-input:focus { outline: none; border-color: #fbbf24; }
 
         /* Stat Gauge Bar */
         .stat-bar-bg {
-            width: 100%; height: 8px; background-color: #334155;
-            border-radius: 4px; overflow: hidden; margin-top: 4px;
+            width: 100%; height: 6px; background-color: #1e293b;
+            border-radius: 3px; overflow: hidden; margin-top: 4px;
         }
         .stat-bar-fill { height: 100%; width: 0%; transition: width 0.1s ease; }
 
-        /* Cards */
+        /* Stepper Buttons */
+        .step-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: #334155; color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; cursor: pointer; user-select: none;
+            transition: active 0.1s;
+        }
+        .step-btn:active { background: #475569; transform: scale(0.95); }
+
+        /* Cards (Grid Layout Optimized) */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            width: 180px; /* Compact width for mobile */
+        }
+
         .battle-card {
-            width: 85px; height: 120px;
+            width: 100%; aspect-ratio: 3/4;
             background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid #475569; border-radius: 10px;
+            border: 1px solid #475569; border-radius: 8px;
             position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: space-between; padding: 8px 4px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            align-items: center; justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
@@ -108,10 +87,9 @@
             border-color: #94a3b8; transform: rotateY(0deg);
         }
         
-        /* Effects */
-        .battle-card.win-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); border-color: #3b82f6; }
-        .battle-card.lose-glow { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); border-color: #ef4444; opacity: 0.6; }
-        .battle-card.active-turn { box-shadow: 0 0 25px #fbbf24; border-color: #fbbf24; transform: scale(1.1); z-index: 10; }
+        .battle-card.win-glow { box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); border-color: #3b82f6; }
+        .battle-card.lose-glow { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); border-color: #ef4444; opacity: 0.6; }
+        .battle-card.active-turn { box-shadow: 0 0 20px #fbbf24; border-color: #fbbf24; z-index: 10; transform: scale(1.05); }
 
         .battle-card.hidden-card {
             background: repeating-linear-gradient(45deg, #1e293b, #1e293b 10px, #0f172a 10px, #0f172a 20px);
@@ -120,331 +98,302 @@
         .battle-card.hidden-card .card-content { opacity: 0; }
         .battle-card.hidden-card::after {
             content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 2rem; color: #334155; font-family: 'Black Ops One', cursive;
+            font-size: 1.5rem; color: #334155; font-family: 'Black Ops One', cursive;
         }
 
-        .card-icon { width: 24px; height: 24px; margin-bottom: 2px; }
+        .card-label { position: absolute; top: 2px; left: 4px; font-size: 0.6rem; font-weight: bold; opacity: 0.7; }
+        .card-icon { position: absolute; top: 2px; right: 4px; width: 14px; height: 14px; opacity: 0.7; }
+        .card-content { font-size: 1.5rem; font-weight: bold; font-family: 'Black Ops One', cursive; z-index: 2; }
 
-        /* Damage Animation */
+        /* Bottom Sheet UI */
+        .bottom-sheet {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #334155;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            max-height: 80vh;
+            display: flex; flex-direction: column;
+        }
+        .bottom-sheet.closed { transform: translateY(110%); }
+        .sheet-handle {
+            width: 40px; height: 4px; background: #475569; border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        /* Animations */
         @keyframes floatDamage {
             0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
             100% { transform: translate(-50%, -60px) scale(1.5); opacity: 0; }
         }
         .float-anim { animation: floatDamage 1.5s ease-out forwards; }
-
-        /* Utility */
-        .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .hidden { display: none !important; }
-        .disabled-area { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-
-        /* Layout Tweaks */
-        .cockpit-panel {
-            box-shadow: 10px 0 20px rgba(0,0,0,0.5);
-            z-index: 20;
-        }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen w-screen flex flex-col bg-black">
 
-    <!-- Top Navigation -->
-    <header class="h-14 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 shrink-0 z-30">
+    <!-- Top Bar -->
+    <header class="h-14 bg-gray-900/80 backdrop-blur border-b border-gray-800 flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-50">
         <div class="flex items-center gap-2">
-            <div class="text-blue-500 font-gaming text-xl tracking-wider">STRATEGY<span class="text-white">BATTLE</span></div>
-            <div class="bg-gray-800 px-2 py-0.5 rounded text-[10px] text-gray-400 font-mono">VER 07</div>
+            <div class="text-[10px] text-gray-500 font-bold tracking-widest">ROUND <span id="current-round" class="text-yellow-500 text-lg font-gaming">1</span>/5</div>
         </div>
-
-        <!-- Step Indicator -->
-        <div class="hidden md:flex items-center w-1/3 relative justify-between">
-            <div class="step-line"></div>
-            <div id="step-1" class="step-item active flex flex-col items-center">
-                <div class="step-circle bg-gray-800 border-gray-600 text-gray-300">1</div>
-                <div class="text-[10px] mt-1 text-gray-400 font-bold tracking-widest">SPD</div>
+        <div class="flex items-center gap-3 bg-gray-800/50 py-1 px-3 rounded-full border border-gray-700">
+            <div class="flex flex-col items-center leading-none">
+                <span class="text-[8px] text-blue-400 font-bold">YOU</span>
+                <span id="player-score" class="text-base font-bold text-white">0</span>
             </div>
-            <div id="step-2" class="step-item flex flex-col items-center">
-                <div class="step-circle">2</div>
-                <div class="text-[10px] mt-1 text-gray-500 font-bold tracking-widest">BUILD</div>
-            </div>
-            <div id="step-3" class="step-item flex flex-col items-center">
-                <div class="step-circle">3</div>
-                <div class="text-[10px] mt-1 text-gray-500 font-bold tracking-widest">FIGHT</div>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-            <div class="text-center">
-                <div class="text-[10px] text-gray-500 tracking-wider">ROUND</div>
-                <div class="text-lg font-gaming text-yellow-500"><span id="current-round">1</span><span class="text-xs text-gray-600">/5</span></div>
-            </div>
-            <div class="flex items-center gap-2 bg-gray-800 py-1 px-3 rounded-lg border border-gray-700">
-                <div class="text-center">
-                    <div class="text-[10px] text-blue-400 font-bold">YOU</div>
-                    <div id="player-score" class="text-lg font-bold leading-none">0</div>
-                </div>
-                <div class="text-gray-600 font-bold">-</div>
-                <div class="text-center">
-                    <div class="text-[10px] text-red-500 font-bold">CPU</div>
-                    <div id="cpu-score" class="text-lg font-bold leading-none">0</div>
-                </div>
+            <div class="text-gray-600 font-bold text-xs">VS</div>
+            <div class="flex flex-col items-center leading-none">
+                <span class="text-[8px] text-red-500 font-bold">CPU</span>
+                <span id="cpu-score" class="text-base font-bold text-white">0</span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+    <!-- Main Arena (Background) -->
+    <main class="flex-1 relative w-full h-full pt-16 pb-32 flex flex-col items-center justify-center overflow-hidden">
+        
+        <!-- BG Effects -->
+        <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(circle at center, #1e293b 0%, #000 80%);"></div>
+        <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 40px 40px;"></div>
 
-        <!-- LEFT PANEL: COCKPIT (Input) -->
-        <section class="w-full md:w-4/12 bg-gray-900 border-r border-gray-800 flex flex-col cockpit-panel relative">
-            
-            <!-- Sticky Top: Resource Display -->
-            <div class="bg-gray-800/90 backdrop-blur border-b border-gray-700 p-4 shrink-0 shadow-lg z-20">
-                <div class="flex justify-between items-end mb-1">
-                    <span class="text-xs text-blue-300 font-bold tracking-widest">REMAINING RESOURCE</span>
-                    <span class="text-xs text-gray-400">MAX: 1000</span>
+        <!-- CPU Stats & History (Top Right) -->
+        <div class="absolute top-16 right-4 z-10 flex flex-col items-end pointer-events-none">
+            <div class="bg-gray-900/60 backdrop-blur px-2 py-1 rounded border border-red-900/50 mb-1">
+                <span class="text-[8px] text-gray-400">ENEMY RESOURCE</span>
+                <div class="text-sm font-tech font-bold text-red-500 text-right"><span id="cpu-total-pts">1000</span></div>
+            </div>
+            <div id="cpu-history" class="hidden bg-gray-900/80 border-r-2 border-yellow-500 p-2 rounded text-right shadow-sm backdrop-blur">
+                <div class="text-[8px] text-yellow-500 font-bold mb-0.5 uppercase">Intel</div>
+                <div id="history-content" class="text-[9px] space-y-0.5 font-mono text-gray-300"></div>
+            </div>
+        </div>
+
+        <!-- BATTLE AREA -->
+        <div class="relative z-10 w-full max-w-md h-full flex flex-col justify-evenly py-4">
+
+            <!-- CPU CARDS (Top) -->
+            <div class="flex flex-col items-center relative">
+                <div id="cpu-adv-badge" class="hidden mb-2 bg-red-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-lg border border-red-400 animate-pulse">
+                    ATK x1.5 ACTIVE
                 </div>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-baseline gap-2">
-                        <!-- Points are now updated in real-time -->
-                        <span id="player-total-pts" class="text-5xl font-tech font-bold text-blue-400 text-shadow">1000</span>
-                        <span class="text-sm text-gray-400 font-bold">PTS</span>
+                
+                <div class="card-grid">
+                    <!-- SPD -->
+                    <div class="battle-card" style="border-color: #a855f7;">
+                        <div class="card-label text-purple-400">SPD</div>
+                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                        <div class="card-content text-white" id="card-c-spd">?</div>
+                    </div>
+                    <!-- HP -->
+                    <div class="battle-card hidden-card" id="card-c-hp-container">
+                        <div class="card-label text-green-400">HP</div>
+                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                        <div class="card-content text-white" id="card-c-hp">?</div>
+                        <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all rounded-b"></div>
+                    </div>
+                    <!-- ATK -->
+                    <div class="battle-card hidden-card" id="card-c-atk-container">
+                        <div class="card-label text-red-400">ATK</div>
+                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
+                        <div class="card-content text-white" id="card-c-atk">?</div>
+                    </div>
+                    <!-- DEF -->
+                    <div class="battle-card hidden-card" id="card-c-def-container">
+                        <div class="card-label text-blue-400">DEF</div>
+                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                        <div class="card-content text-white" id="card-c-def">?</div>
                     </div>
                 </div>
-                <div class="w-full bg-gray-700 h-2 mt-2 rounded-full overflow-hidden border border-gray-600">
-                    <div id="resource-bar" class="h-full bg-blue-500 w-full transition-all duration-200 shadow-[0_0_10px_#3b82f6]"></div>
+
+                <!-- Damage Float -->
+                <div id="c-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-blue-400 opacity-0 pointer-events-none text-shadow z-50"></div>
+            </div>
+
+            <!-- VS Divider -->
+            <div class="flex items-center justify-center my-2 opacity-30">
+                <div class="h-px bg-white w-20"></div>
+                <div class="mx-2 font-gaming text-white">VS</div>
+                <div class="h-px bg-white w-20"></div>
+            </div>
+
+            <!-- PLAYER CARDS (Bottom) -->
+            <div class="flex flex-col items-center relative">
+                <div class="card-grid">
+                    <!-- SPD -->
+                    <div class="battle-card" style="border-color: #a855f7;">
+                        <div class="card-label text-purple-400">SPD</div>
+                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                        <div class="card-content text-white" id="card-p-spd">-</div>
+                    </div>
+                    <!-- HP -->
+                    <div class="battle-card hidden-card" id="card-p-hp-container">
+                        <div class="card-label text-green-400">HP</div>
+                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                        <div class="card-content text-white" id="card-p-hp">-</div>
+                        <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all rounded-b"></div>
+                    </div>
+                    <!-- ATK -->
+                    <div class="battle-card hidden-card" id="card-p-atk-container">
+                        <div class="card-label text-red-400">ATK</div>
+                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
+                        <div class="card-content text-white" id="card-p-atk">-</div>
+                    </div>
+                    <!-- DEF -->
+                    <div class="battle-card hidden-card" id="card-p-def-container">
+                        <div class="card-label text-blue-400">DEF</div>
+                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                        <div class="card-content text-white" id="card-p-def">-</div>
+                    </div>
+                </div>
+
+                <div id="player-adv-badge" class="hidden mt-2 bg-blue-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-lg border border-blue-400 animate-pulse">
+                    ATK x1.5 ACTIVE
+                </div>
+
+                <!-- Damage Float -->
+                <div id="p-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-red-500 opacity-0 pointer-events-none text-shadow z-50"></div>
+            </div>
+
+            <!-- Game Status Toast -->
+            <div class="absolute bottom-4 left-0 right-0 text-center pointer-events-none z-0">
+                <span id="game-status" class="bg-black/60 text-white text-xs px-4 py-1 rounded-full border border-gray-700 backdrop-blur">WAITING FOR INPUT...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- INPUT COCKPIT (Bottom Sheet) -->
+    <div id="cockpit-sheet" class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        
+        <!-- Header: Resource -->
+        <div class="px-6 pb-2 pt-1 flex justify-between items-end border-b border-gray-800">
+            <div>
+                <div class="text-[10px] text-gray-500 tracking-wider">YOUR RESOURCES</div>
+                <div class="flex items-baseline gap-1">
+                    <span id="sheet-resource-val" class="text-3xl font-tech font-bold text-blue-400">1000</span>
+                    <span class="text-xs text-gray-400">PTS</span>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-[10px] text-gray-500">COST</div>
+                <div class="text-xl font-bold text-white" id="round-cost">0</div>
+            </div>
+        </div>
+
+        <!-- Scrollable Inputs -->
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+            
+            <!-- Phase 1 Content -->
+            <div id="p1-inputs">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-purple-400 font-bold text-sm">SPEED</span>
+                    <span class="text-[10px] text-gray-500">Win for 1.5x ATK & 30% Refund</span>
+                </div>
+                <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="step-btn" onclick="stepVal('spd', -10)">-10</div>
+                        <div class="step-btn" onclick="stepVal('spd', -1)">-</div>
+                        <input type="number" id="num-spd" class="num-input flex-1" value="0" oninput="syncInput('spd', this.value)">
+                        <div class="step-btn" onclick="stepVal('spd', 1)">+</div>
+                        <div class="step-btn" onclick="stepVal('spd', 10)">+10</div>
+                    </div>
+                    <input type="range" id="input-spd" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('spd', this.value)">
+                    <div class="stat-bar-bg"><div id="bar-spd" class="stat-bar-fill bg-purple-500"></div></div>
                 </div>
             </div>
 
-            <!-- Scrollable Input Area -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-6 pb-24">
+            <!-- Phase 2 Content -->
+            <div id="p2-inputs" class="hidden space-y-4">
                 
-                <!-- Phase 1: Speed Control -->
-                <div id="p1-phase" class="transition-all duration-300">
-                    <div class="flex items-center gap-2 mb-2">
-                        <div class="p-1 bg-purple-500/20 rounded text-purple-400">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        </div>
-                        <span class="font-bold text-sm text-purple-200">INITIATIVE SPEED</span>
+                <!-- HP -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-green-400 font-bold text-sm">HP COST</span>
+                        <span class="text-[10px] text-green-300">REAL HP: <span id="real-hp-val">0</span></span>
                     </div>
-                    
-                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-colors">
-                        <div class="flex justify-between items-center mb-2 text-gray-400">
-                            <span class="text-xs">ALLOCATE</span>
-                            <!-- Number Input for SPD -->
-                            <input type="number" id="num-spd" min="0" max="1000" value="0" class="num-input w-20 text-purple-400 border-purple-900 focus:border-purple-500" oninput="syncInput('spd', this.value)">
+                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="step-btn" onclick="stepVal('hp', -10)">-10</div>
+                            <input type="range" id="input-hp" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('hp', this.value)">
+                            <div class="step-btn" onclick="stepVal('hp', 10)">+10</div>
+                            <input type="number" id="num-hp" class="num-input" value="0" oninput="syncInput('hp', this.value)">
                         </div>
-                        <!-- Slider for SPD -->
-                        <input type="range" id="input-spd" min="0" max="1000" value="0" class="custom-range mb-2" oninput="syncInput('spd', this.value)">
-                        <div class="stat-bar-bg"><div id="bar-spd" class="stat-bar-fill bg-purple-500"></div></div>
-                        <div class="text-[10px] text-gray-500 mt-2 text-right">Win: ATK x1.5 & Return 30%</div>
+                        <div class="stat-bar-bg"><div id="bar-hp" class="stat-bar-fill bg-green-500"></div></div>
                     </div>
                 </div>
 
-                <!-- Phase 2: Build Controls -->
-                <div id="p2-phase" class="flex flex-col gap-4 transition-all duration-300 disabled-area">
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="p-1 bg-green-500/20 rounded text-green-400">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <!-- ATK -->
+                <div>
+                    <div class="mb-1"><span class="text-red-400 font-bold text-sm">ATTACK</span></div>
+                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="step-btn" onclick="stepVal('atk', -10)">-10</div>
+                            <input type="range" id="input-atk" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('atk', this.value)">
+                            <div class="step-btn" onclick="stepVal('atk', 10)">+10</div>
+                            <input type="number" id="num-atk" class="num-input" value="0" oninput="syncInput('atk', this.value)">
                         </div>
-                        <span class="font-bold text-sm text-green-200">UNIT BUILD</span>
-                    </div>
-
-                    <!-- HP Control -->
-                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-green-500/50 transition-colors">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-gray-400">HP COST</span>
-                            <!-- Number Input for HP -->
-                            <input type="number" id="num-hp" min="0" max="1000" value="0" class="num-input w-20 text-green-400 border-green-900 focus:border-green-500" oninput="syncInput('hp', this.value)">
-                        </div>
-                        <!-- Slider for HP -->
-                        <input type="range" id="input-hp" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('hp', this.value)">
-                        <div class="stat-bar-bg"><div id="bar-hp" class="stat-bar-fill bg-green-500"></div></div>
-                        <div class="text-[10px] text-gray-500 mt-1 flex justify-between">
-                            <span>Efficiency: 50%</span>
-                            <span class="text-green-300 font-bold">Real HP: <span id="real-hp-val">0</span></span>
-                        </div>
-                    </div>
-
-                    <!-- ATK Control -->
-                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-red-500/50 transition-colors">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-gray-400">ATTACK</span>
-                            <!-- Number Input for ATK -->
-                            <input type="number" id="num-atk" min="0" max="1000" value="0" class="num-input w-20 text-red-400 border-red-900 focus:border-red-500" oninput="syncInput('atk', this.value)">
-                        </div>
-                        <!-- Slider for ATK -->
-                        <input type="range" id="input-atk" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('atk', this.value)">
                         <div class="stat-bar-bg"><div id="bar-atk" class="stat-bar-fill bg-red-500"></div></div>
                     </div>
+                </div>
 
-                    <!-- DEF Control -->
-                    <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-blue-500/50 transition-colors">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-gray-400">DEFENSE</span>
-                            <!-- Number Input for DEF -->
-                            <input type="number" id="num-def" min="0" max="1000" value="0" class="num-input w-20 text-blue-400 border-blue-900 focus:border-blue-500" oninput="syncInput('def', this.value)">
+                <!-- DEF -->
+                <div>
+                    <div class="mb-1"><span class="text-blue-400 font-bold text-sm">DEFENSE</span></div>
+                    <div class="bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="step-btn" onclick="stepVal('def', -10)">-10</div>
+                            <input type="range" id="input-def" min="0" max="1000" value="0" class="custom-range flex-1 mx-2" oninput="syncInput('def', this.value)">
+                            <div class="step-btn" onclick="stepVal('def', 10)">+10</div>
+                            <input type="number" id="num-def" class="num-input" value="0" oninput="syncInput('def', this.value)">
                         </div>
-                        <!-- Slider for DEF -->
-                        <input type="range" id="input-def" min="0" max="1000" value="0" class="custom-range" oninput="syncInput('def', this.value)">
                         <div class="stat-bar-bg"><div id="bar-def" class="stat-bar-fill bg-blue-500"></div></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Sticky Footer Action Button -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-800 shadow-[0_-5px_20px_rgba(0,0,0,0.5)] z-20">
-                <div class="flex justify-between text-xs mb-2 px-1">
-                    <span class="text-gray-500">CURRENT ROUND COST</span>
-                    <span id="round-cost" class="text-white font-bold">0</span>
-                </div>
-                <button id="action-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-blue-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2" onclick="handlePhaseAction()">
-                    <span>LOCK IN SPEED</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </button>
-                <div id="error-msg" class="text-red-500 text-[10px] mt-1 h-4 text-center font-bold"></div>
-            </div>
-        </section>
-
-        <!-- RIGHT PANEL: ARENA (Visualization) -->
-        <section class="flex-1 bg-black relative flex flex-col items-center justify-center p-2 overflow-hidden">
             
-            <!-- Background -->
-            <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(circle at center, #1e293b 0%, #000 70%);"></div>
-            <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 50px 50px;"></div>
-            
-            <!-- CPU Info HUD -->
-            <div class="absolute top-2 right-2 z-10 flex flex-col items-end">
-                <div class="bg-gray-900/80 border border-gray-700 backdrop-blur px-3 py-1.5 rounded mb-2 shadow-lg">
-                    <div class="text-[10px] text-gray-500 tracking-wider">OPPONENT RESOURCE</div>
-                    <div class="text-lg font-tech font-bold text-red-500 text-right"><span id="cpu-total-pts">1000</span> PTS</div>
-                </div>
-                <!-- CPU History -->
-                <div id="cpu-history" class="hidden bg-gray-900/90 border-r-4 border-yellow-500 p-2 w-40 rounded text-right shadow-xl backdrop-blur-sm">
-                    <div class="text-[9px] text-yellow-500 font-bold mb-1 tracking-wider uppercase">Last Round Intel</div>
-                    <div id="history-content" class="text-[10px] space-y-0.5 font-mono text-gray-300"></div>
-                </div>
-            </div>
+            <div id="error-msg" class="text-red-500 text-xs text-center font-bold h-4"></div>
+        </div>
 
-            <!-- BATTLE FIELD -->
-            <div class="relative z-10 w-full max-w-lg h-full flex flex-col justify-center py-6">
+        <!-- Action Button -->
+        <div class="p-4 border-t border-gray-800 bg-gray-900">
+            <button id="action-btn" class="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-900/40 active:scale-95 transition-all text-lg tracking-wider" onclick="handlePhaseAction()">
+                LOCK IN SPEED
+            </button>
+        </div>
+    </div>
 
-                <!-- CPU CARDS (Top) -->
-                <div class="flex justify-center items-end gap-2 md:gap-4 mb-4 relative pt-12">
-                    <!-- CPU Badge (Top Position) -->
-                    <div id="cpu-adv-badge" class="hidden absolute top-0 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-lg shadow-red-900 animate-pulse border border-red-400 z-20 whitespace-nowrap">
-                        CPU: ATK x1.5 ACTIVE
-                    </div>
+    <!-- RESULT OVERLAY -->
+    <div id="result-overlay" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[150] hidden backdrop-blur-md">
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-2xl shadow-2xl max-w-xs w-full text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
+            <h1 id="result-title" class="text-2xl font-gaming text-white mb-4">ROUND COMPLETE</h1>
+            <div id="result-detail" class="text-sm text-gray-300 space-y-4 mb-6"></div>
+            <button onclick="nextRound()" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-lg uppercase tracking-widest">
+                NEXT ROUND
+            </button>
+        </div>
+    </div>
 
-                    <!-- SPD Card -->
-                    <div class="battle-card" style="border-color: #a855f7;">
-                        <div class="text-[9px] text-purple-400 font-bold mt-1">SPD</div>
-                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-c-spd">?</div>
-                    </div>
-
-                    <!-- HP Card -->
-                    <div class="battle-card hidden-card" id="card-c-hp-container">
-                        <div class="text-[9px] text-green-400 font-bold mt-1">HP</div>
-                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-c-hp">?</div>
-                        <div id="cpu-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all"></div>
-                    </div>
-
-                    <!-- ATK Card -->
-                    <div class="battle-card hidden-card" id="card-c-atk-container">
-                        <div class="text-[9px] text-red-400 font-bold mt-1">ATK</div>
-                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-c-atk">?</div>
-                    </div>
-
-                    <!-- DEF Card -->
-                    <div class="battle-card hidden-card" id="card-c-def-container">
-                        <div class="text-[9px] text-blue-400 font-bold mt-1">DEF</div>
-                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-c-def">?</div>
-                    </div>
-
-                    <!-- Damage Float -->
-                    <div id="c-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-blue-400 opacity-0 pointer-events-none text-shadow z-50"></div>
-                </div>
-
-                <!-- Center Divider -->
-                <div class="flex items-center justify-center my-2">
-                    <div class="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent w-full"></div>
-                </div>
-
-                <!-- PLAYER CARDS (Bottom) -->
-                <div class="flex justify-center items-start gap-2 md:gap-4 mt-4 relative pb-12">
-                    <!-- Player Badge (Bottom Position) -->
-                    <div id="player-adv-badge" class="hidden absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-4 py-1 rounded-full shadow-lg shadow-blue-900 animate-pulse border border-blue-400 z-20 whitespace-nowrap">
-                        PLAYER: ATK x1.5 ACTIVE
-                    </div>
-
-                    <!-- SPD Card -->
-                    <div class="battle-card" style="border-color: #a855f7;">
-                        <div class="text-[9px] text-purple-400 font-bold mt-1">SPD</div>
-                        <div class="card-icon text-purple-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-p-spd">-</div>
-                    </div>
-
-                    <!-- HP Card -->
-                    <div class="battle-card hidden-card" id="card-p-hp-container">
-                        <div class="text-[9px] text-green-400 font-bold mt-1">HP</div>
-                        <div class="card-icon text-green-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-p-hp">-</div>
-                        <div id="player-hp-bar" class="absolute bottom-0 left-0 w-full h-1 bg-green-500 transition-all"></div>
-                    </div>
-
-                    <!-- ATK Card -->
-                    <div class="battle-card hidden-card" id="card-p-atk-container">
-                        <div class="text-[9px] text-red-400 font-bold mt-1">ATK</div>
-                        <div class="card-icon text-red-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-p-atk">-</div>
-                    </div>
-
-                    <!-- DEF Card -->
-                    <div class="battle-card hidden-card" id="card-p-def-container">
-                        <div class="text-[9px] text-blue-400 font-bold mt-1">DEF</div>
-                        <div class="card-icon text-blue-500"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                        <div class="card-content font-gaming text-xl text-white" id="card-p-def">-</div>
-                    </div>
-
-                    <!-- Damage Float -->
-                    <div id="p-dmg-float" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl font-gaming text-red-500 opacity-0 pointer-events-none text-shadow z-50"></div>
-                </div>
-
-                <!-- Messages Area -->
-                <div id="status-message" class="absolute bottom-20 left-0 right-0 text-center pointer-events-none z-40">
-                    <span class="bg-black/90 text-white px-8 py-2 rounded border border-gray-600 text-sm tracking-widest uppercase shadow-[0_0_15px_rgba(0,0,0,0.8)] font-bold" id="game-status">PHASE 1: SET SPEED</span>
-                </div>
-            </div>
-
-            <!-- RESULT OVERLAY -->
-            <div id="result-overlay" class="absolute inset-0 bg-black/95 flex flex-col items-center justify-center z-50 hidden backdrop-blur-md">
-                <div class="bg-gray-900 border border-gray-700 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-yellow-500 to-red-500"></div>
-                    <h1 id="result-title" class="text-3xl font-gaming text-white mb-6">ROUND COMPLETE</h1>
-                    <div id="result-detail" class="text-sm text-gray-300 space-y-4 mb-8"></div>
-                    <button onclick="nextRound()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 rounded-lg shadow-lg uppercase tracking-widest text-lg">
-                        NEXT ROUND
-                    </button>
-                </div>
-            </div>
-
-            <!-- GAME OVER OVERLAY -->
-            <div id="game-over-overlay" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-50 hidden">
-                 <div class="text-center">
-                    <h1 id="final-result-title" class="text-6xl md:text-8xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
-                    <p class="text-gray-500 tracking-[0.5em] mb-8">SIMULATION ENDED</p>
-                    <button onclick="location.reload()" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-12 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)] transition-all">
-                        REBOOT SYSTEM
-                    </button>
-                 </div>
-            </div>
-
-        </section>
-    </main>
+    <!-- GAME OVER OVERLAY -->
+    <div id="game-over-overlay" class="fixed inset-0 bg-black flex flex-col items-center justify-center z-[200] hidden">
+            <h1 id="final-result-title" class="text-6xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
+            <p class="text-gray-500 tracking-[0.5em] mb-8">SIMULATION ENDED</p>
+            <button onclick="location.reload()" class="bg-white text-black font-bold py-3 px-12 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)]">
+                REBOOT SYSTEM
+            </button>
+    </div>
 
     <script>
-        // --- GAME CONSTANTS ---
+        // Haptics Helper
+        function pulse(ms = 10) {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        }
+
+        // --- GAME LOGIC ---
         const MAX_ROUNDS = 5;
         const WIN_CONDITION = 3;
         const START_POINTS = 1000;
@@ -470,8 +419,6 @@
                 hp: document.getElementById('input-hp'),
                 atk: document.getElementById('input-atk'),
                 def: document.getElementById('input-def'),
-                
-                // Number Inputs
                 nSpd: document.getElementById('num-spd'),
                 nHp: document.getElementById('num-hp'),
                 nAtk: document.getElementById('num-atk'),
@@ -485,20 +432,16 @@
             },
             
             realHpVal: document.getElementById('real-hp-val'),
-            resourceBar: document.getElementById('resource-bar'),
+            sheetResource: document.getElementById('sheet-resource-val'),
             
-            phase1: document.getElementById('p1-phase'),
-            phase2: document.getElementById('p2-phase'),
+            p1Group: document.getElementById('p1-inputs'),
+            p2Group: document.getElementById('p2-inputs'),
+            
             btn: document.getElementById('action-btn'),
             cost: document.getElementById('round-cost'),
             error: document.getElementById('error-msg'),
+            sheet: document.getElementById('cockpit-sheet'),
             
-            steps: [
-                document.getElementById('step-1'),
-                document.getElementById('step-2'),
-                document.getElementById('step-3'),
-            ],
-
             cardsP: {
                 spd: document.getElementById('card-p-spd'),
                 hp: document.getElementById('card-p-hp'),
@@ -538,30 +481,28 @@
             }
         };
 
-        // --- UI Updates ---
-        function setPhaseStep(stepIdx) {
-            els.steps.forEach((el, i) => {
-                if (i <= stepIdx) el.classList.add('active');
-                else el.classList.remove('active');
-            });
+        // --- UI Interactions ---
+
+        function toggleSheet(open) {
+            if (open) els.sheet.classList.remove('closed');
+            else els.sheet.classList.add('closed');
+        }
+
+        function stepVal(type, delta) {
+            pulse(5);
+            let input = els.inputs[type];
+            let current = parseInt(input.value) || 0;
+            let next = Math.max(0, current + delta);
+            syncInput(type, next);
         }
 
         function syncInput(type, val) {
-            // Update both inputs to match
             const intVal = parseInt(val) || 0;
-            if (type === 'spd') {
-                els.inputs.spd.value = intVal;
-                els.inputs.nSpd.value = intVal;
-            } else if (type === 'hp') {
-                els.inputs.hp.value = intVal;
-                els.inputs.nHp.value = intVal;
-            } else if (type === 'atk') {
-                els.inputs.atk.value = intVal;
-                els.inputs.nAtk.value = intVal;
-            } else if (type === 'def') {
-                els.inputs.def.value = intVal;
-                els.inputs.nDef.value = intVal;
-            }
+            const rangeIn = els.inputs[type];
+            const numIn = els.inputs['n' + type.charAt(0).toUpperCase() + type.slice(1)];
+            
+            rangeIn.value = intVal;
+            numIn.value = intVal;
             updateUI();
         }
 
@@ -583,65 +524,51 @@
             els.cost.innerText = currentCost;
 
             const remaining = gameState.player.totalPts - currentCost;
-            
-            // Real-time update of Top Bar resource
-            els.pTotal.innerText = remaining;
+            els.sheetResource.innerText = remaining;
 
-            const remainingPct = Math.max(0, (remaining / START_POINTS) * 100);
-            els.resourceBar.style.width = `${remainingPct}%`;
-            
             if (remaining < 0) {
                 els.error.innerText = "INSUFFICIENT RESOURCES";
                 els.btn.disabled = true;
                 els.btn.classList.add('opacity-50', 'grayscale');
-                els.resourceBar.classList.add('bg-red-500');
-                els.resourceBar.classList.remove('bg-blue-500');
-                els.pTotal.classList.add('text-red-500');
-                els.pTotal.classList.remove('text-blue-400');
+                els.sheetResource.classList.add('text-red-500');
+                els.sheetResource.classList.remove('text-blue-400');
                 return false;
             } else {
                 els.error.innerText = "";
                 els.btn.disabled = false;
                 els.btn.classList.remove('opacity-50', 'grayscale');
-                els.resourceBar.classList.remove('bg-red-500');
-                els.resourceBar.classList.add('bg-blue-500');
-                els.pTotal.classList.remove('text-red-500');
-                els.pTotal.classList.add('text-blue-400');
+                els.sheetResource.classList.remove('text-red-500');
+                els.sheetResource.classList.add('text-blue-400');
                 return true;
             }
         }
 
+        // --- GAME LOOP ---
+
         function initRound() {
-            // Reset Inputs (Range and Number)
+            // Reset Inputs
             ['spd', 'hp', 'atk', 'def'].forEach(k => {
-                els.inputs[k].value = 0;
-                // e.g. nSpd
-                const nKey = 'n' + k.charAt(0).toUpperCase() + k.slice(1);
-                els.inputs[nKey].value = 0;
+                syncInput(k, 0);
             });
-            
             els.inputs.spd.readOnly = false;
             els.inputs.nSpd.readOnly = false;
             
-            updateUI(); 
-
+            // State
             gameState.player.currentStats = {};
             gameState.cpu.currentStats = {};
             gameState.player.advantage = false;
             gameState.cpu.advantage = false;
             
+            // UI Setup Phase 1
             gameState.phase = 1;
-            setPhaseStep(0);
+            els.p1Group.classList.remove('hidden');
+            els.p2Group.classList.add('hidden');
+            els.btn.innerText = "LOCK IN SPEED";
+            els.btn.classList.remove('bg-red-600', 'hover:bg-red-500');
+            els.btn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+            els.status.innerText = "PHASE 1: SET SPEED";
             
-            els.phase1.classList.remove('disabled-area');
-            els.phase2.classList.add('disabled-area');
-            
-            els.btn.innerHTML = `<span>LOCK IN SPEED</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
-            els.btn.className = "w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-blue-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2";
-            els.btn.classList.remove('hidden');
-
-            els.status.innerText = "PHASE 1: SET SPEED ALLOCATION";
-            
+            toggleSheet(true); // Open Input Sheet
             generateCPUStats();
         }
 
@@ -666,36 +593,12 @@
             els.floats.c.classList.add('opacity-0');
         }
 
-        function updateCPUHistoryDisplay() {
-            if (gameState.cpuHistory.length === 0) return;
-            const lastStats = gameState.cpuHistory[gameState.cpuHistory.length - 1];
-            let tendency = "BALANCED";
-            const totalBuild = lastStats.hpCost + lastStats.atk + lastStats.def;
-            if (totalBuild > 0) {
-                if (lastStats.atk > totalBuild * 0.5) tendency = "AGGRO (ATK)";
-                else if (lastStats.def > totalBuild * 0.5) tendency = "DEFENSIVE";
-                else if (lastStats.hpCost > totalBuild * 0.5) tendency = "TANK (HP)";
-                else if (lastStats.spd > 150) tendency = "SPEEDSTER";
-            } else {
-                tendency = "SAVER";
-            }
-            els.history.content.innerHTML = `
-                <div class="flex justify-between"><span>SPD:</span><span class="text-purple-400">${lastStats.spd}</span></div>
-                <div class="flex justify-between"><span>HP:</span><span class="text-green-400">${lastStats.hp}</span></div>
-                <div class="flex justify-between"><span>ATK:</span><span class="text-red-400">${lastStats.atk}</span></div>
-                <div class="flex justify-between"><span>DEF:</span><span class="text-blue-400">${lastStats.def}</span></div>
-                <div class="mt-1 text-yellow-500 border-t border-gray-700 pt-0.5 text-center">${tendency}</div>
-            `;
-            els.history.panel.classList.remove('hidden');
-        }
-
         function generateCPUStats() {
             const cpu = gameState.cpu;
             const roundsLeft = (MAX_ROUNDS - gameState.round) + 1;
             let budget = 0;
-            if (gameState.round === MAX_ROUNDS) {
-                budget = cpu.totalPts;
-            } else {
+            if (gameState.round === MAX_ROUNDS) budget = cpu.totalPts;
+            else {
                 const avg = Math.floor(cpu.totalPts / roundsLeft);
                 const variance = Math.floor(Math.random() * (avg * 0.4)) - (avg * 0.2); 
                 budget = Math.max(0, Math.min(cpu.totalPts, avg + variance));
@@ -708,115 +611,108 @@
             const hpCost = Math.max(0, remaining);
             const hp = Math.ceil(hpCost * 0.5); 
             gameState.cpu.currentStats = { spd, hp, atk, def, hpCost };
+            
+            // History
+            if(gameState.cpuHistory.length > 0) {
+                 const last = gameState.cpuHistory[gameState.cpuHistory.length - 1];
+                 let t = "BALANCED";
+                 const tot = last.hpCost + last.atk + last.def;
+                 if(tot>0) {
+                    if(last.atk > tot*0.5) t="AGGRO";
+                    else if(last.def > tot*0.5) t="DEFENSE";
+                    else if(last.hpCost > tot*0.5) t="TANK";
+                    else if(last.spd > 150) t="SPEED";
+                 } else t="SAVER";
+                 els.history.content.innerText = `TYPE: ${t} | S:${last.spd} A:${last.atk} D:${last.def} H:${last.hp}`;
+                 els.history.panel.classList.remove('hidden');
+            }
         }
 
         function handlePhaseAction() {
+            pulse(20);
             if (!updateUI()) return; 
-            if (gameState.phase === 1) resolveSpeedPhase();
-            else if (gameState.phase === 2) startBattle();
-        }
+            
+            if (gameState.phase === 1) {
+                // Phase 1 -> Phase 2
+                resetBattleArena();
+                els.inputs.spd.readOnly = true;
+                els.inputs.nSpd.readOnly = true;
+                const pSpd = parseInt(els.inputs.spd.value) || 0;
+                gameState.player.currentStats.spd = pSpd;
+                gameState.player.totalPts -= pSpd;
+                gameState.cpu.totalPts -= gameState.cpu.currentStats.spd;
+                
+                // Show Speed Result
+                els.cardsP.spd.innerText = pSpd;
+                els.cardsC.spd.innerText = gameState.cpu.currentStats.spd;
+                
+                const cSpd = gameState.cpu.currentStats.spd;
+                if (pSpd > cSpd) {
+                    gameState.player.advantage = true;
+                    els.badges.p.classList.remove('hidden');
+                    const returned = Math.ceil(pSpd * 0.3);
+                    gameState.player.totalPts += returned;
+                    els.status.innerText = `INITIATIVE WON! +${returned} PTS`;
+                } else if (cSpd > pSpd) {
+                    gameState.cpu.advantage = true;
+                    els.badges.c.classList.remove('hidden');
+                    const returned = Math.ceil(cSpd * 0.3);
+                    gameState.cpu.totalPts += returned;
+                    els.status.innerText = "OPPONENT WON INITIATIVE";
+                } else {
+                    els.status.innerText = "SPEED TIED";
+                }
 
-        function resolveSpeedPhase() {
-            resetBattleArena();
-            els.inputs.spd.readOnly = true;
-            els.inputs.nSpd.readOnly = true;
-            const pSpd = parseInt(els.inputs.spd.value) || 0;
-            gameState.player.currentStats.spd = pSpd;
-            
-            gameState.player.totalPts -= pSpd;
-            gameState.cpu.totalPts -= gameState.cpu.currentStats.spd;
-            
-            els.cardsP.spd.innerText = pSpd;
-            els.cardsC.spd.innerText = gameState.cpu.currentStats.spd;
-            
-            const cSpd = gameState.cpu.currentStats.spd;
-            let msg = "";
-            
-            if (pSpd > cSpd) {
-                gameState.player.advantage = true;
-                els.badges.p.classList.remove('hidden');
-                const returned = Math.ceil(pSpd * 0.3);
-                gameState.player.totalPts += returned;
-                msg = `YOU WON INITIATIVE! +${returned} PTS`;
-            } else if (cSpd > pSpd) {
-                gameState.cpu.advantage = true;
-                els.badges.c.classList.remove('hidden');
-                const returned = Math.ceil(cSpd * 0.3);
-                gameState.cpu.totalPts += returned;
-                msg = "ENEMY WON INITIATIVE!";
-            } else {
-                msg = "SPEED TIED";
+                // Switch to Phase 2 Inputs
+                gameState.phase = 2;
+                els.p1Group.classList.add('hidden');
+                els.p2Group.classList.remove('hidden');
+                els.btn.innerText = "ENGAGE BATTLE";
+                els.btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                els.btn.classList.add('bg-red-600', 'hover:bg-red-500');
+                updateUI(); // refresh resource view
+
+            } else if (gameState.phase === 2) {
+                // Phase 2 -> Battle
+                toggleSheet(false); // Hide Input
+                
+                const pStats = gameState.player.currentStats;
+                const hpCost = parseInt(els.inputs.hp.value) || 0;
+                pStats.hp = Math.ceil(hpCost * 0.5); 
+                pStats.atk = parseInt(els.inputs.atk.value) || 0;
+                pStats.def = parseInt(els.inputs.def.value) || 0;
+                pStats.hpCost = hpCost;
+                
+                gameState.player.totalPts -= (hpCost + pStats.atk + pStats.def);
+                const cStats = gameState.cpu.currentStats;
+                gameState.cpu.totalPts -= (cStats.hpCost + cStats.atk + cStats.def);
+                
+                updateTopBar();
+                gameState.cpuHistory.push({...cStats});
+                
+                startBattleSequence(pStats, cStats);
             }
-
-            updateTopBar();
-            els.status.innerText = msg;
-            
-            gameState.phase = 2;
-            setPhaseStep(1);
-            els.phase1.classList.add('disabled-area');
-            
-            setTimeout(() => {
-                 els.phase2.classList.remove('disabled-area');
-                 els.btn.innerHTML = `<span>ENGAGE BATTLE</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-                 els.btn.className = "w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold h-14 rounded-lg shadow-lg shadow-red-900/40 transform active:scale-95 transition-all uppercase tracking-widest text-lg flex items-center justify-center gap-2";
-                 els.status.innerText = "PHASE 2: BUILD YOUR UNIT";
-            }, 800);
         }
 
-        function startBattle() {
-            els.phase2.classList.add('disabled-area');
-            els.btn.classList.add('hidden');
-            setPhaseStep(2);
-            
-            const pStats = gameState.player.currentStats;
-            const hpCost = parseInt(els.inputs.hp.value) || 0;
-            pStats.hp = Math.ceil(hpCost * 0.5); 
-            pStats.atk = parseInt(els.inputs.atk.value) || 0;
-            pStats.def = parseInt(els.inputs.def.value) || 0;
-            pStats.hpCost = hpCost;
-            
-            gameState.player.totalPts -= (hpCost + pStats.atk + pStats.def);
-            const cStats = gameState.cpu.currentStats;
-            gameState.cpu.totalPts -= (cStats.hpCost + cStats.atk + cStats.def);
-            
-            updateTopBar();
-            gameState.cpuHistory.push({...cStats});
-            updateCPUHistoryDisplay();
-
-            startBattleSequence(pStats, cStats);
-        }
-
-        function revealCard(container, valueEl, value) {
-            container.classList.remove('hidden-card');
-            container.classList.add('revealed');
-            valueEl.innerText = value;
-        }
-
-        // --- NEW BATTLE SEQUENCE LOGIC ---
+        // --- BATTLE SEQUENCE ---
         function startBattleSequence(pStats, cStats) {
-            // Determine turn order
-            // Tie = Player goes first
             const playerGoesFirst = (pStats.spd >= cStats.spd);
-            
-            // Stats with multipliers applied
             const pMult = gameState.player.advantage ? 1.5 : 1.0;
             const cMult = gameState.cpu.advantage ? 1.5 : 1.0;
-            
             const pFinalAtk = Math.ceil(pStats.atk * pMult);
             const cFinalAtk = Math.ceil(cStats.atk * cMult);
 
             const sequence = [
-                // 1. Reveal Both HP
                 { action: () => {
-                    els.status.innerText = "REVEALING HULL INTEGRITY...";
+                    els.status.innerText = "SCANNING INTEGRITY...";
                     revealCard(els.cardsP.hpContainer, els.cardsP.hp, pStats.hp);
                     revealCard(els.cardsC.hpContainer, els.cardsC.hp, cStats.hp);
-                }, delay: 1000 },
-
-                // --- TURN 1 (FASTER) ---
+                }, delay: 800 },
+                
+                // Turn 1
                 { action: () => {
-                    const attacker = playerGoesFirst ? "PLAYER" : "CPU";
-                    els.status.innerText = `${attacker} ATTACKS! (SPEED ADVANTAGE)`;
+                    const attacker = playerGoesFirst ? "YOU" : "CPU";
+                    els.status.innerText = `${attacker} ATTACK!`;
                     if(playerGoesFirst) {
                         els.cardsP.atkContainer.classList.add('active-turn');
                         revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
@@ -824,11 +720,11 @@
                         els.cardsC.atkContainer.classList.add('active-turn');
                         revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
                     }
-                }, delay: 2000 },
-
+                }, delay: 1800 },
+                
                 { action: () => {
-                    const defender = playerGoesFirst ? "CPU" : "PLAYER";
-                    els.status.innerText = `${defender} DEFENDS...`;
+                    const defender = playerGoesFirst ? "CPU" : "YOU";
+                    els.status.innerText = `${defender} DEFEND...`;
                     if(playerGoesFirst) {
                         els.cardsC.defContainer.classList.add('active-turn');
                         revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
@@ -836,33 +732,31 @@
                         els.cardsP.defContainer.classList.add('active-turn');
                         revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
                     }
-                }, delay: 3000 },
+                }, delay: 2800 },
 
-                // Damage 1
                 { action: () => {
                     let dmg = 0;
+                    pulse(50);
                     if(playerGoesFirst) {
                         dmg = Math.max(0, pFinalAtk - cStats.def);
-                        animateDamage(0, dmg); // 0 to player, dmg to cpu
+                        animateDamage(0, dmg);
                         updateHpVisuals(pStats.hp, cStats.hp - dmg);
-                        cStats.remainingHp = cStats.hp - dmg; // Store temp
-                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE!`;
+                        cStats.remainingHp = cStats.hp - dmg;
+                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE`;
                     } else {
                         dmg = Math.max(0, cFinalAtk - pStats.def);
                         animateDamage(dmg, 0); 
                         updateHpVisuals(pStats.hp - dmg, cStats.hp);
                         pStats.remainingHp = pStats.hp - dmg;
-                        els.status.innerText = `PLAYER TOOK ${dmg} DAMAGE!`;
+                        els.status.innerText = `YOU TOOK ${dmg} DAMAGE`;
                     }
-                    
-                    // Clear Active Highlights
                     document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
-                }, delay: 4500 },
+                }, delay: 4000 },
 
-                // --- TURN 2 (SLOWER) ---
+                // Turn 2
                 { action: () => {
-                    const attacker = playerGoesFirst ? "CPU" : "PLAYER";
-                    els.status.innerText = `${attacker} COUNTER ATTACKS!`;
+                    const attacker = playerGoesFirst ? "CPU" : "YOU";
+                    els.status.innerText = `${attacker} COUNTER!`;
                     if(!playerGoesFirst) {
                         els.cardsP.atkContainer.classList.add('active-turn');
                         revealCard(els.cardsP.atkContainer, els.cardsP.atk, pStats.atk);
@@ -870,11 +764,11 @@
                         els.cardsC.atkContainer.classList.add('active-turn');
                         revealCard(els.cardsC.atkContainer, els.cardsC.atk, cStats.atk);
                     }
-                }, delay: 6000 },
+                }, delay: 5500 },
 
                 { action: () => {
-                    const defender = playerGoesFirst ? "PLAYER" : "CPU";
-                    els.status.innerText = `${defender} DEFENDS...`;
+                    const defender = playerGoesFirst ? "YOU" : "CPU";
+                    els.status.innerText = `${defender} DEFEND...`;
                     if(!playerGoesFirst) {
                         els.cardsC.defContainer.classList.add('active-turn');
                         revealCard(els.cardsC.defContainer, els.cardsC.def, cStats.def);
@@ -882,48 +776,45 @@
                         els.cardsP.defContainer.classList.add('active-turn');
                         revealCard(els.cardsP.defContainer, els.cardsP.def, pStats.def);
                     }
-                }, delay: 7000 },
+                }, delay: 6500 },
 
-                // Damage 2
                 { action: () => {
                     let dmg = 0;
-                    // Note: Logic inverted from turn 1
+                    pulse(50);
                     if(!playerGoesFirst) {
                         dmg = Math.max(0, pFinalAtk - cStats.def);
                         animateDamage(0, dmg);
-                        // Use stored remaining HP or fresh HP if first hit
                         const currentCHp = (cStats.remainingHp !== undefined) ? cStats.remainingHp : cStats.hp;
                         updateHpVisuals(pStats.remainingHp || pStats.hp, currentCHp - dmg);
                         cStats.remainingHp = currentCHp - dmg;
-                         els.status.innerText = `CPU TOOK ${dmg} DAMAGE!`;
+                        els.status.innerText = `CPU TOOK ${dmg} DAMAGE`;
                     } else {
                         dmg = Math.max(0, cFinalAtk - pStats.def);
                         animateDamage(dmg, 0);
                         const currentPHp = (pStats.remainingHp !== undefined) ? pStats.remainingHp : pStats.hp;
                         updateHpVisuals(currentPHp - dmg, cStats.remainingHp || cStats.hp);
                         pStats.remainingHp = currentPHp - dmg;
-                        els.status.innerText = `PLAYER TOOK ${dmg} DAMAGE!`;
+                        els.status.innerText = `YOU TOOK ${dmg} DAMAGE`;
                     }
                     document.querySelectorAll('.active-turn').forEach(el => el.classList.remove('active-turn'));
-                }, delay: 8500 },
+                }, delay: 7700 },
 
-                // Final Result
                 { action: () => {
                     const finalPHp = pStats.remainingHp !== undefined ? pStats.remainingHp : pStats.hp;
                     const finalCHp = cStats.remainingHp !== undefined ? cStats.remainingHp : cStats.hp;
-                    
-                    // Total Damage Calculation for display
                     const pDmgTotal = pStats.hp - finalPHp;
                     const cDmgTotal = cStats.hp - finalCHp;
-
                     showRoundResult(finalPHp, finalCHp, pDmgTotal, cDmgTotal);
-                }, delay: 10000 }
+                }, delay: 9000 }
             ];
 
-            // Execute Sequence
-            sequence.forEach(step => {
-                setTimeout(step.action, step.delay);
-            });
+            sequence.forEach(step => setTimeout(step.action, step.delay));
+        }
+
+        function revealCard(container, valueEl, value) {
+            container.classList.remove('hidden-card');
+            container.classList.add('revealed');
+            valueEl.innerText = value;
         }
 
         function updateHpVisuals(pHp, cHp) {
@@ -959,10 +850,12 @@
                 gameState.player.wins++;
                 resultText = "<span class='text-blue-500'>ROUND WON</span>";
                 pClass = "text-blue-500";
+                pulse(100);
             } else if (cHp > pHp) {
                 gameState.cpu.wins++;
                 resultText = "<span class='text-red-500'>ROUND LOST</span>";
                 cClass = "text-red-500";
+                pulse([50, 50, 50]);
             } else {
                 resultText = "<span class='text-yellow-500'>DRAW</span>";
             }
@@ -972,22 +865,16 @@
             els.overlays.resTitle.innerHTML = resultText;
             els.overlays.resDetail.innerHTML = `
                 <div class="flex justify-between items-center border-b border-gray-700 pb-2 mb-2">
-                    <span class="text-xs text-gray-500">UNIT STATUS</span>
-                    <span class="text-xs text-gray-500">INTEGRITY</span>
+                    <span class="text-xs text-gray-500">UNIT</span>
+                    <span class="text-xs text-gray-500">HP</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <div class="text-left">
-                        <div class="text-blue-400 font-bold">PLAYER</div>
-                        <div class="text-[10px] text-gray-500">DMG TAKEN: -${pDmg}</div>
-                    </div>
-                    <div class="text-2xl font-bold font-tech ${pClass}">${Math.max(0, pHp)}</div>
+                    <div class="text-left text-blue-400 font-bold">YOU</div>
+                    <div class="text-xl font-bold font-tech ${pClass}">${Math.max(0, pHp)}</div>
                 </div>
                 <div class="flex justify-between items-center mt-2">
-                    <div class="text-left">
-                        <div class="text-red-500 font-bold">CPU</div>
-                        <div class="text-[10px] text-gray-500">DMG TAKEN: -${cDmg}</div>
-                    </div>
-                    <div class="text-2xl font-bold font-tech ${cClass}">${Math.max(0, cHp)}</div>
+                    <div class="text-left text-red-500 font-bold">CPU</div>
+                    <div class="text-xl font-bold font-tech ${cClass}">${Math.max(0, cHp)}</div>
                 </div>
             `;
             
@@ -997,9 +884,7 @@
         function nextRound() {
             if (gameState.player.wins >= WIN_CONDITION) return endGame(true);
             if (gameState.cpu.wins >= WIN_CONDITION) return endGame(false);
-            if (gameState.round >= MAX_ROUNDS) {
-                return endGame(gameState.player.wins > gameState.cpu.wins);
-            }
+            if (gameState.round >= MAX_ROUNDS) return endGame(gameState.player.wins > gameState.cpu.wins);
 
             gameState.round++;
             els.overlays.result.classList.add('hidden');
@@ -1010,7 +895,6 @@
         function endGame(playerWon) {
             els.overlays.result.classList.add('hidden');
             els.overlays.gameOver.classList.remove('hidden');
-            
             const title = els.overlays.finalTitle;
             if (playerWon) {
                 title.innerText = "VICTORY";
@@ -1025,16 +909,12 @@
             els.pScore.innerText = gameState.player.wins;
             els.cScore.innerText = gameState.cpu.wins;
             els.round.innerText = gameState.round;
-            els.pTotal.innerText = gameState.player.totalPts;
-            els.cTotal.innerText = gameState.cpu.totalPts;
-            updateUI(); 
         }
 
         window.onload = () => {
             initRound();
             updateTopBar();
         }
-
     </script>
 </body>
 </html>
