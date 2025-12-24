@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：26</title>
+    <title>Resource Strategy Card Battle：27</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -334,6 +334,7 @@
                 <div class="text-center text-gray-600 py-4">Scanning...</div>
             </div>
             <button onclick="backToHome()" class="text-gray-500 text-sm mt-4 underline">BACK</button>
+            <button onclick="cleanupRooms()" class="text-red-900 text-xs mt-8 border border-red-900 px-2 py-1 rounded hover:bg-red-900 hover:text-white transition-colors block mx-auto">DEBUG: CLEAN ALL ROOMS</button>
         </div>
     </div>
 
@@ -593,6 +594,19 @@
             await window.deleteRoom();
             location.reload();
         }
+        
+        window.cleanupRooms = async () => {
+            if(!confirm("Are you sure you want to delete ALL rooms? This cannot be undone.")) return;
+            const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
+            const snapshot = await getDocs(roomsRef);
+            let count = 0;
+            snapshot.forEach(async (docSnap) => {
+                await deleteDoc(docSnap.ref);
+                count++;
+            });
+            alert(`Deleted ${count} rooms.`);
+            refreshRoomList();
+        };
 
         // Try to clean up on close (best effort)
         window.addEventListener('beforeunload', () => {
