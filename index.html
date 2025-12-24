@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：27</title>
+    <title>Resource Strategy Card Battle：28</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -286,7 +286,7 @@
     </section>
 
     <!-- Name Entry Screen (New) -->
-    <div id="name-screen" class="overlay p-6 text-center">
+    <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming cyber-text mb-8">IDENTITY</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
         <button onclick="submitName()" class="lobby-btn">CONFIRM</button>
@@ -299,11 +299,11 @@
     </div>
 
     <!-- Home Screen -->
-    <div id="home-screen" class="overlay hidden p-6 text-center">
+    <div id="home-screen" class="overlay p-6 text-center">
         <h1 class="text-5xl font-gaming cyber-text mb-8">RESOURCE BATTLE</h1>
         <div class="w-full max-w-sm space-y-4">
             <button onclick="startCpuGame()" class="lobby-btn">CPU BATTLE</button>
-            <button onclick="showLobby()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
+            <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
         </div>
         <div class="mt-8 text-left bg-gray-900/80 p-4 rounded border border-gray-700 w-full max-w-sm">
             <h2 class="text-yellow-500 font-bold border-b border-gray-700 pb-1 mb-2 font-gaming">GAME RULES</h2>
@@ -445,13 +445,20 @@
             }
         };
 
-        // --- Name Input ---
+        // --- Name Input & Navigation Logic ---
+        window.enterOnlineMode = () => {
+            if (!userId) return alert("Connecting...");
+            el('home-screen').classList.add('hidden');
+            el('name-screen').classList.remove('hidden');
+        };
+
         window.submitName = () => {
             const input = el('player-name-input').value.trim();
             if (input) {
                 userName = input.toUpperCase().substr(0, 8);
                 el('name-screen').classList.add('hidden');
-                el('home-screen').classList.remove('hidden');
+                el('lobby-screen').classList.remove('hidden');
+                refreshRoomList();
             }
         };
 
@@ -472,12 +479,7 @@
         };
 
         // --- Online Lobby Logic ---
-        window.showLobby = async () => {
-            if (!userId) return alert("Connecting...");
-            el('home-screen').classList.add('hidden');
-            el('lobby-screen').classList.remove('hidden');
-            refreshRoomList();
-        };
+        // (Existing showLobby removed/replaced by flow logic above)
 
         async function refreshRoomList() {
             const listEl = el('room-list');
