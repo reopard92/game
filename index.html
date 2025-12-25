@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：32</title>
+    <title>Resource Strategy Card Battle：33</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -925,15 +925,28 @@
             ui.btn.disabled = !enable;
         }
 
+        // --- Timer Logic (Modified for Drone) ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
             ui.timer.innerText = count;
             ui.timer.classList.remove('hidden', 'timer-urgent');
+            
             timerInterval = setInterval(() => {
                 count--;
                 ui.timer.innerText = count;
-                if (count <= 3) ui.timer.classList.add('timer-urgent');
+                
+                // --- Drone Effect: Reveal at remaining 7s (8s elapsed) ---
+                if (state.p.item === 'drone' && count === 7) {
+                     const used = state.c.hpCost + state.c.atk + state.c.def;
+                     el('notice-msg').innerText = `解析完了: 敵使用コスト ${used} PT`;
+                     ui.timer.classList.add('text-green-400'); // Visual clue
+                     setTimeout(()=>ui.timer.classList.remove('text-green-400'), 500);
+                }
+                
+                if (count <= 3) {
+                    ui.timer.classList.add('timer-urgent');
+                }
                 if (count <= 0) {
                     clearInterval(timerInterval);
                     ui.timer.classList.add('hidden');
@@ -1133,14 +1146,6 @@
                     setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
                 }
                 
-                // Drone effect: Reveal remaining resource
-                if (state.p.item === 'drone' && state.c.total) {
-                    // Calc opponent's remaining resource for phase 2
-                    // Total - Speed Cost = Remaining for Build
-                    // Note: c.total is already updated in resolvePhase1 logic for CPU/Network
-                    el('notice-msg').innerText = `解析完了: 敵リソース残り ${Math.floor(state.c.total)}`;
-                }
-                
                 state.phase = 2;
                 state.p.submitted = false;
                 state.p.resolved = false;
@@ -1170,18 +1175,7 @@
 
         function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
-            // Wait for drone effect (Reveal Used Points)
-            const delay = (state.p.item === 'drone') ? 3000 : 0;
-            
-            if(state.p.item === 'drone') {
-                const used = state.c.hpCost + state.c.atk + state.c.def;
-                el('notice-msg').innerText = `ドローン解析: 敵使用コスト ${used} PT`;
-                // Maybe play sound
-            }
-
-            setTimeout(() => {
-                startBattleSequence();
-            }, delay);
+            startBattleSequence();
         }
 
         function startBattleSequence() {
