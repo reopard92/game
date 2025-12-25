@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：31</title>
+    <title>Resource Strategy Card Battle：32</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -1133,7 +1133,11 @@
                     setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
                 }
                 
+                // Drone effect: Reveal remaining resource
                 if (state.p.item === 'drone' && state.c.total) {
+                    // Calc opponent's remaining resource for phase 2
+                    // Total - Speed Cost = Remaining for Build
+                    // Note: c.total is already updated in resolvePhase1 logic for CPU/Network
                     el('notice-msg').innerText = `解析完了: 敵リソース残り ${Math.floor(state.c.total)}`;
                 }
                 
@@ -1166,7 +1170,18 @@
 
         function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
-            startBattleSequence();
+            // Wait for drone effect (Reveal Used Points)
+            const delay = (state.p.item === 'drone') ? 3000 : 0;
+            
+            if(state.p.item === 'drone') {
+                const used = state.c.hpCost + state.c.atk + state.c.def;
+                el('notice-msg').innerText = `ドローン解析: 敵使用コスト ${used} PT`;
+                // Maybe play sound
+            }
+
+            setTimeout(() => {
+                startBattleSequence();
+            }, delay);
         }
 
         function startBattleSequence() {
@@ -1409,12 +1424,15 @@
         }
 
         function endRound(pHp, cHp) {
-            if (maxPlayers === 4) return;
+            if (maxPlayers === 4) return; // 4P handled separately
+            
             let title = "DRAW"; let color = "text-yellow-500";
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="cyber-text"; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
+            
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
+            
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             el('res-content').innerHTML = `
@@ -1437,7 +1455,8 @@
         }
 
         window.nextRound = () => {
-            if (maxPlayers === 4) return; 
+            if (maxPlayers === 4) return; // 4P auto loops
+            
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
