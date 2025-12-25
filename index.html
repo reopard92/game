@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：38</title>
+    <title>Resource Strategy Card Battle：39</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -44,19 +44,87 @@
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; justify-content: center; }
         .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
-        /* カード修正 */
+        /* カード (Flip Animation 対応) */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 7px; letter-spacing: 1px; color: #64748b; }
-        .battle-card { aspect-ratio: 1/1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; } 
-        .card-spd { border-color: var(--color-spd); } .card-hp { border-color: var(--color-hp); } .card-atk { border-color: var(--color-atk); } .card-def { border-color: var(--color-def); }
+
+        /* 3D Container */
+        .battle-card-wrapper {
+            aspect-ratio: 1/1;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        /* Inner Flipper */
+        .battle-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 4px;
+        }
+
+        /* Flip Action */
+        .battle-card-wrapper.is-open .battle-card-inner {
+            transform: rotateY(0deg);
+        }
+        .battle-card-wrapper:not(.is-open) .battle-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Front & Back */
+        .battle-card-front, .battle-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+            border: 1px solid;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .battle-card-front {
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+
+        .battle-card-back {
+            transform: rotateY(180deg);
+            background: #0f172a;
+            border-color: #475569;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.3) 5px, rgba(0,0,0,0.3) 10px);
+            color: #64748b;
+            font-family: 'Black Ops One';
+            font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Color Borders */
+        .card-spd { border-color: var(--color-spd); }
+        .card-hp { border-color: var(--color-hp); }
+        .card-atk { border-color: var(--color-atk); }
+        .card-def { border-color: var(--color-def); }
+
         .card-label { position: absolute; top: 1px; font-size: 7px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
         .card-val { font-family: 'Black Ops One', cursive; font-size: 1.1rem; z-index: 10; text-shadow: 0 0 3px currentColor; transition: transform 0.2s; margin-top: 2px; } 
         .card-icon { position: absolute; bottom: 1px; font-size: 0.7rem; opacity: 0.5; } 
-        
-        .battle-card.hidden-card { background: #0f172a; border-color: #475569; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.3) 5px, rgba(0,0,0,0.3) 10px); }
-        .battle-card.hidden-card .card-val, .battle-card.hidden-card .card-label, .battle-card.hidden-card .card-icon { opacity: 0; }
-        .battle-card.hidden-card::after { content: '?'; position: absolute; font-family: 'Black Ops One'; font-size: 1.5rem; color: #64748b; }
-        .battle-card.active-turn { transform: scale(1.1); z-index: 20; box-shadow: 0 0 15px var(--neon-blue); border-color: var(--neon-blue); }
+
+        /* Active Effect */
+        .battle-card-wrapper.active-turn { transform: scale(1.1); z-index: 20; }
+        .battle-card-wrapper.active-turn .battle-card-front, 
+        .battle-card-wrapper.active-turn .battle-card-back {
+            box-shadow: 0 0 15px var(--neon-blue);
+            border-color: var(--neon-blue);
+        }
+
         .val-boost { color: #ffff00; text-shadow: 0 0 10px #ffff00; transform: scale(1.3); transition: transform 0.2s; }
 
         /* 4P Mode Specifics */
@@ -165,6 +233,30 @@
         .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
+        /* Ready Fight Anim */
+        #ready-fight { pointer-events: none; }
+        .rf-overlay {
+            position: absolute; inset: 0; z-index: 55;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.2); opacity: 0;
+        }
+        .rf-text {
+            font-family: 'Black Ops One'; font-size: 5rem; color: #fff;
+            text-shadow: 0 0 20px var(--neon-blue); letter-spacing: 0.1em;
+            transform: scale(0);
+        }
+        .rf-text.fight { color: #ef4444; text-shadow: 0 0 20px #ef4444; }
+
+        @keyframes rf-pop {
+            0% { transform: scale(0); opacity: 0; }
+            20% { transform: scale(1.2); opacity: 1; }
+            40% { transform: scale(1); opacity: 1; }
+            80% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .anim-rf { animation: rf-pop 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+
+
         /* Timer - Adjusted z-index and opacity */
         .phase-timer {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -224,6 +316,13 @@
             </div>
         </div>
     </div>
+    
+    <!-- Ready Fight Layer -->
+    <div id="ready-fight" class="">
+        <div id="rf-bg" class="rf-overlay">
+            <div id="rf-text" class="rf-text">READY</div>
+        </div>
+    </div>
 
     <!-- Header -->
     <header class="flex justify-between items-center px-4 py-2 border-b border-blue-900/50 bg-gray-900/50 h-12">
@@ -261,10 +360,50 @@
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
                 <div class="card-grid">
-                    <div class="battle-card card-spd" id="card-c-spd-wrap"><div class="card-label text-purple-300">SPD</div><div class="card-val text-purple-300" id="card-c-spd">?</div><div class="card-icon">⚡</div></div>
-                    <div class="battle-card card-hp hidden-card" id="card-c-hp-wrap"><div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="card-c-hp">?</div><div class="card-icon">♥</div></div>
-                    <div class="battle-card card-atk hidden-card" id="card-c-atk-wrap"><div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="card-c-atk">?</div><div class="card-icon">⚔</div></div>
-                    <div class="battle-card card-def hidden-card" id="card-c-def-wrap"><div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="card-c-def">?</div><div class="card-icon">🛡</div></div>
+                    <!-- SPD -->
+                    <div class="battle-card-wrapper" id="card-c-spd-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-spd">
+                                <div class="card-label text-purple-300">SPD</div>
+                                <div class="card-val text-purple-300" id="card-c-spd">?</div>
+                                <div class="card-icon">⚡</div>
+                            </div>
+                            <div class="battle-card-back card-spd">?</div>
+                        </div>
+                    </div>
+                    <!-- HP -->
+                    <div class="battle-card-wrapper" id="card-c-hp-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-hp">
+                                <div class="card-label text-green-300">HP</div>
+                                <div class="card-val text-green-300" id="card-c-hp">?</div>
+                                <div class="card-icon">♥</div>
+                            </div>
+                            <div class="battle-card-back card-hp">?</div>
+                        </div>
+                    </div>
+                    <!-- ATK -->
+                    <div class="battle-card-wrapper" id="card-c-atk-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-atk">
+                                <div class="card-label text-red-300">ATK</div>
+                                <div class="card-val text-red-300" id="card-c-atk">?</div>
+                                <div class="card-icon">⚔</div>
+                            </div>
+                            <div class="battle-card-back card-atk">?</div>
+                        </div>
+                    </div>
+                    <!-- DEF -->
+                    <div class="battle-card-wrapper" id="card-c-def-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-def">
+                                <div class="card-label text-blue-300">DEF</div>
+                                <div class="card-val text-blue-300" id="card-c-def">?</div>
+                                <div class="card-icon">🛡</div>
+                            </div>
+                            <div class="battle-card-back card-def">?</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -276,10 +415,50 @@
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
-                    <div class="battle-card card-spd" id="card-p-spd-wrap"><div class="card-label text-purple-300">SPD</div><div class="card-val text-purple-300" id="card-p-spd">-</div><div class="card-icon">⚡</div></div>
-                    <div class="battle-card card-hp hidden-card" id="card-p-hp-wrap"><div class="card-label text-green-300">HP</div><div class="card-val text-green-300" id="card-p-hp">-</div><div class="card-icon">♥</div></div>
-                    <div class="battle-card card-atk hidden-card" id="card-p-atk-wrap"><div class="card-label text-red-300">ATK</div><div class="card-val text-red-300" id="card-p-atk">-</div><div class="card-icon">⚔</div></div>
-                    <div class="battle-card card-def hidden-card" id="card-p-def-wrap"><div class="card-label text-blue-300">DEF</div><div class="card-val text-blue-300" id="card-p-def">-</div><div class="card-icon">🛡</div></div>
+                    <!-- SPD -->
+                    <div class="battle-card-wrapper" id="card-p-spd-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-spd">
+                                <div class="card-label text-purple-300">SPD</div>
+                                <div class="card-val text-purple-300" id="card-p-spd">-</div>
+                                <div class="card-icon">⚡</div>
+                            </div>
+                            <div class="battle-card-back card-spd">?</div>
+                        </div>
+                    </div>
+                    <!-- HP -->
+                    <div class="battle-card-wrapper" id="card-p-hp-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-hp">
+                                <div class="card-label text-green-300">HP</div>
+                                <div class="card-val text-green-300" id="card-p-hp">-</div>
+                                <div class="card-icon">♥</div>
+                            </div>
+                            <div class="battle-card-back card-hp">?</div>
+                        </div>
+                    </div>
+                    <!-- ATK -->
+                    <div class="battle-card-wrapper" id="card-p-atk-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-atk">
+                                <div class="card-label text-red-300">ATK</div>
+                                <div class="card-val text-red-300" id="card-p-atk">-</div>
+                                <div class="card-icon">⚔</div>
+                            </div>
+                            <div class="battle-card-back card-atk">?</div>
+                        </div>
+                    </div>
+                    <!-- DEF -->
+                    <div class="battle-card-wrapper" id="card-p-def-wrap">
+                        <div class="battle-card-inner">
+                            <div class="battle-card-front card-def">
+                                <div class="card-label text-blue-300">DEF</div>
+                                <div class="card-val text-blue-300" id="card-p-def">-</div>
+                                <div class="card-icon">🛡</div>
+                            </div>
+                            <div class="battle-card-back card-def">?</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -580,6 +759,10 @@
             cutinNameC: el('cutin-name-c'),
             cutinDescC: el('cutin-desc-c'), // desc ref added
             
+            // Ready Fight Ref
+            rfOverlay: el('rf-bg'),
+            rfText: el('rf-text'),
+
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
@@ -669,6 +852,27 @@
                     ui.cutin.classList.remove('animate-cutin');
                     resolve();
                 }, 4000);
+            });
+        }
+        
+        function showReadyFight() {
+            return new Promise(resolve => {
+                ui.rfText.innerText = "READY";
+                ui.rfText.className = "rf-text anim-rf";
+                ui.rfOverlay.style.opacity = 1;
+                
+                setTimeout(() => {
+                   ui.rfText.classList.remove('anim-rf');
+                   void ui.rfText.offsetWidth; // trigger reflow
+                   ui.rfText.innerText = "BUILD!";
+                   ui.rfText.classList.add('fight', 'anim-rf');
+                   
+                   setTimeout(() => {
+                       ui.rfOverlay.style.opacity = 0;
+                       ui.rfText.classList.remove('fight', 'anim-rf');
+                       resolve();
+                   }, 1000);
+                }, 1000);
             });
         }
 
@@ -1077,18 +1281,25 @@
             ui.title.innerText = "PHASE 1: TACTICS & SPEED";
             ui.btn.innerText = "LOCK IN";
             
+            // --- FLIP LOGIC INIT ---
             ['spd','hp','atk','def'].forEach(k => {
+                // Reset Values
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
+                
+                // Reset Flip Classes
+                // Player: Always 'is-open' (face up) initially, even if empty
+                ui.wrapsP[k].classList.add('is-open');
+                // Opponent: Always closed (face down) initially
+                ui.wrapsC[k].classList.remove('is-open');
+                
+                // Visual resets
                 ui.cP[k].classList.remove('val-boost');
                 ui.cC[k].classList.remove('val-boost');
                 ui.wrapsP[k].classList.remove('active-turn');
                 ui.wrapsC[k].classList.remove('active-turn');
-                if(k!=='spd') {
-                    ui.wrapsP[k].classList.add('hidden-card');
-                    ui.wrapsC[k].classList.add('hidden-card');
-                }
             });
+
             el('adv-badge').classList.add('hidden');
             el('adv-badge').classList.remove('scale-100', 'scale-0');
             el('adv-badge').classList.add('scale-0');
@@ -1178,8 +1389,9 @@
             
             // --- Reveal Sequence ---
             setTimeout(() => {
+                // FLIP!
+                reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd);
                 ui.cP.spd.innerText = state.p.spd;
-                ui.cC.spd.innerText = state.c.spd;
             }, 500);
 
             // Item Cut-ins
@@ -1192,7 +1404,7 @@
             }, 1000);
 
             // Wait for cutin (4s) + margin
-            setTimeout(() => {
+            setTimeout(async () => {
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
                     state.pAdv = true;
@@ -1215,6 +1427,9 @@
                 state.p.submitted = false;
                 state.p.resolved = false;
                 if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
+                
+                // READY -> FIGHT Animation
+                await showReadyFight();
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
@@ -1232,7 +1447,7 @@
                         setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
                     }
                     startTimer(time);
-                }, 1500);
+                }, 100);
 
             }, 5500); // 1000 delay + 4000 cutin + 500 margin
         }
@@ -1522,7 +1737,12 @@
         }
 
         // --- Visual Helpers ---
-        function reveal(wrap, valEl, val) { wrap.classList.remove('hidden-card'); valEl.innerText = val; }
+        function reveal(wrap, valEl, val) { 
+            // 値をセット
+            valEl.innerText = val; 
+            // クラスをつけて回転させる
+            wrap.classList.add('is-open');
+        }
         function highlight(el) { el.classList.add('active-turn'); }
         function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
         function updateHpVal(el, val) { el.innerText = Math.max(0, Math.floor(val)); el.classList.add('val-boost'); setTimeout(()=>el.classList.remove('val-boost'), 500); }
