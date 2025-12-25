@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：42</title>
+    <title>Resource Strategy Card Battle：43</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -287,6 +287,20 @@
     </style>
 </head>
 <body class="select-none">
+
+    <!-- Audio Elements -->
+    <audio id="bgm" loop>
+        <source src="ファンタジー3-やすらぎ-.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="se-flip">
+        <source src="ページめくり2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="se-attack">
+        <source src="会心の一撃1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="se-select">
+        <source src="選択5.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Cut-in Layer (New Dual Design with Desc) -->
     <div id="item-cutin" class="">
@@ -699,6 +713,28 @@
             userId = userCredential.user.uid;
             console.log("Signed in:", userId);
         }).catch((error) => console.error(error));
+        
+        // --- Audio Setup ---
+        const audio = {
+            bgm: document.getElementById('bgm'),
+            flip: document.getElementById('se-flip'),
+            attack: document.getElementById('se-attack'),
+            select: document.getElementById('se-select')
+        };
+        
+        function playBgm() {
+            if (audio.bgm) {
+                audio.bgm.volume = 0.3;
+                audio.bgm.play().catch(e => console.log("BGM play failed", e));
+            }
+        }
+        
+        function playSe(name) {
+            if (audio[name]) {
+                audio[name].currentTime = 0;
+                audio[name].play().catch(e => console.log("SE play failed", e));
+            }
+        }
 
         // --- Global Game State ---
         const MAX_ROUNDS = 5;
@@ -775,11 +811,13 @@
         // --- Name Input & Navigation Logic ---
         window.enterOnlineMode = () => {
             if (!userId) return alert("Connecting...");
+            playBgm();
             el('home-screen').classList.add('hidden');
             el('name-screen').classList.remove('hidden');
         };
 
         window.submitName = () => {
+            playSe('select');
             const input = el('player-name-input').value.trim();
             if (input) {
                 userName = input.toUpperCase().substr(0, 8);
@@ -791,6 +829,7 @@
 
         // --- Mode Handlers ---
         window.startCpuGame = () => {
+            playBgm();
             isOnline = false;
             role = 'cpu';
             maxPlayers = 2;
@@ -801,12 +840,14 @@
         };
 
         window.backToHome = () => {
+            playSe('select');
             el('lobby-screen').classList.add('hidden');
             el('home-screen').classList.remove('hidden');
         };
 
         // --- Item Logic ---
         window.selectItem = (itemId) => {
+            playSe('select');
             if (state.phase !== 1) return;
             state.p.item = itemId;
             
@@ -831,7 +872,12 @@
                 const pItem = ITEMS[pItemKey];
                 const cItem = ITEMS[cItemKey];
                 
-                // Always show cut-in even if 'none' to reveal what happened
+                // If both are none, skip animation
+                if (pItemKey === 'none' && cItemKey === 'none') {
+                    resolve();
+                    return;
+                }
+
                 ui.cutinNameP.innerText = pItem.name;
                 ui.cutinDescP.innerText = pItem.desc; 
                 ui.cutinImgP.src = pItem.img || "";
@@ -912,6 +958,7 @@
         }
 
         window.createRoom = async (max = 2) => {
+            playSe('select');
             role = 'host';
             isOnline = true;
             maxPlayers = max;
@@ -943,6 +990,7 @@
         };
 
         window.joinRoom = async (id, max) => {
+            playSe('select');
             role = 'guest';
             isOnline = true;
             roomId = id;
@@ -979,6 +1027,7 @@
         }
 
         window.cancelRoom = async () => {
+            playSe('select');
             await window.deleteRoom();
             location.reload();
         }
@@ -1173,6 +1222,7 @@
             ui.btn.disabled = !enable;
         }
 
+        // --- Timer Logic (Modified for Drone) ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
@@ -1213,6 +1263,7 @@
         };
 
         window.step = (key, delta) => {
+            playSe('select');
             state.inputs[key] = Math.max(0, state.inputs[key] + delta);
             el('range-'+key).value = state.inputs[key];
             updateUI();
@@ -1359,9 +1410,15 @@
 
         window.commitPhase = () => {
             if(!updateUI()) return;
+            playSe('select'); // Lock in sound
             toggleInputs(false); 
             stopTimer();
             
+            // Player Card Flip (Close for Reveal Effect)
+            if (state.phase === 1) {
+                 ui.wrapsP.spd.classList.remove('is-open');
+            }
+
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
                 const itemCost = ITEMS[state.p.item].cost;
@@ -1738,6 +1795,7 @@
             valEl.innerText = val; 
             // クラスをつけて回転させる
             wrap.classList.add('is-open');
+            playSe('flip'); // Add Flip Sound
         }
         function highlight(el) { el.classList.add('active-turn'); }
         function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
@@ -1745,6 +1803,7 @@
         function hit(target, dmg) {
             const float = el(target+'-dmg-float'); float.innerText = `-${Math.floor(dmg)}`;
             float.classList.remove('anim-float'); void float.offsetWidth; float.classList.add('anim-float');
+            playSe('attack'); // Add Attack Sound
         }
 
         function endRound(pHp, cHp) {
