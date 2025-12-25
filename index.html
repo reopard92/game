@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：39</title>
+    <title>Resource Strategy Card Battle：40</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -320,7 +320,7 @@
     <!-- Ready Fight Layer -->
     <div id="ready-fight" class="">
         <div id="rf-bg" class="rf-overlay">
-            <div id="rf-text" class="rf-text">READY</div>
+            <div id="rf-text" class="rf-text">ROUND 1</div>
         </div>
     </div>
 
@@ -515,6 +515,7 @@
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
                             <div class="item-label">アイテムなし</div>
                             <div class="item-cost">0 PT</div>
+                            <img src="アイテムなし.jpg" class="item-img" onerror="this.style.display='none'">
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
                             <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
@@ -709,7 +710,7 @@
 
         // Item Defs (Japanese, PNG)
         const ITEMS = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.jpg" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
@@ -830,19 +831,14 @@
                 const pItem = ITEMS[pItemKey];
                 const cItem = ITEMS[cItemKey];
                 
-                // If both are none, skip animation
-                if (pItemKey === 'none' && cItemKey === 'none') {
-                    resolve();
-                    return;
-                }
-
+                // Always show cut-in even if 'none' to reveal what happened
                 ui.cutinNameP.innerText = pItem.name;
-                ui.cutinDescP.innerText = pItem.desc; // Set description
+                ui.cutinDescP.innerText = pItem.desc; 
                 ui.cutinImgP.src = pItem.img || "";
                 ui.cutinImgP.style.display = pItem.img ? 'block' : 'none';
                 
                 ui.cutinNameC.innerText = cItem.name;
-                ui.cutinDescC.innerText = cItem.desc; // Set description
+                ui.cutinDescC.innerText = cItem.desc;
                 ui.cutinImgC.src = cItem.img || "";
                 ui.cutinImgC.style.display = cItem.img ? 'block' : 'none';
 
@@ -855,9 +851,9 @@
             });
         }
         
-        function showReadyFight() {
+        function showReadyFight(round) {
             return new Promise(resolve => {
-                ui.rfText.innerText = "READY";
+                ui.rfText.innerText = `ROUND ${round}`; // Changed to show round
                 ui.rfText.className = "rf-text anim-rf";
                 ui.rfOverlay.style.opacity = 1;
                 
@@ -1172,7 +1168,6 @@
             ui.btn.disabled = !enable;
         }
 
-        // --- Timer Logic (Modified for Drone) ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
@@ -1429,7 +1424,7 @@
                 if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
                 
                 // READY -> FIGHT Animation
-                await showReadyFight();
+                await showReadyFight(state.round);
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
