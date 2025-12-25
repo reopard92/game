@@ -80,12 +80,12 @@
             flex: 6.5; display: flex; flex-direction: row; 
             background: rgba(15, 23, 42, 0.85); /* 半透明 */
             backdrop-filter: blur(10px); /* すりガラス効果 */
-            overflow: hidden; padding: 8px; gap: 8px; 
+            overflow: hidden; padding: 4px; gap: 4px; 
             border-top: 1px solid var(--glass-border); 
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
-        .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; justify-content: center; }
-        .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
+        .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 2px; justify-content: center; }
+        .action-area { width: 70px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
         /* カード (Flip Animation 対応) */
         /* max-widthを260pxに縮小し、gapも少し詰めました */
@@ -197,43 +197,43 @@
         @keyframes pulse-red { 0%, 100% { color: rgba(255,255,255,0.3); text-shadow: 0 0 5px white; } 50% { color: var(--color-atk); text-shadow: 0 0 20px var(--color-atk); transform: translate(-50%, -50%) scale(1.1); } }
         .timer-urgent { animation: pulse-red 0.5s infinite; color: var(--color-atk) !important; }
 
-        /* Inputs */
-        .control-block { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 6px; border-left-width: 4px; flex-shrink: 0; transition: opacity 0.3s; }
+        /* Inputs - Compact Mode for Mobile */
+        .control-block { display: flex; flex-direction: column; gap: 0px; padding: 2px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 2px; border-left-width: 3px; flex-shrink: 0; transition: opacity 0.3s; }
         .control-block.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(0.8); }
-        .control-row { display: flex; align-items: center; justify-content: space-between; height: 26px; }
-        .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 14px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
-        .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 22px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 24px; margin: 4px 0; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; height: 20px; }
+        .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
+        .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 18px; margin: 2px 0; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; background: #fff; margin-top: -9px; border-radius: 50%; box-shadow: 0 0 10px currentColor; border: 2px solid rgba(255,255,255,0.8); }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; background: #fff; margin-top: -7px; border-radius: 50%; box-shadow: 0 0 10px currentColor; border: 2px solid rgba(255,255,255,0.8); }
         
-        .btn-row { display: flex; gap: 6px; justify-content: space-between; margin-top: 4px; height: 32px; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
+        .btn-row { display: flex; gap: 4px; justify-content: space-between; margin-top: 2px; height: 28px; }
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
         .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
         
         .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
         .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
-        .phase-title-text { font-size: 12px; color: #94a3b8; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 6px; text-align: center; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
+        .phase-title-text { font-size: 10px; color: #94a3b8; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 2px; text-align: center; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
 
         /* Item Selection (Glassmorphism) */
-        .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
         .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); }
         .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .item-label { font-size: 10px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 4px; font-family: 'Noto Sans JP'; }
-        .item-cost { font-size: 9px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 4px; right: 4px;}
+        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 4px; font-family: 'Noto Sans JP'; }
+        .item-cost { font-size: 8px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 2px; right: 2px;}
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 0.9; }
         
         /* New Item Info Area */
         .item-info-box {
             background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 10px; margin-top: 8px; border-radius: 0 0 8px 8px;
-            min-height: 50px; display: flex; flex-direction: column; justify-content: center;
+            padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px;
+            min-height: 40px; display: flex; flex-direction: column; justify-content: center;
         }
-        .item-info-title { font-size: 12px; font-weight: bold; color: #fcd34d; margin-bottom: 3px; font-family: 'Cinzel'; letter-spacing: 1px; }
-        .item-info-desc { font-size: 11px; color: #e2e8f0; line-height: 1.4; font-family: 'Noto Sans JP'; }
+        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
+        .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: 'Noto Sans JP'; }
 
         /* Updated Dual Cut-in (More Dramatic) */
         #item-cutin { pointer-events: none; }
@@ -354,10 +354,7 @@
     <div class="firefly" style="animation-delay: 4s; top: 40%; left: 40%;"></div>
     <div class="firefly" style="animation-delay: 6s; top: 90%; left: 60%;"></div>
 
-    <!-- Audio Elements -->
-    <audio id="bgm" loop>
-        <source src="ファンタジー3-やすらぎ-.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Audio Elements (No BGM) -->
     <audio id="se-flip">
         <source src="ページめくり2.mp3" type="audio/mpeg">
     </audio>
@@ -773,7 +770,6 @@
         
         // --- Audio Setup ---
         const audio = {
-            bgm: document.getElementById('bgm'),
             flip: document.getElementById('se-flip'),
             attack: document.getElementById('se-attack'),
             select: document.getElementById('se-select')
@@ -781,25 +777,18 @@
         
         // Mobile Audio Unlock
         function unlockAudio() {
-            // Play and pause all audio to unlock on mobile
-            [audio.bgm, audio.flip, audio.attack, audio.select].forEach(a => {
+            [audio.flip, audio.attack, audio.select].forEach(a => {
                 if(a) {
+                    a.volume = 0; // Mute for unlock
                     a.play().then(() => {
                         a.pause();
-                        if(a !== audio.bgm) a.currentTime = 0;
+                        a.currentTime = 0;
+                        a.volume = 1; // Restore volume
                     }).catch(e => console.log("Unlock failed", e));
                 }
             });
-            // Re-play BGM properly
-            playBgm();
         }
         
-        function playBgm() {
-            if (audio.bgm) {
-                audio.bgm.volume = 0.3;
-                audio.bgm.play().catch(e => console.log("BGM play failed", e));
-            }
-        }
         function playSe(name) {
             if (audio[name]) {
                 audio[name].currentTime = 0;
