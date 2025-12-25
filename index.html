@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：41</title>
+    <title>Resource Strategy Card Battle：42</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -851,17 +851,28 @@
             });
         }
         
-        function showRoundStart(round) {
+        function showTextCutin(text1, text2) {
             return new Promise(resolve => {
-                // Initial Round Announcement
-                ui.rfText.innerText = `ROUND ${round}`; 
+                ui.rfText.innerText = text1; 
                 ui.rfText.className = "rf-text anim-rf";
                 ui.rfOverlay.style.opacity = 1;
                 
                 setTimeout(() => {
                    ui.rfText.classList.remove('anim-rf');
-                   ui.rfOverlay.style.opacity = 0;
-                   resolve();
+                   void ui.rfText.offsetWidth; // trigger reflow
+                   
+                   if (text2) {
+                       ui.rfText.innerText = text2;
+                       ui.rfText.classList.add('fight', 'anim-rf');
+                       setTimeout(() => {
+                           ui.rfOverlay.style.opacity = 0;
+                           ui.rfText.classList.remove('fight', 'anim-rf');
+                           resolve();
+                       }, 1000);
+                   } else {
+                       ui.rfOverlay.style.opacity = 0;
+                       resolve();
+                   }
                 }, 1000);
             });
         }
@@ -1247,7 +1258,7 @@
 
         window.initRound = async () => {
             // First, show Round Announcement
-            await showRoundStart(state.round);
+            await showTextCutin(`ROUND ${state.round}`);
 
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
@@ -1280,8 +1291,8 @@
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
                 
                 // Reset Flip Classes
-                // Player: Always 'is-open' (face up) initially, even if empty
-                ui.wrapsP[k].classList.add('is-open');
+                // Player: START CLOSED (Fixing previous issue)
+                ui.wrapsP[k].classList.remove('is-open');
                 // Opponent: Always closed (face down) initially
                 ui.wrapsC[k].classList.remove('is-open');
                 
@@ -1351,11 +1362,6 @@
             toggleInputs(false); 
             stopTimer();
             
-            // Player Card Flip (Close for Reveal Effect)
-            if (state.phase === 1) {
-                 ui.wrapsP.spd.classList.remove('is-open');
-            }
-
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
                 const itemCost = ITEMS[state.p.item].cost;
@@ -1384,7 +1390,7 @@
 
             ui.btn.innerText = "REVEALING...";
             
-            // 1. Show Item Cut-in First
+            // 1. Show Item Cut-in First (Correction: Reveal Items FIRST)
             await showDualCutin(state.p.item, state.c.item);
 
             // 2. Reveal SPD (Flip Cards)
@@ -1417,6 +1423,9 @@
                 state.p.submitted = false;
                 state.p.resolved = false;
                 if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
+                
+                // READY -> FIGHT Animation
+                await showTextCutin("READY", "BUILD!");
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
@@ -1434,7 +1443,7 @@
                         setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
                     }
                     startTimer(time);
-                }, 1500);
+                }, 100);
 
             }, 2000); // Wait after reveal
         }
