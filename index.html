@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：35</title>
+    <title>Resource Strategy Card Battle：36</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -146,20 +146,19 @@
             0% { opacity: 0; }
             10% { opacity: 1; }
             20% { opacity: 1; }
-            25% { opacity: 1; }
-            30% { opacity: 1; }
+            80% { opacity: 1; } /* Extended Duration */
             100% { opacity: 0; }
         }
         
         @keyframes cutin-scale {
             0% { transform: scale(2); opacity: 0; }
-            15% { transform: scale(1); opacity: 1; }
-            85% { transform: scale(1); opacity: 1; }
+            10% { transform: scale(1); opacity: 1; }
+            90% { transform: scale(1); opacity: 1; }
             100% { transform: scale(0.8); opacity: 0; }
         }
 
-        .animate-cutin .cutin-overlay { animation: cutin-anim 2.5s forwards; }
-        .animate-cutin .cutin-content { animation: cutin-scale 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
+        .animate-cutin .cutin-content { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
         /* Timer - Adjusted z-index and opacity */
         .phase-timer {
@@ -326,7 +325,7 @@
                         <div class="item-btn" id="item-prot" onclick="selectItem('prot')" oncontextmenu="return false;">
                             <img src="01プロテクション.png" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-blue-400">01プロテクション</div>
-                            <div class="item-cost">80 PT</div>
+                            <div class="item-cost">200 PT</div>
                         </div>
                     </div>
                     
@@ -513,7 +512,7 @@
         const ITEMS = {
             'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.png" },
-            'prot': { cost: 80, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
 
         let state = {
@@ -633,7 +632,7 @@
                 setTimeout(() => {
                     ui.cutin.classList.remove('animate-cutin');
                     resolve();
-                }, 2500);
+                }, 4000);
             });
         }
 
@@ -1079,7 +1078,7 @@
                     itemCost = 50;
                 } else if (roll < 0.4) { // 20% chance for Protection
                     state.c.item = 'prot';
-                    itemCost = 80;
+                    itemCost = 200;
                 }
             }
             
@@ -1144,14 +1143,14 @@
                 setTimeout(async () => {
                     await showItemCutin('player', state.p.item);
                 }, delay);
-                delay += 2500;
+                delay += 4500;
             }
             
             if (cHasItem) {
                 setTimeout(async () => {
                     await showItemCutin('cpu', state.c.item);
                 }, delay);
-                delay += 2500;
+                delay += 4500;
             }
 
             setTimeout(() => {
@@ -1176,7 +1175,7 @@
                 state.phase = 2;
                 state.p.submitted = false;
                 state.p.resolved = false;
-                if(isOnline && role === 'host') clearRoomInputs();
+                if(isOnline && role === 'host') clearRoomInputs(); // Moved here to fix race condition
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
