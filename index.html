@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：30</title>
+    <title>Resource Strategy Card Battle：31</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -102,12 +102,14 @@
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 0.7; }
         
-        .item-desc-popup {
-            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
-            width: 90%; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--neon-blue);
-            padding: 10px; border-radius: 4px; z-index: 100; pointer-events: none;
-            text-align: center; box-shadow: 0 0 20px rgba(0,247,255,0.2);
+        /* New Item Info Area */
+        .item-info-box {
+            background: rgba(15, 23, 42, 0.5); border-top: 1px solid #334155;
+            padding: 6px; margin-top: 4px; border-radius: 0 0 4px 4px;
+            min-height: 40px; display: flex; flex-direction: column; justify-content: center;
         }
+        .item-info-title { font-size: 10px; font-weight: bold; color: var(--neon-blue); margin-bottom: 2px; }
+        .item-info-desc { font-size: 9px; color: #cbd5e1; line-height: 1.2; }
 
         /* Item Cut-in Animation */
         #item-cutin { pointer-events: none; }
@@ -303,7 +305,7 @@
                 </div>
                 
                 <!-- Item Selection Area -->
-                <div class="flex-1 border-t border-gray-700 pt-1">
+                <div class="flex-1 border-t border-gray-700 pt-1 flex flex-col">
                     <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
                     <div class="item-grid">
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
@@ -311,25 +313,22 @@
                             <div class="item-cost">0 PT</div>
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
-                            <img src="早送り.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-red-400">早送り</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                         <div class="item-btn" id="item-drone" onclick="selectItem('drone')" oncontextmenu="return false;">
-                            <img src="ドローン.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="ドローン.png" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-green-400">ドローン</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                     </div>
-                    <div class="text-[9px] text-gray-500 text-center mt-2">
-                        長押しでアイテム説明
+                    
+                    <!-- Fixed Description Area -->
+                    <div id="item-info-area" class="item-info-box">
+                        <div id="info-title" class="item-info-title">NO ITEM</div>
+                        <div id="info-desc" class="item-info-desc">アイテムなし。通常の戦術で戦う。</div>
                     </div>
-                </div>
-                
-                <!-- Item Description Popup (Hidden by default) -->
-                <div id="item-desc" class="item-desc-popup hidden">
-                    <div id="item-desc-title" class="text-xs font-bold text-white mb-1"></div>
-                    <div id="item-desc-text" class="text-[10px] text-gray-300"></div>
                 </div>
             </div>
 
@@ -504,11 +503,11 @@
         let maxPlayers = 2; 
         let timerInterval = null;
 
-        // Item Defs (Japanese)
+        // Item Defs (Japanese, PNG)
         const ITEMS = {
             'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.jpg" },
-            'drone': { cost: 50, name: "ドローン", desc: "相手の合計消費リソースを暴き、時間を8秒にする。", img: "ドローン.jpg" }
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.png" },
+            'drone': { cost: 50, name: "ドローン", desc: "相手の合計消費リソースを暴き、時間を8秒にする。", img: "ドローン.png" }
         };
 
         let state = {
@@ -539,9 +538,10 @@
             cpuRes: el('cpu-resource'),
             wait: el('wait-overlay'),
             timer: el('phase-timer'),
-            itemDesc: el('item-desc'),
-            itemTitle: el('item-desc-title'),
-            itemText: el('item-desc-text'),
+            
+            // Info Area Refs
+            infoTitle: el('info-title'),
+            infoDesc: el('info-desc'),
             
             // Cut-in Refs
             cutin: el('item-cutin'),
@@ -602,31 +602,14 @@
                 if (id === itemId) btn.classList.add('selected');
                 else btn.classList.remove('selected');
             });
+            
+            // Update Info Area
+            const item = ITEMS[itemId];
+            ui.infoTitle.innerText = item.name;
+            ui.infoDesc.innerText = item.desc;
+            
             updateUI();
         };
-
-        // Long Press Logic
-        let pressTimer;
-        ['none','fast','drone'].forEach(id => {
-            const btn = el('item-'+id);
-            const startPress = () => {
-                pressTimer = setTimeout(() => {
-                    const item = ITEMS[id];
-                    ui.itemTitle.innerText = item.name;
-                    ui.itemText.innerText = item.desc;
-                    ui.itemDesc.classList.remove('hidden');
-                }, 500);
-            };
-            const endPress = () => {
-                clearTimeout(pressTimer);
-                ui.itemDesc.classList.add('hidden');
-            };
-            btn.addEventListener('touchstart', startPress);
-            btn.addEventListener('touchend', endPress);
-            btn.addEventListener('mousedown', startPress);
-            btn.addEventListener('mouseup', endPress);
-            btn.addEventListener('mouseleave', endPress);
-        });
 
         // --- Cut-in Logic ---
         function showItemCutin(userType, itemId) {
