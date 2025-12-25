@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：40</title>
+    <title>Resource Strategy Card Battle：41</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -515,7 +515,7 @@
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
                             <div class="item-label">アイテムなし</div>
                             <div class="item-cost">0 PT</div>
-                            <img src="アイテムなし.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="アイテムなし.png" class="item-img" onerror="this.style.display='none'">
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
                             <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
@@ -710,7 +710,7 @@
 
         // Item Defs (Japanese, PNG)
         const ITEMS = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.jpg" },
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
@@ -851,23 +851,17 @@
             });
         }
         
-        function showReadyFight(round) {
+        function showRoundStart(round) {
             return new Promise(resolve => {
-                ui.rfText.innerText = `ROUND ${round}`; // Changed to show round
+                // Initial Round Announcement
+                ui.rfText.innerText = `ROUND ${round}`; 
                 ui.rfText.className = "rf-text anim-rf";
                 ui.rfOverlay.style.opacity = 1;
                 
                 setTimeout(() => {
                    ui.rfText.classList.remove('anim-rf');
-                   void ui.rfText.offsetWidth; // trigger reflow
-                   ui.rfText.innerText = "BUILD!";
-                   ui.rfText.classList.add('fight', 'anim-rf');
-                   
-                   setTimeout(() => {
-                       ui.rfOverlay.style.opacity = 0;
-                       ui.rfText.classList.remove('fight', 'anim-rf');
-                       resolve();
-                   }, 1000);
+                   ui.rfOverlay.style.opacity = 0;
+                   resolve();
                 }, 1000);
             });
         }
@@ -1251,7 +1245,10 @@
             }
         }
 
-        window.initRound = () => {
+        window.initRound = async () => {
+            // First, show Round Announcement
+            await showRoundStart(state.round);
+
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
             
@@ -1353,6 +1350,11 @@
             if(!updateUI()) return;
             toggleInputs(false); 
             stopTimer();
+            
+            // Player Card Flip (Close for Reveal Effect)
+            if (state.phase === 1) {
+                 ui.wrapsP.spd.classList.remove('is-open');
+            }
 
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
@@ -1382,23 +1384,16 @@
 
             ui.btn.innerText = "REVEALING...";
             
-            // --- Reveal Sequence ---
+            // 1. Show Item Cut-in First
+            await showDualCutin(state.p.item, state.c.item);
+
+            // 2. Reveal SPD (Flip Cards)
             setTimeout(() => {
-                // FLIP!
-                reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd);
-                ui.cP.spd.innerText = state.p.spd;
+                reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd); // Opponent
+                reveal(ui.wrapsP.spd, ui.cP.spd, state.p.spd); // Player
             }, 500);
 
-            // Item Cut-ins
-            const pHasItem = state.p.item !== 'none';
-            const cHasItem = state.c.item !== 'none';
-            
-            // Show Dual Cut-in
-            setTimeout(async () => {
-                await showDualCutin(state.p.item, state.c.item);
-            }, 1000);
-
-            // Wait for cutin (4s) + margin
+            // 3. Logic & Transition
             setTimeout(async () => {
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
@@ -1422,9 +1417,6 @@
                 state.p.submitted = false;
                 state.p.resolved = false;
                 if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
-                
-                // READY -> FIGHT Animation
-                await showReadyFight(state.round);
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
@@ -1442,9 +1434,9 @@
                         setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
                     }
                     startTimer(time);
-                }, 100);
+                }, 1500);
 
-            }, 5500); // 1000 delay + 4000 cutin + 500 margin
+            }, 2000); // Wait after reveal
         }
 
         async function clearRoomInputs() {
@@ -1778,8 +1770,6 @@
         }
 
         window.nextRound = () => {
-            if (maxPlayers === 4) return; // 4P auto loops
-            
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
