@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：34</title>
+    <title>Resource Strategy Card Battle：35</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -94,11 +94,11 @@
 
         /* Item Selection */
         .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
-        .item-btn { position: relative; height: 50px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; }
+        .item-btn { position: relative; aspect-ratio: 1/1; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; }
         .item-btn.selected { border-color: var(--neon-blue); background: rgba(0,247,255,0.1); box-shadow: 0 0 10px rgba(0,247,255,0.2); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 2px black; }
-        .item-cost { font-size: 8px; color: var(--neon-blue); font-family: 'Black Ops One'; z-index: 2; text-shadow: 0 0 2px black; }
+        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 2px black; text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px;}
+        .item-cost { font-size: 8px; color: var(--neon-blue); font-family: 'Black Ops One'; z-index: 2; text-shadow: 0 0 2px black; position: absolute; top: 2px; right: 2px;}
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 0.7; }
         
@@ -135,6 +135,11 @@
         }
         .cutin-sub {
             font-family: 'Rajdhani'; font-size: 1rem; color: #cbd5e1;
+        }
+        .cutin-desc {
+            font-family: 'Noto Sans JP', sans-serif; font-size: 0.9rem; color: #fff;
+            background: rgba(0, 0, 0, 0.6); padding: 4px 12px; border-radius: 4px;
+            border: 1px solid #334155; max-width: 80%; text-align: center;
         }
 
         @keyframes cutin-anim {
@@ -196,6 +201,7 @@
                     <img id="cutin-img" class="cutin-img" src="" alt="ITEM">
                 </div>
                 <div id="cutin-name" class="cutin-text">ITEM NAME</div>
+                <div id="cutin-desc" class="cutin-desc">ITEM DESCRIPTION</div>
             </div>
         </div>
     </div>
@@ -549,6 +555,7 @@
             cutinUser: el('cutin-user'),
             cutinImg: el('cutin-img'),
             cutinName: el('cutin-name'),
+            cutinDesc: el('cutin-desc'), // Added ref
             
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
@@ -619,6 +626,7 @@
             return new Promise((resolve) => {
                 ui.cutinUser.innerText = userType === 'player' ? "YOU ACTIVATED" : "OPPONENT ACTIVATED";
                 ui.cutinName.innerText = item.name;
+                ui.cutinDesc.innerText = item.desc; // Set description
                 ui.cutinImg.src = item.img;
                 ui.cutin.classList.add('animate-cutin');
                 
@@ -925,15 +933,28 @@
             ui.btn.disabled = !enable;
         }
 
+        // --- Timer Logic (Modified for Drone) ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
             ui.timer.innerText = count;
             ui.timer.classList.remove('hidden', 'timer-urgent');
+            
             timerInterval = setInterval(() => {
                 count--;
                 ui.timer.innerText = count;
-                if (count <= 3) ui.timer.classList.add('timer-urgent');
+                
+                // --- Drone Effect: Reveal at remaining 7s (8s elapsed) ---
+                if (state.p.item === 'drone' && count === 7) {
+                     const used = state.c.hpCost + state.c.atk + state.c.def;
+                     el('notice-msg').innerText = `解析完了: 敵使用コスト ${used} PT`;
+                     ui.timer.classList.add('text-green-400'); // Visual clue
+                     setTimeout(()=>ui.timer.classList.remove('text-green-400'), 500);
+                }
+                
+                if (count <= 3) {
+                    ui.timer.classList.add('timer-urgent');
+                }
                 if (count <= 0) {
                     clearInterval(timerInterval);
                     ui.timer.classList.add('hidden');
@@ -1046,7 +1067,25 @@
                 const variance = Math.floor(Math.random() * (avg * 0.4)) - (avg * 0.2); 
                 budget = Math.max(0, Math.min(state.c.total, avg + variance));
             }
-            let rem = budget;
+            
+            // --- Item Logic ---
+            state.c.item = 'none';
+            let itemCost = 0;
+            // CPU tries to buy item if budget allows
+            if (budget > 300) {
+                const roll = Math.random();
+                if (roll < 0.2) { // 20% chance for Fast Forward
+                    state.c.item = 'fast';
+                    itemCost = 50;
+                } else if (roll < 0.4) { // 20% chance for Protection
+                    state.c.item = 'prot';
+                    itemCost = 80;
+                }
+            }
+            
+            let rem = budget - itemCost;
+            if (rem < 0) rem = 0; // Safety check
+
             const spd = Math.ceil(Math.random() * (rem * 0.3)); rem -= spd;
             const atk = Math.ceil(Math.random() * (rem * 0.5)); rem -= atk;
             const def = Math.ceil(Math.random() * (rem * 0.4)); rem -= def;
@@ -1054,7 +1093,6 @@
             const hp = Math.ceil(hpCost * 0.5);
             state.c.spd = spd; state.c.hp = hp; state.c.hpCost = hpCost;
             state.c.atk = atk; state.c.def = def;
-            state.c.item = 'none'; 
         }
 
         window.commitPhase = () => {
@@ -1083,7 +1121,9 @@
 
         async function resolvePhase1() {
             if(!isOnline) {
-                state.c.total -= state.c.spd; 
+                // Deduct cost for CPU
+                const cpuItemCost = ITEMS[state.c.item].cost;
+                state.c.total -= (state.c.spd + cpuItemCost); 
             }
 
             ui.btn.innerText = "REVEALING...";
@@ -1242,10 +1282,6 @@
                         const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
                         state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
                         
-                        // Protection Check (2nd hit also protected? Usually once per battle or round)
-                        // If logic: "Survive lethal damage". 
-                        // Let's assume it works once per round. If triggered 1st hit, maybe not 2nd?
-                        // Simplified: It prevents death *this round*. So keep at 1.
                         if (state.c.currHp <= 0 && state.c.item === 'prot') state.c.currHp = 1;
                         
                         updateHpVal(ui.cC.hp, state.c.currHp); 
