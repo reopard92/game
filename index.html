@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：29</title>
+    <title>Resource Strategy Card Battle：30</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -44,7 +44,7 @@
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; justify-content: center; }
         .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
-        /* カード修正: 縦幅縮小 */
+        /* カード修正 */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 7px; letter-spacing: 1px; color: #64748b; }
         .battle-card { aspect-ratio: 1/1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; } 
@@ -94,18 +94,65 @@
 
         /* Item Selection */
         .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
-        .item-btn { position: relative; height: 40px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; }
+        .item-btn { position: relative; height: 50px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; }
         .item-btn.selected { border-color: var(--neon-blue); background: rgba(0,247,255,0.1); box-shadow: 0 0 10px rgba(0,247,255,0.2); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .item-label { font-size: 9px; font-weight: bold; color: #cbd5e1; }
-        .item-cost { font-size: 8px; color: var(--neon-blue); font-family: 'Black Ops One'; }
+        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 2px black; }
+        .item-cost { font-size: 8px; color: var(--neon-blue); font-family: 'Black Ops One'; z-index: 2; text-shadow: 0 0 2px black; }
+        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; z-index: 1; transition: opacity 0.2s; }
+        .item-btn.selected .item-img { opacity: 0.7; }
         
         .item-desc-popup {
-            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-            width: 90%; background: rgba(0,0,0,0.95); border: 1px solid var(--neon-blue);
-            padding: 8px; border-radius: 4px; z-index: 100; pointer-events: none;
-            text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+            width: 90%; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--neon-blue);
+            padding: 10px; border-radius: 4px; z-index: 100; pointer-events: none;
+            text-align: center; box-shadow: 0 0 20px rgba(0,247,255,0.2);
         }
+
+        /* Item Cut-in Animation */
+        #item-cutin { pointer-events: none; }
+        .cutin-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 60;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0;
+        }
+        .cutin-content {
+            transform: scale(0.5); opacity: 0;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .cutin-img-box {
+            width: 120px; height: 120px; border: 2px solid var(--neon-blue);
+            border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px var(--neon-blue);
+            background: #000;
+        }
+        .cutin-img { width: 100%; height: 100%; object-fit: cover; }
+        .cutin-text {
+            font-family: 'Black Ops One'; font-size: 2rem; color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue); text-align: center;
+        }
+        .cutin-sub {
+            font-family: 'Rajdhani'; font-size: 1rem; color: #cbd5e1;
+        }
+
+        @keyframes cutin-anim {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            20% { opacity: 1; }
+            25% { opacity: 1; }
+            30% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        @keyframes cutin-scale {
+            0% { transform: scale(2); opacity: 0; }
+            15% { transform: scale(1); opacity: 1; }
+            85% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0; }
+        }
+
+        .animate-cutin .cutin-overlay { animation: cutin-anim 2.5s forwards; }
+        .animate-cutin .cutin-content { animation: cutin-scale 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
         /* Timer - Adjusted z-index and opacity */
         .phase-timer {
@@ -138,6 +185,20 @@
 </head>
 <body class="select-none">
 
+    <!-- Cut-in Layer -->
+    <div id="item-cutin" class="">
+        <div id="cutin-bg" class="cutin-overlay">
+            <div class="cutin-content">
+                <div class="cutin-sub" id="cutin-user">PLAYER USED</div>
+                <div class="cutin-img-box">
+                    <img id="cutin-img" class="cutin-img" src="" alt="ITEM">
+                </div>
+                <div id="cutin-name" class="cutin-text">ITEM NAME</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
     <header class="flex justify-between items-center px-4 py-2 border-b border-blue-900/50 bg-gray-900/50 h-12">
         <div class="flex flex-col">
             <div class="text-[10px] text-gray-400 font-bold tracking-widest">
@@ -162,11 +223,14 @@
         </div>
     </header>
 
+    <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
         <div id="phase-timer" class="phase-timer hidden">15</div>
         <div id="notice-msg" class="absolute top-2 w-full text-center text-[10px] text-yellow-400 font-bold z-50"></div>
 
+        <!-- 1vs1 / CPU Arena -->
         <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10">
+            <!-- CPU Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
                 <div class="card-grid">
@@ -181,6 +245,7 @@
                 <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-[12px] px-6 py-1 rounded-full border-2 border-white shadow-xl absolute z-30 opacity-0">INITIATIVE WIN!</div>
             </div>
 
+            <!-- Player Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
@@ -192,10 +257,14 @@
             </div>
         </div>
 
+        <!-- 4P Arena -->
         <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
+            <!-- Opponents Container -->
             <div class="opp-container-4p" id="opp-list-4p">
-                </div>
+                <!-- Opponent cards will be injected here -->
+            </div>
 
+            <!-- Self Player (Simplified) -->
             <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
@@ -211,11 +280,14 @@
         <div id="p-dmg-float" class="dmg-float text-red-500" style="top:75%"></div>
     </main>
 
+    <!-- Input Panel (Bottom) -->
     <section id="input-panel" class="input-panel">
         <div class="input-controls">
             <div class="phase-title-text" id="phase-title">PHASE 1: SPEED INPUT</div>
             
+            <!-- Phase 1 (Modified with Items) -->
             <div id="input-group-spd" class="w-full flex flex-col h-full">
+                <!-- Speed Slider on Top -->
                 <div class="control-block border-purple-500 mb-2" id="blk-spd">
                     <div class="control-row">
                         <div class="control-label text-purple-400">SPEED</div>
@@ -230,33 +302,38 @@
                     </div>
                 </div>
                 
+                <!-- Item Selection Area -->
                 <div class="flex-1 border-t border-gray-700 pt-1">
                     <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
                     <div class="item-grid">
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
-                            <div class="item-label">NO ITEM</div>
+                            <div class="item-label">購入しない</div>
                             <div class="item-cost">0 PT</div>
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
-                            <div class="item-label text-red-400">FAST FWD</div>
+                            <img src="早送り.jpg" class="item-img" onerror="this.style.display='none'">
+                            <div class="item-label text-red-400">早送り</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                         <div class="item-btn" id="item-drone" onclick="selectItem('drone')" oncontextmenu="return false;">
-                            <div class="item-label text-green-400">R-DRONE</div>
+                            <img src="ドローン.jpg" class="item-img" onerror="this.style.display='none'">
+                            <div class="item-label text-green-400">ドローン</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                     </div>
                     <div class="text-[9px] text-gray-500 text-center mt-2">
-                        Hold item to view details
+                        長押しでアイテム説明
                     </div>
                 </div>
                 
+                <!-- Item Description Popup (Hidden by default) -->
                 <div id="item-desc" class="item-desc-popup hidden">
                     <div id="item-desc-title" class="text-xs font-bold text-white mb-1"></div>
                     <div id="item-desc-text" class="text-[10px] text-gray-300"></div>
                 </div>
             </div>
 
+            <!-- Phase 2 -->
             <div id="input-group-build" class="hidden w-full flex flex-col gap-1 justify-start h-full pt-1">
                 <div class="control-block border-green-500" id="blk-hp">
                     <div class="control-row">
@@ -311,17 +388,20 @@
         </div>
     </section>
 
+    <!-- Name Entry Screen (New) -->
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming cyber-text mb-8">IDENTITY</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
         <button onclick="submitName()" class="lobby-btn">CONFIRM</button>
     </div>
 
+    <!-- Wait Overlay (Online) -->
     <div id="wait-overlay" class="overlay hidden">
         <div class="text-2xl font-gaming cyber-text animate-pulse mb-4">OPPONENT DECIDING...</div>
         <div class="text-sm text-gray-400 font-tech">INPUT LOCKED</div>
     </div>
 
+    <!-- Home Screen -->
     <div id="home-screen" class="overlay p-6 text-center">
         <h1 class="text-5xl font-gaming cyber-text mb-8">RESOURCE BATTLE</h1>
         <div class="w-full max-w-sm space-y-4">
@@ -344,6 +424,7 @@
         </div>
     </div>
 
+    <!-- Lobby Screen -->
     <div id="lobby-screen" class="overlay hidden p-6">
         <h2 class="text-3xl font-gaming cyber-text mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
@@ -360,6 +441,7 @@
         </div>
     </div>
 
+    <!-- Waiting for Guest Screen -->
     <div id="host-wait-screen" class="overlay hidden p-6 text-center">
         <h2 class="text-2xl font-gaming cyber-text mb-2">ROOM CREATED</h2>
         <div class="text-4xl font-bold text-white mb-2 tracking-widest" id="room-id-disp">...</div>
@@ -369,18 +451,21 @@
         <button onclick="cancelRoom()" class="mt-12 text-red-500 text-sm border border-red-900 px-4 py-2 rounded">CANCEL</button>
     </div>
 
+    <!-- Result Overlay -->
     <div id="result-overlay" class="overlay hidden p-6 text-center">
         <h1 id="res-title" class="text-4xl font-gaming text-white mb-6 cyber-text">VICTORY</h1>
         <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
         <button onclick="nextRound()" class="w-full max-w-xs h-14 bg-yellow-500 text-black font-bold text-xl rounded font-gaming">NEXT ROUND</button>
     </div>
 
+    <!-- Game Over Overlay -->
     <div id="game-over-overlay" class="overlay hidden">
         <h1 id="final-result-title" class="text-6xl font-gaming mb-4 cyber-text animate-pulse">VICTORY</h1>
         <p class="text-gray-500 tracking-[0.5em] mb-8 font-tech">SIMULATION ENDED</p>
         <button onclick="location.reload()" class="px-12 py-4 bg-blue-600 text-white font-bold rounded">RETURN TO TITLE</button>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -419,11 +504,11 @@
         let maxPlayers = 2; 
         let timerInterval = null;
 
-        // Item Defs
+        // Item Defs (Japanese)
         const ITEMS = {
-            'none': { cost: 0, name: "NO ITEM", desc: "No tactical equipment." },
-            'fast': { cost: 50, name: "FAST FWD", desc: "Reduce opponent's build time to 4 sec." },
-            'drone': { cost: 50, name: "R-DRONE", desc: "Reveal enemy total resource & reduce time to 8s." }
+            'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.jpg" },
+            'drone': { cost: 50, name: "ドローン", desc: "相手の合計消費リソースを暴き、時間を8秒にする。", img: "ドローン.jpg" }
         };
 
         let state = {
@@ -457,6 +542,13 @@
             itemDesc: el('item-desc'),
             itemTitle: el('item-desc-title'),
             itemText: el('item-desc-text'),
+            
+            // Cut-in Refs
+            cutin: el('item-cutin'),
+            cutinOverlay: el('cutin-bg'),
+            cutinUser: el('cutin-user'),
+            cutinImg: el('cutin-img'),
+            cutinName: el('cutin-name'),
             
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
@@ -535,6 +627,24 @@
             btn.addEventListener('mouseup', endPress);
             btn.addEventListener('mouseleave', endPress);
         });
+
+        // --- Cut-in Logic ---
+        function showItemCutin(userType, itemId) {
+            const item = ITEMS[itemId];
+            if (!item || itemId === 'none') return Promise.resolve();
+
+            return new Promise((resolve) => {
+                ui.cutinUser.innerText = userType === 'player' ? "YOU ACTIVATED" : "OPPONENT ACTIVATED";
+                ui.cutinName.innerText = item.name;
+                ui.cutinImg.src = item.img;
+                ui.cutin.classList.add('animate-cutin');
+                
+                setTimeout(() => {
+                    ui.cutin.classList.remove('animate-cutin');
+                    resolve();
+                }, 2500);
+            });
+        }
 
         // --- Online Lobby Logic ---
         async function refreshRoomList() {
@@ -736,7 +846,6 @@
 
         // --- 4P Logic ---
         function handle4pUpdate(data) {
-            // Simplified 4P logic (items not fully implemented in 4P for brevity, focusing on 1v1 request)
             data.players.forEach(pid => {
                 if (!state.players[pid]) state.players[pid] = {};
                 const pd = data.playerData[pid];
@@ -825,7 +934,6 @@
                     ui.blocks[k].style.opacity = opacity;
                 }
             });
-            // Items
             ['none','fast','drone'].forEach(id => {
                 el('item-'+id).style.pointerEvents = pointerEvent;
                 if(!enable) el('item-'+id).classList.add('disabled');
@@ -876,7 +984,6 @@
             let currentCost = 0;
             if (state.phase === 1) {
                 currentCost = state.inputs.spd;
-                // Item Cost
                 if (state.p.item && ITEMS[state.p.item]) {
                     currentCost += ITEMS[state.p.item].cost;
                 }
@@ -906,7 +1013,6 @@
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
             
-            // Reset Items
             state.p.item = 'none';
             selectItem('none');
             
@@ -919,7 +1025,6 @@
             ui.title.innerText = "PHASE 1: TACTICS & SPEED";
             ui.btn.innerText = "LOCK IN";
             
-            // Reset visual cards
             ['spd','hp','atk','def'].forEach(k => {
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
@@ -941,9 +1046,6 @@
 
             if(!isOnline) generateCPU();
             if (maxPlayers === 4) {
-                 if (role === 'host' && isOnline) {
-                     // Cleanup 4P
-                 }
                  render4PArena();
             } else {
                  if (isOnline && role === 'host') clearRoomInputs();
@@ -969,7 +1071,7 @@
             const hp = Math.ceil(hpCost * 0.5);
             state.c.spd = spd; state.c.hp = hp; state.c.hpCost = hpCost;
             state.c.atk = atk; state.c.def = def;
-            state.c.item = 'none'; // CPU doesn't use items for now
+            state.c.item = 'none'; 
         }
 
         window.commitPhase = () => {
@@ -996,23 +1098,40 @@
             }
         }
 
-        function resolvePhase1() {
+        async function resolvePhase1() {
             if(!isOnline) {
-                state.c.total -= state.c.spd; // CPU cost
+                state.c.total -= state.c.spd; 
             }
 
             ui.btn.innerText = "REVEALING...";
+            
+            // --- Reveal Sequence ---
             setTimeout(() => {
                 ui.cP.spd.innerText = state.p.spd;
                 ui.cC.spd.innerText = state.c.spd;
-                
-                // --- Item Reveal & Effect ---
-                let notices = [];
-                if (state.p.item !== 'none') notices.push(`YOU: ${ITEMS[state.p.item].name}`);
-                if (state.c.item !== 'none') notices.push(`OPP: ${ITEMS[state.c.item].name}`);
-                if (notices.length > 0) el('notice-msg').innerText = notices.join(" | ");
+            }, 500);
 
-                // Logic
+            // Item Cut-ins
+            const pHasItem = state.p.item !== 'none';
+            const cHasItem = state.c.item !== 'none';
+            
+            let delay = 1000;
+            
+            if (pHasItem) {
+                setTimeout(async () => {
+                    await showItemCutin('player', state.p.item);
+                }, delay);
+                delay += 2500;
+            }
+            
+            if (cHasItem) {
+                setTimeout(async () => {
+                    await showItemCutin('cpu', state.c.item);
+                }, delay);
+                delay += 2500;
+            }
+
+            setTimeout(() => {
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
                     state.pAdv = true;
@@ -1022,49 +1141,44 @@
                     state.c.total += Math.ceil(state.c.spd * 0.3);
                 }
 
-                setTimeout(() => {
-                    if (state.pAdv || state.cAdv) {
-                        el('adv-badge').classList.remove('hidden');
-                        el('adv-badge').innerText = state.pAdv ? "INITIATIVE WIN!" : "OPPONENT ADVANTAGE";
-                        el('adv-badge').className = state.pAdv ? 
-                            "bg-blue-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim" :
-                            "bg-red-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim";
-                        setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
-                    }
-                    
-                    // Spy Drone Effect
-                    if (state.p.item === 'drone' && state.c.total) {
-                        el('notice-msg').innerText += ` [OPP RES: ${Math.floor(state.c.total)}]`;
-                    }
-                }, 600);
-            }, 500);
-
-            state.phase = 2;
-            state.p.submitted = false;
-            state.p.resolved = false;
-            if(isOnline && role === 'host') clearRoomInputs();
-
-            setTimeout(() => {
-                ui.p1.classList.add('hidden');
-                ui.p2.classList.remove('hidden');
-                ui.title.innerText = "PHASE 2: BUILD UNIT";
-                ui.btn.innerText = "ENGAGE";
-                toggleInputs(true); 
-                updateUI();
-                
-                // --- Timer Effect ---
-                let time = 15;
-                if (state.c.item === 'fast') time = 4;
-                else if (state.c.item === 'drone') time = 8;
-                
-                // Flash alert if time reduced
-                if(time < 15) {
-                    ui.timer.classList.add('text-red-500');
-                    setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
+                if (state.pAdv || state.cAdv) {
+                    el('adv-badge').classList.remove('hidden');
+                    el('adv-badge').innerText = state.pAdv ? "INITIATIVE WIN!" : "OPPONENT ADVANTAGE";
+                    el('adv-badge').className = state.pAdv ? 
+                        "bg-blue-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim" :
+                        "bg-red-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim";
+                    setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
                 }
                 
-                startTimer(time);
-            }, 3000);
+                if (state.p.item === 'drone' && state.c.total) {
+                    el('notice-msg').innerText = `解析完了: 敵リソース残り ${Math.floor(state.c.total)}`;
+                }
+                
+                state.phase = 2;
+                state.p.submitted = false;
+                state.p.resolved = false;
+                if(isOnline && role === 'host') clearRoomInputs();
+
+                setTimeout(() => {
+                    ui.p1.classList.add('hidden');
+                    ui.p2.classList.remove('hidden');
+                    ui.title.innerText = "PHASE 2: BUILD UNIT";
+                    ui.btn.innerText = "ENGAGE";
+                    toggleInputs(true); 
+                    updateUI();
+                    
+                    let time = 15;
+                    if (state.c.item === 'fast') time = 4;
+                    else if (state.c.item === 'drone') time = 8;
+                    
+                    if(time < 15) {
+                        ui.timer.classList.add('text-red-500');
+                        setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
+                    }
+                    startTimer(time);
+                }, 1500);
+
+            }, delay + 500);
         }
 
         function resolvePhase2() {
@@ -1075,7 +1189,7 @@
         function startBattleSequence() {
             state.p.currHp = undefined; state.c.currHp = undefined;
             const pFirst = state.p.spd >= state.c.spd;
-            const pMult = state.pAdv ? 1.2 : 1.0; // 1.2x Multiplier
+            const pMult = state.pAdv ? 1.2 : 1.0; 
             const cMult = state.cAdv ? 1.2 : 1.0;
             const pAtkFinal = Math.ceil(state.p.atk * pMult);
             const cAtkFinal = Math.ceil(state.c.atk * cMult);
@@ -1094,7 +1208,6 @@
                 }},
                 { t: 3500, f: () => { if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
                 
-                // 1st Attack & Instant Kill Check
                 { t: 4500, f: () => {
                     let dead = false;
                     if(pFirst) { 
@@ -1109,13 +1222,12 @@
                     clearHighlights();
                     
                     if (dead) {
-                        // Skip remaining turns
                         setTimeout(() => {
                             const pHp = Math.max(0, state.p.currHp!==undefined ? state.p.currHp : state.p.hp);
                             const cHp = Math.max(0, state.c.currHp!==undefined ? state.c.currHp : state.c.hp);
                             endRound(pHp, cHp);
                         }, 1000);
-                        return true; // Stop sequence
+                        return true; 
                     }
                 }},
                 
@@ -1126,7 +1238,6 @@
                 }},
                 { t: 8000, f: () => { if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
                 
-                // 2nd Attack
                 { t: 9000, f: () => {
                     if(!pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg; updateHpVal(ui.cC.hp, state.c.currHp); } 
                     else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; updateHpVal(ui.cP.hp, state.p.currHp); }
@@ -1139,7 +1250,6 @@
                 }}
             ];
 
-            // Execute sequence with break capability
             let stop = false;
             seq.forEach((s, i) => {
                 setTimeout(() => {
@@ -1152,7 +1262,6 @@
 
         // --- 4P Resolve ---
         async function resolvePhase1_4P(data) {
-            // Simplified 4P logic: Items currently ignored in speed sort
             const pIds = data.players;
             const speeds = pIds.map(pid => ({ id: pid, spd: state.players[pid].spd }));
             speeds.sort((a,b) => b.spd - a.spd || Math.random() - 0.5);
@@ -1180,7 +1289,6 @@
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
             const newTargets = { ...state.targets, [userId]: targetId };
             
-            // Refund Logic 30% for 4P
             const mySpd = state.players[userId].spd;
             const tSpd = state.players[targetId].spd;
             if (mySpd > tSpd) {
@@ -1195,7 +1303,6 @@
 
         function resolvePhase2_4P(data) {
             state.phase = 3;
-            // 4P: No instant kill rule yet to keep simple, just damage
             let battleLog = [];
             data.players.forEach(attackerId => {
                 const targetId = state.targets[attackerId];
@@ -1203,7 +1310,7 @@
                 const atkP = state.players[attackerId];
                 const defP = state.players[targetId];
                 const hasAdvantage = atkP.spd > defP.spd;
-                const finalAtk = Math.ceil(atkP.atk * (hasAdvantage ? 1.2 : 1.0)); // 1.2x
+                const finalAtk = Math.ceil(atkP.atk * (hasAdvantage ? 1.2 : 1.0)); 
                 const dmg = Math.max(0, finalAtk - defP.def);
                 state.players[targetId].currHp = (state.players[targetId].hp) - dmg;
                 battleLog.push({ atk: attackerId, def: targetId, dmg: dmg, adv: hasAdvantage });
