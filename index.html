@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：28</title>
+    <title>Resource Strategy Card Battle：29</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -45,13 +45,13 @@
         .action-area { width: 80px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
         /* カード修正: 縦幅縮小 */
-        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} /* max-width縮小 */
+        .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 7px; letter-spacing: 1px; color: #64748b; }
-        .battle-card { aspect-ratio: 1/1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; } /* アスペクト比を4/5から1/1に変更 */
+        .battle-card { aspect-ratio: 1/1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 1px solid; border-radius: 4px; transition: transform 0.3s, box-shadow 0.3s; overflow: hidden; } 
         .card-spd { border-color: var(--color-spd); } .card-hp { border-color: var(--color-hp); } .card-atk { border-color: var(--color-atk); } .card-def { border-color: var(--color-def); }
         .card-label { position: absolute; top: 1px; font-size: 7px; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
-        .card-val { font-family: 'Black Ops One', cursive; font-size: 1.1rem; z-index: 10; text-shadow: 0 0 3px currentColor; transition: transform 0.2s; margin-top: 2px; } /* フォント微調整 */
-        .card-icon { position: absolute; bottom: 1px; font-size: 0.7rem; opacity: 0.5; } /* アイコンサイズ微調整 */
+        .card-val { font-family: 'Black Ops One', cursive; font-size: 1.1rem; z-index: 10; text-shadow: 0 0 3px currentColor; transition: transform 0.2s; margin-top: 2px; } 
+        .card-icon { position: absolute; bottom: 1px; font-size: 0.7rem; opacity: 0.5; } 
         
         .battle-card.hidden-card { background: #0f172a; border-color: #475569; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.3) 5px, rgba(0,0,0,0.3) 10px); }
         .battle-card.hidden-card .card-val, .battle-card.hidden-card .card-label, .battle-card.hidden-card .card-icon { opacity: 0; }
@@ -92,6 +92,21 @@
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
         .phase-title-text { font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 2px; text-align: center; }
 
+        /* Item Selection */
+        .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+        .item-btn { position: relative; height: 40px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; }
+        .item-btn.selected { border-color: var(--neon-blue); background: rgba(0,247,255,0.1); box-shadow: 0 0 10px rgba(0,247,255,0.2); }
+        .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+        .item-label { font-size: 9px; font-weight: bold; color: #cbd5e1; }
+        .item-cost { font-size: 8px; color: var(--neon-blue); font-family: 'Black Ops One'; }
+        
+        .item-desc-popup {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            width: 90%; background: rgba(0,0,0,0.95); border: 1px solid var(--neon-blue);
+            padding: 8px; border-radius: 4px; z-index: 100; pointer-events: none;
+            text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
         /* Timer - Adjusted z-index and opacity */
         .phase-timer {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -123,7 +138,6 @@
 </head>
 <body class="select-none">
 
-    <!-- Header -->
     <header class="flex justify-between items-center px-4 py-2 border-b border-blue-900/50 bg-gray-900/50 h-12">
         <div class="flex flex-col">
             <div class="text-[10px] text-gray-400 font-bold tracking-widest">
@@ -148,14 +162,11 @@
         </div>
     </header>
 
-    <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
         <div id="phase-timer" class="phase-timer hidden">15</div>
         <div id="notice-msg" class="absolute top-2 w-full text-center text-[10px] text-yellow-400 font-bold z-50"></div>
 
-        <!-- 1vs1 / CPU Arena -->
         <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10">
-            <!-- CPU Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
                 <div class="card-grid">
@@ -170,7 +181,6 @@
                 <div id="adv-badge" class="hidden bg-yellow-500 text-black font-black text-[12px] px-6 py-1 rounded-full border-2 border-white shadow-xl absolute z-30 opacity-0">INITIATIVE WIN!</div>
             </div>
 
-            <!-- Player Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
@@ -182,14 +192,10 @@
             </div>
         </div>
 
-        <!-- 4P Arena -->
         <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
-            <!-- Opponents Container -->
             <div class="opp-container-4p" id="opp-list-4p">
-                <!-- Opponent cards will be injected here -->
-            </div>
+                </div>
 
-            <!-- Self Player (Simplified) -->
             <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
@@ -205,14 +211,12 @@
         <div id="p-dmg-float" class="dmg-float text-red-500" style="top:75%"></div>
     </main>
 
-    <!-- Input Panel (Bottom) -->
     <section id="input-panel" class="input-panel">
         <div class="input-controls">
             <div class="phase-title-text" id="phase-title">PHASE 1: SPEED INPUT</div>
             
-            <!-- Phase 1 -->
-            <div id="input-group-spd" class="w-full">
-                <div class="control-block border-purple-500" id="blk-spd">
+            <div id="input-group-spd" class="w-full flex flex-col h-full">
+                <div class="control-block border-purple-500 mb-2" id="blk-spd">
                     <div class="control-row">
                         <div class="control-label text-purple-400">SPEED</div>
                         <div class="control-val text-purple-400" id="disp-spd">0</div>
@@ -225,12 +229,34 @@
                         <button class="btn-mini" onclick="step('spd', 10)">+10</button>
                     </div>
                 </div>
-                <div class="text-[10px] text-gray-500 text-center mt-2">
-                    Win for <span class="text-yellow-400">ATK x1.5</span> & 30% Refund
+                
+                <div class="flex-1 border-t border-gray-700 pt-1">
+                    <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
+                    <div class="item-grid">
+                        <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
+                            <div class="item-label">NO ITEM</div>
+                            <div class="item-cost">0 PT</div>
+                        </div>
+                        <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
+                            <div class="item-label text-red-400">FAST FWD</div>
+                            <div class="item-cost">50 PT</div>
+                        </div>
+                        <div class="item-btn" id="item-drone" onclick="selectItem('drone')" oncontextmenu="return false;">
+                            <div class="item-label text-green-400">R-DRONE</div>
+                            <div class="item-cost">50 PT</div>
+                        </div>
+                    </div>
+                    <div class="text-[9px] text-gray-500 text-center mt-2">
+                        Hold item to view details
+                    </div>
+                </div>
+                
+                <div id="item-desc" class="item-desc-popup hidden">
+                    <div id="item-desc-title" class="text-xs font-bold text-white mb-1"></div>
+                    <div id="item-desc-text" class="text-[10px] text-gray-300"></div>
                 </div>
             </div>
 
-            <!-- Phase 2 -->
             <div id="input-group-build" class="hidden w-full flex flex-col gap-1 justify-start h-full pt-1">
                 <div class="control-block border-green-500" id="blk-hp">
                     <div class="control-row">
@@ -285,20 +311,17 @@
         </div>
     </section>
 
-    <!-- Name Entry Screen (New) -->
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming cyber-text mb-8">IDENTITY</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
         <button onclick="submitName()" class="lobby-btn">CONFIRM</button>
     </div>
 
-    <!-- Wait Overlay (Online) -->
     <div id="wait-overlay" class="overlay hidden">
         <div class="text-2xl font-gaming cyber-text animate-pulse mb-4">OPPONENT DECIDING...</div>
         <div class="text-sm text-gray-400 font-tech">INPUT LOCKED</div>
     </div>
 
-    <!-- Home Screen -->
     <div id="home-screen" class="overlay p-6 text-center">
         <h1 class="text-5xl font-gaming cyber-text mb-8">RESOURCE BATTLE</h1>
         <div class="w-full max-w-sm space-y-4">
@@ -311,17 +334,16 @@
                 <li><b class="text-white">5ラウンド制</b>：HPが多い方がラウンド勝利</li>
                 <li><b class="text-blue-400">1000 PTS</b>：全ラウンド共通の総資産を配分</li>
                 <li><b class="text-purple-400">フェーズ1 (SPEED)</b>：
-                    <br><span class="pl-4">数値が大きいと <b class="text-yellow-400">攻撃1.5倍</b> & <b class="text-green-400">消費30%還元</b></span>
+                    <br><span class="pl-4">勝者: <b class="text-yellow-400">攻撃1.2倍</b> & <b class="text-green-400">消費30%還元</b></span>
+                    <br><span class="pl-4 text-red-400">★即死: 先行でHP0にすれば即勝利</span>
                 </li>
                 <li><b class="text-green-400">フェーズ2 (BUILD)</b>：
                     <br><span class="pl-4">残りを <b class="text-green-500">HP</b>・<b class="text-red-500">攻撃</b>・<b class="text-blue-500">防御</b> に配分</span>
                 </li>
-                <li><b class="text-gray-500">注</b>：4人対戦では速度順にターゲット指定</li>
             </ul>
         </div>
     </div>
 
-    <!-- Lobby Screen -->
     <div id="lobby-screen" class="overlay hidden p-6">
         <h2 class="text-3xl font-gaming cyber-text mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
@@ -338,7 +360,6 @@
         </div>
     </div>
 
-    <!-- Waiting for Guest Screen -->
     <div id="host-wait-screen" class="overlay hidden p-6 text-center">
         <h2 class="text-2xl font-gaming cyber-text mb-2">ROOM CREATED</h2>
         <div class="text-4xl font-bold text-white mb-2 tracking-widest" id="room-id-disp">...</div>
@@ -348,21 +369,18 @@
         <button onclick="cancelRoom()" class="mt-12 text-red-500 text-sm border border-red-900 px-4 py-2 rounded">CANCEL</button>
     </div>
 
-    <!-- Result Overlay -->
     <div id="result-overlay" class="overlay hidden p-6 text-center">
         <h1 id="res-title" class="text-4xl font-gaming text-white mb-6 cyber-text">VICTORY</h1>
         <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
         <button onclick="nextRound()" class="w-full max-w-xs h-14 bg-yellow-500 text-black font-bold text-xl rounded font-gaming">NEXT ROUND</button>
     </div>
 
-    <!-- Game Over Overlay -->
     <div id="game-over-overlay" class="overlay hidden">
         <h1 id="final-result-title" class="text-6xl font-gaming mb-4 cyber-text animate-pulse">VICTORY</h1>
         <p class="text-gray-500 tracking-[0.5em] mb-8 font-tech">SIMULATION ENDED</p>
         <button onclick="location.reload()" class="px-12 py-4 bg-blue-600 text-white font-bold rounded">RETURN TO TITLE</button>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -397,21 +415,27 @@
         const MAX_ROUNDS = 5;
         const START_PTS = 1000;
         let isOnline = false;
-        let role = 'host'; // host, guest, or cpu
-        let maxPlayers = 2; // 2 or 4
+        let role = 'host'; 
+        let maxPlayers = 2; 
         let timerInterval = null;
 
-        // Shared State
+        // Item Defs
+        const ITEMS = {
+            'none': { cost: 0, name: "NO ITEM", desc: "No tactical equipment." },
+            'fast': { cost: 50, name: "FAST FWD", desc: "Reduce opponent's build time to 4 sec." },
+            'drone': { cost: 50, name: "R-DRONE", desc: "Reveal enemy total resource & reduce time to 8s." }
+        };
+
         let state = {
             round: 1,
-            phase: 1, // 1: Speed, 1.5: TargetPick(4P), 2: Build, 3: Battle
+            phase: 1, 
             // 1v1 Data
-            p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
-            c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, currHp: undefined, submitted: false, resolved: false },
+            p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, item: 'none', currHp: undefined, submitted: false, resolved: false },
+            c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, item: 'none', currHp: undefined, submitted: false, resolved: false },
             // 4P Data
-            players: {}, // { uid: { name, spd, hp, atk, def, total, wins, ready } }
-            targets: {}, // { attackerId: targetId }
-            pickOrder: [], // [uid1, uid2, uid3, uid4] sorted by speed
+            players: {}, 
+            targets: {}, 
+            pickOrder: [], 
             pickIndex: 0,
             
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 }
@@ -430,19 +454,16 @@
             cpuRes: el('cpu-resource'),
             wait: el('wait-overlay'),
             timer: el('phase-timer'),
+            itemDesc: el('item-desc'),
+            itemTitle: el('item-desc-title'),
+            itemText: el('item-desc-text'),
             
-            // 1v1 refs
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
-            
-            // 4P refs
             oppContainer: el('opp-list-4p'),
-            
-            blocks: {
-                spd: el('blk-spd'), hp: el('blk-hp'), atk: el('blk-atk'), def: el('blk-def')
-            }
+            blocks: { spd: el('blk-spd'), hp: el('blk-hp'), atk: el('blk-atk'), def: el('blk-def') }
         };
 
         // --- Name Input & Navigation Logic ---
@@ -478,14 +499,49 @@
             el('home-screen').classList.remove('hidden');
         };
 
-        // --- Online Lobby Logic ---
-        // (Existing showLobby removed/replaced by flow logic above)
+        // --- Item Logic ---
+        window.selectItem = (itemId) => {
+            if (state.phase !== 1) return;
+            state.p.item = itemId;
+            
+            // UI Update
+            ['none','fast','drone'].forEach(id => {
+                const btn = el('item-'+id);
+                if (id === itemId) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+            updateUI();
+        };
 
+        // Long Press Logic
+        let pressTimer;
+        ['none','fast','drone'].forEach(id => {
+            const btn = el('item-'+id);
+            const startPress = () => {
+                pressTimer = setTimeout(() => {
+                    const item = ITEMS[id];
+                    ui.itemTitle.innerText = item.name;
+                    ui.itemText.innerText = item.desc;
+                    ui.itemDesc.classList.remove('hidden');
+                }, 500);
+            };
+            const endPress = () => {
+                clearTimeout(pressTimer);
+                ui.itemDesc.classList.add('hidden');
+            };
+            btn.addEventListener('touchstart', startPress);
+            btn.addEventListener('touchend', endPress);
+            btn.addEventListener('mousedown', startPress);
+            btn.addEventListener('mouseup', endPress);
+            btn.addEventListener('mouseleave', endPress);
+        });
+
+        // --- Online Lobby Logic ---
         async function refreshRoomList() {
             const listEl = el('room-list');
             listEl.innerHTML = '<div class="text-center text-gray-500">Searching...</div>';
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
-            const q = query(roomsRef); // Get all, filter client side for simplicity/cleanup
+            const q = query(roomsRef);
             try {
                 const snapshot = await getDocs(q);
                 let html = '';
@@ -550,23 +606,18 @@
             isOnline = true;
             roomId = id;
             maxPlayers = max;
-            
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            // Transaction-like update would be better but keeping simple:
-            // Fetch first to append
             const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
             if (snap.empty) return alert("Room gone");
             
             const data = snap.docs[0].data();
             if (data.players.includes(userId)) {
-                 // Already in
             } else if (data.players.length < data.maxPlayers) {
                 const newPlayers = [...data.players, userId];
                 const newPD = { ...data.playerData, [userId]: { name: userName, ready: false } };
                 const updates = { players: newPlayers, playerData: newPD };
                 if (newPlayers.length >= data.maxPlayers) {
                     updates.status = 'playing';
-                    // init 4p state if needed
                     updates.round = 1;
                     updates.phase = 1;
                 }
@@ -579,16 +630,10 @@
             subscribeRoom(roomId);
         };
 
-        // --- Room Cleanup Logic ---
         window.deleteRoom = async () => {
             if (roomId && role === 'host') {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-                try {
-                    await deleteDoc(roomRef);
-                    console.log("Room deleted");
-                } catch (e) {
-                    console.error("Error deleting room", e);
-                }
+                try { await deleteDoc(roomRef); } catch (e) { console.error(e); }
             }
         }
 
@@ -598,23 +643,17 @@
         }
         
         window.cleanupRooms = async () => {
-            if(!confirm("Are you sure you want to delete ALL rooms? This cannot be undone.")) return;
+            if(!confirm("Delete ALL rooms?")) return;
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
             const snapshot = await getDocs(roomsRef);
             let count = 0;
-            snapshot.forEach(async (docSnap) => {
-                await deleteDoc(docSnap.ref);
-                count++;
-            });
+            snapshot.forEach(async (docSnap) => { await deleteDoc(docSnap.ref); count++; });
             alert(`Deleted ${count} rooms.`);
             refreshRoomList();
         };
 
-        // Try to clean up on close (best effort)
         window.addEventListener('beforeunload', () => {
             if (isOnline && role === 'host' && roomId && el('host-wait-screen').classList.contains('hidden') === false) {
-                // We use standard firestore call here, though it might not complete. 
-                // Reliable disconnects require Presence system (Realtime Database), but this is a helper.
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                 deleteDoc(roomRef); 
             }
@@ -623,7 +662,6 @@
         function subscribeRoom(id) {
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', id);
             unsubscribeRoom = onSnapshot(roomRef, (doc) => {
-                // Check if room was deleted
                 if (!doc.exists()) {
                     if (role === 'guest' && isOnline) {
                         alert("Host cancelled the room.");
@@ -631,21 +669,17 @@
                     }
                     return;
                 }
-
                 const data = doc.data();
                 if (!data) return;
                 
-                // Lobby Wait Logic
                 if (el('host-wait-screen').classList.contains('hidden') === false) {
                     el('joined-count').innerText = `${data.players.length} / ${data.maxPlayers}`;
                     if (data.status === 'playing') {
                         el('host-wait-screen').classList.add('hidden');
-                        
-                        // Switch UI Mode
                         if (maxPlayers === 4) {
                             el('arena-1v1').classList.add('hidden');
                             el('arena-4p').classList.remove('hidden');
-                            state.players = {}; // Init local mirror
+                            state.players = {}; 
                             data.players.forEach(pid => {
                                 state.players[pid] = { 
                                     name: data.playerData[pid].name, 
@@ -657,19 +691,14 @@
                             el('arena-1v1').classList.remove('hidden');
                             el('arena-4p').classList.add('hidden');
                         }
-                        
                         initRound(); 
                     }
                     return;
                 }
 
-                // In-Game Logic
                 if (data.status === 'playing') {
-                    if (maxPlayers === 2) {
-                        handle1v1Update(data);
-                    } else {
-                        handle4pUpdate(data);
-                    }
+                    if (maxPlayers === 2) handle1v1Update(data);
+                    else handle4pUpdate(data);
                 }
             });
         }
@@ -680,20 +709,18 @@
             const myData = data.playerData[userId];
             const oppData = data.playerData[oppId];
             
-            // Name Update
             if (oppData && oppData.name) el('header-opp-label').innerHTML = `OPP: ${oppData.name} <span id="cpu-resource"></span>`;
 
-            // Sync Phase
             if (myData && oppData && myData.input && oppData.input) {
                 if (!state.p.resolved) {
                     state.p.resolved = true;
                     ui.wait.classList.add('hidden');
-                    // Sync Opponent Local State
                     state.c.spd = oppData.input.spd || 0;
                     state.c.hp = oppData.input.hp || 0;
                     state.c.atk = oppData.input.atk || 0;
                     state.c.def = oppData.input.def || 0;
                     state.c.total = oppData.input.total || state.c.total;
+                    state.c.item = oppData.input.item || 'none'; // Sync Item
                     
                     if (state.phase === 1) resolvePhase1();
                     else resolvePhase2();
@@ -709,15 +736,14 @@
 
         // --- 4P Logic ---
         function handle4pUpdate(data) {
-            // Update local players state (except Self inputs usually)
+            // Simplified 4P logic (items not fully implemented in 4P for brevity, focusing on 1v1 request)
             data.players.forEach(pid => {
                 if (!state.players[pid]) state.players[pid] = {};
-                // Sync public data
                 const pd = data.playerData[pid];
                 if (pd) {
                     state.players[pid].name = pd.name;
                     state.players[pid].wins = pd.wins || 0;
-                    state.players[pid].total = pd.total || state.players[pid].total; // Total might be updated at end of round
+                    state.players[pid].total = pd.total || state.players[pid].total; 
                     if (pd.phase1) state.players[pid].spd = pd.phase1.spd;
                     if (pd.phase2) {
                         state.players[pid].hp = pd.phase2.hp;
@@ -726,37 +752,27 @@
                     }
                 }
             });
-
             state.targets = data.targets || {};
             state.pickOrder = data.pickOrder || [];
             state.pickIndex = data.pickIndex || 0;
-
             render4PArena();
 
-            // Phase Control
-            // 1. Waiting for Speed Inputs
             const allPhase1 = data.players.every(pid => data.playerData[pid].phase1);
             if (state.phase === 1 && allPhase1 && !state.p.resolved) {
                 state.p.resolved = true;
                 ui.wait.classList.add('hidden');
                 resolvePhase1_4P(data);
             }
-
-            // 2. Target Picking Phase
             if (state.phase === 1.5) {
-                ui.title.innerText = "PHASE 1.5: TARGET ACQUISITION";
+                ui.title.innerText = "PHASE 1.5: TARGET";
                 ui.btn.innerText = "WAITING...";
                 ui.btn.disabled = true;
-                
                 const currentPicker = state.pickOrder[state.pickIndex];
-                if (currentPicker === userId) {
-                    el('notice-msg').innerText = "YOUR TURN: SELECT TARGET";
-                    // Interaction is handled by clicks on cards
-                } else {
+                if (currentPicker === userId) el('notice-msg').innerText = "YOUR TURN: SELECT TARGET";
+                else {
                     const pickerName = state.players[currentPicker]?.name || '???';
                     el('notice-msg').innerText = `${pickerName} IS SELECTING...`;
                 }
-
                 if (state.pickIndex >= 4) {
                     state.phase = 2;
                     state.p.submitted = false;
@@ -772,8 +788,6 @@
                     startTimer(15);
                 }
             }
-
-            // 3. Waiting for Build Inputs
             const allPhase2 = data.players.every(pid => data.playerData[pid].phase2);
             if (state.phase === 2 && allPhase2 && !state.p.resolved) {
                 state.p.resolved = true;
@@ -785,13 +799,10 @@
         async function sendInput(inputData) {
             if (!isOnline) return;
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            
             if (maxPlayers === 2) {
-                // Legacy 1v1 structure logic adapted
                 const updateKey = `playerData.${userId}.input`;
                 await updateDoc(roomRef, { [updateKey]: { ...inputData, total: state.p.total } });
             } else {
-                // 4P Logic
                 let updateKey = "";
                 let payload = {};
                 if (state.phase === 1) {
@@ -805,33 +816,33 @@
             }
         }
 
-        // --- Helper: Disable/Enable Inputs ---
         function toggleInputs(enable) {
             const pointerEvent = enable ? 'auto' : 'none';
             const opacity = enable ? '1' : '0.5';
-            
             ['spd', 'hp', 'atk', 'def'].forEach(k => {
                 if(ui.blocks[k]) {
                     ui.blocks[k].style.pointerEvents = pointerEvent;
                     ui.blocks[k].style.opacity = opacity;
                 }
             });
+            // Items
+            ['none','fast','drone'].forEach(id => {
+                el('item-'+id).style.pointerEvents = pointerEvent;
+                if(!enable) el('item-'+id).classList.add('disabled');
+                else el('item-'+id).classList.remove('disabled');
+            });
             ui.btn.disabled = !enable;
         }
 
-        // --- Timer Logic ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
             ui.timer.innerText = count;
             ui.timer.classList.remove('hidden', 'timer-urgent');
-            
             timerInterval = setInterval(() => {
                 count--;
                 ui.timer.innerText = count;
-                if (count <= 3) {
-                    ui.timer.classList.add('timer-urgent');
-                }
+                if (count <= 3) ui.timer.classList.add('timer-urgent');
                 if (count <= 0) {
                     clearInterval(timerInterval);
                     ui.timer.classList.add('hidden');
@@ -844,8 +855,6 @@
             clearInterval(timerInterval);
             ui.timer.classList.add('hidden');
         }
-
-        // --- Game Logic ---
 
         window.onInput = (key, val) => {
             state.inputs[key] = parseInt(val) || 0;
@@ -865,14 +874,19 @@
             el('real-hp').innerText = Math.ceil(state.inputs.hp * 0.5);
 
             let currentCost = 0;
-            if (state.phase === 1) currentCost = state.inputs.spd;
-            else currentCost = state.inputs.hp + state.inputs.atk + state.inputs.def;
+            if (state.phase === 1) {
+                currentCost = state.inputs.spd;
+                // Item Cost
+                if (state.p.item && ITEMS[state.p.item]) {
+                    currentCost += ITEMS[state.p.item].cost;
+                }
+            } else {
+                currentCost = state.inputs.hp + state.inputs.atk + state.inputs.def;
+            }
 
             const remaining = state.p.total - currentCost;
-            
-            const displayRem = Math.floor(remaining);
-            ui.res.innerText = displayRem;
-            ui.topRes.innerText = displayRem;
+            ui.res.innerText = Math.floor(remaining);
+            ui.topRes.innerText = Math.floor(remaining);
             if (maxPlayers === 2) ui.cpuRes.innerText = Math.floor(state.c.total); 
             
             if (remaining < 0) {
@@ -892,29 +906,46 @@
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
             
+            // Reset Items
+            state.p.item = 'none';
+            selectItem('none');
+            
             state.phase = 1;
             state.p.submitted = false;
             state.p.resolved = false;
             
             ui.p1.classList.remove('hidden');
             ui.p2.classList.add('hidden');
-            ui.title.innerText = "PHASE 1: SPEED INPUT";
+            ui.title.innerText = "PHASE 1: TACTICS & SPEED";
             ui.btn.innerText = "LOCK IN";
+            
+            // Reset visual cards
+            ['spd','hp','atk','def'].forEach(k => {
+                ui.cP[k].innerText = (k==='spd' ? '-' : '-');
+                ui.cC[k].innerText = (k==='spd' ? '?' : '?');
+                ui.cP[k].classList.remove('val-boost');
+                ui.cC[k].classList.remove('val-boost');
+                ui.wrapsP[k].classList.remove('active-turn');
+                ui.wrapsC[k].classList.remove('active-turn');
+                if(k!=='spd') {
+                    ui.wrapsP[k].classList.add('hidden-card');
+                    ui.wrapsC[k].classList.add('hidden-card');
+                }
+            });
+            el('adv-badge').classList.add('hidden');
+            el('adv-badge').classList.remove('scale-100', 'scale-0');
+            el('adv-badge').classList.add('scale-0');
+            el('notice-msg').innerText = "";
+
             toggleInputs(true); 
 
             if(!isOnline) generateCPU();
             if (maxPlayers === 4) {
-                 // Clear old inputs on server for new round?
-                 // Usually handled by incrementing round and ignoring old data, but explicit clear is safer
                  if (role === 'host' && isOnline) {
-                     // Cleanup 4P specific round data
-                     const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-                     // We need to keep 'total' and 'wins' but clear phase1/phase2 inputs
-                     // This is complex in Firestore 'update'. We will rely on overwriting.
+                     // Cleanup 4P
                  }
                  render4PArena();
             } else {
-                 // 1v1 Init
                  if (isOnline && role === 'host') clearRoomInputs();
             }
 
@@ -938,6 +969,7 @@
             const hp = Math.ceil(hpCost * 0.5);
             state.c.spd = spd; state.c.hp = hp; state.c.hpCost = hpCost;
             state.c.atk = atk; state.c.def = def;
+            state.c.item = 'none'; // CPU doesn't use items for now
         }
 
         window.commitPhase = () => {
@@ -947,8 +979,10 @@
 
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
-                state.p.total -= state.p.spd;
-                if(isOnline) sendInput({ spd: state.p.spd });
+                const itemCost = ITEMS[state.p.item].cost;
+                state.p.total -= (state.p.spd + itemCost);
+                
+                if(isOnline) sendInput({ spd: state.p.spd, item: state.p.item });
                 else resolvePhase1();
             } else {
                 state.p.hpCost = state.inputs.hp;
@@ -962,33 +996,23 @@
             }
         }
 
-        // --- 1v1 Resolve ---
         function resolvePhase1() {
-            // Visual Reset
-            ['spd','hp','atk','def'].forEach(k => {
-                ui.cP[k].innerText = (k==='spd' ? '-' : '-');
-                ui.cC[k].innerText = (k==='spd' ? '?' : '?');
-                ui.cP[k].classList.remove('val-boost');
-                ui.cC[k].classList.remove('val-boost');
-                if(k!=='spd') {
-                    ui.wrapsP[k].classList.add('hidden-card');
-                    ui.wrapsC[k].classList.add('hidden-card');
-                    ui.wrapsP[k].classList.remove('active-turn');
-                    ui.wrapsC[k].classList.remove('active-turn');
-                }
-            });
-            el('adv-badge').classList.add('hidden');
-            el('adv-badge').classList.remove('scale-100');
-            el('adv-badge').classList.add('scale-0');
+            if(!isOnline) {
+                state.c.total -= state.c.spd; // CPU cost
+            }
 
-            if(!isOnline) state.c.total -= state.c.spd;
-
-            // Reveal
             ui.btn.innerText = "REVEALING...";
             setTimeout(() => {
                 ui.cP.spd.innerText = state.p.spd;
                 ui.cC.spd.innerText = state.c.spd;
                 
+                // --- Item Reveal & Effect ---
+                let notices = [];
+                if (state.p.item !== 'none') notices.push(`YOU: ${ITEMS[state.p.item].name}`);
+                if (state.c.item !== 'none') notices.push(`OPP: ${ITEMS[state.c.item].name}`);
+                if (notices.length > 0) el('notice-msg').innerText = notices.join(" | ");
+
+                // Logic
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
                     state.pAdv = true;
@@ -1007,6 +1031,11 @@
                             "bg-red-600 text-white font-black text-[10px] px-6 py-1 rounded-full border border-white shadow-xl absolute z-30 transform scale-0 transition-transform duration-300 adv-anim";
                         setTimeout(() => el('adv-badge').classList.remove('scale-0', 'scale-125'), 50);
                     }
+                    
+                    // Spy Drone Effect
+                    if (state.p.item === 'drone' && state.c.total) {
+                        el('notice-msg').innerText += ` [OPP RES: ${Math.floor(state.c.total)}]`;
+                    }
                 }, 600);
             }, 500);
 
@@ -1022,41 +1051,39 @@
                 ui.btn.innerText = "ENGAGE";
                 toggleInputs(true); 
                 updateUI();
-                startTimer(15);
+                
+                // --- Timer Effect ---
+                let time = 15;
+                if (state.c.item === 'fast') time = 4;
+                else if (state.c.item === 'drone') time = 8;
+                
+                // Flash alert if time reduced
+                if(time < 15) {
+                    ui.timer.classList.add('text-red-500');
+                    setTimeout(()=>ui.timer.classList.remove('text-red-500'), 1000);
+                }
+                
+                startTimer(time);
             }, 3000);
-        }
-
-        async function clearRoomInputs() {
-             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-             if (maxPlayers === 2) {
-                 await updateDoc(roomRef, { 'playerData': { [userId]: { input: null }, [Object.keys(state.players || {}).find(k=>k!==userId) || 'guest']: { input: null } } }); 
-                 // Actually this is tricky for 2P structure. 
-                 // Simplified: Resetting inputs in 1v1 is done by writing null to the fields
-                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
-                 if(!snap.empty) {
-                     const d = snap.docs[0].data();
-                     const updates = {};
-                     d.players.forEach(p => updates[`playerData.${p}.input`] = null);
-                     await updateDoc(roomRef, updates);
-                 }
-             } else {
-                 // 4P cleanup if needed, but we separate phase1/phase2 fields so less collision
-             }
         }
 
         function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
-            // 1v1 cleanup handled above or naturally
             startBattleSequence();
         }
 
         function startBattleSequence() {
             state.p.currHp = undefined; state.c.currHp = undefined;
             const pFirst = state.p.spd >= state.c.spd;
-            const pMult = state.pAdv ? 1.5 : 1.0;
-            const cMult = state.cAdv ? 1.5 : 1.0;
+            const pMult = state.pAdv ? 1.2 : 1.0; // 1.2x Multiplier
+            const cMult = state.cAdv ? 1.2 : 1.0;
             const pAtkFinal = Math.ceil(state.p.atk * pMult);
             const cAtkFinal = Math.ceil(state.c.atk * cMult);
+
+            if(state.pAdv || state.cAdv) {
+                el('adv-badge').classList.remove('hidden');
+                el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.2" : "OPP: ATK x1.2";
+            }
 
             const seq = [
                 { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
@@ -1066,17 +1093,40 @@
                     if(!pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
                 }},
                 { t: 3500, f: () => { if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
+                
+                // 1st Attack & Instant Kill Check
                 { t: 4500, f: () => {
-                    if(pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = state.c.hp - dmg; updateHpVal(ui.cC.hp, state.c.currHp); } 
-                    else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = state.p.hp - dmg; updateHpVal(ui.cP.hp, state.p.currHp); }
+                    let dead = false;
+                    if(pFirst) { 
+                        const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
+                        state.c.currHp = state.c.hp - dmg; updateHpVal(ui.cC.hp, state.c.currHp);
+                        if (state.c.currHp <= 0) dead = true; 
+                    } else { 
+                        const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
+                        state.p.currHp = state.p.hp - dmg; updateHpVal(ui.cP.hp, state.p.currHp);
+                        if (state.p.currHp <= 0) dead = true;
+                    }
                     clearHighlights();
+                    
+                    if (dead) {
+                        // Skip remaining turns
+                        setTimeout(() => {
+                            const pHp = Math.max(0, state.p.currHp!==undefined ? state.p.currHp : state.p.hp);
+                            const cHp = Math.max(0, state.c.currHp!==undefined ? state.c.currHp : state.c.hp);
+                            endRound(pHp, cHp);
+                        }, 1000);
+                        return true; // Stop sequence
+                    }
                 }},
+                
                 { t: 6000, f: () => { if(!pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
                 { t: 7000, f: () => {
                     if(!pFirst && state.pAdv) { ui.cP.atk.innerText = pAtkFinal; ui.cP.atk.classList.add('val-boost'); }
                     if(pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
                 }},
                 { t: 8000, f: () => { if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
+                
+                // 2nd Attack
                 { t: 9000, f: () => {
                     if(!pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg; updateHpVal(ui.cC.hp, state.c.currHp); } 
                     else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; updateHpVal(ui.cP.hp, state.p.currHp); }
@@ -1088,22 +1138,24 @@
                     endRound(pHp, cHp);
                 }}
             ];
-            seq.forEach(s => setTimeout(s.f, s.t));
+
+            // Execute sequence with break capability
+            let stop = false;
+            seq.forEach((s, i) => {
+                setTimeout(() => {
+                    if (stop) return;
+                    const res = s.f();
+                    if (res === true) stop = true;
+                }, s.t);
+            });
         }
 
         // --- 4P Resolve ---
         async function resolvePhase1_4P(data) {
-            // Sort by Speed
+            // Simplified 4P logic: Items currently ignored in speed sort
             const pIds = data.players;
             const speeds = pIds.map(pid => ({ id: pid, spd: state.players[pid].spd }));
-            // Sort descending. Random tie break.
             speeds.sort((a,b) => b.spd - a.spd || Math.random() - 0.5);
-            
-            // Refund Bonus
-            // In 4P, if your speed is high, you get refund logic? 
-            // Rule says: "Higher number -> Attack x1.5 & 30% Refund".
-            // Since target is unknown, let's apply refund if you are in top 50%? 
-            // OR: Wait until target is picked. If Spd > Target.Spd -> Refund.
             
             if (role === 'host') {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
@@ -1113,9 +1165,8 @@
                     targets: {}
                 });
             }
-
-            state.phase = 1.5; // Trigger Target Pick UI
-            render4PArena(); // Show speeds
+            state.phase = 1.5; 
+            render4PArena();
         }
 
         window.pickTarget = async (targetId) => {
@@ -1123,20 +1174,17 @@
             const currentPicker = state.pickOrder[state.pickIndex];
             if (currentPicker !== userId) return;
             
-            // Validate: Can't pick if already targeted
             const alreadyTargeted = Object.values(state.targets).includes(targetId);
-            if (alreadyTargeted) return; // Should be handled by UI disabled state, but safety check
+            if (alreadyTargeted) return; 
 
             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
             const newTargets = { ...state.targets, [userId]: targetId };
             
-            // Calculate Refund Here immediately for self? Or wait for server?
-            // Let's do it on server or next sync.
-            // Check Speed advantage
+            // Refund Logic 30% for 4P
             const mySpd = state.players[userId].spd;
             const tSpd = state.players[targetId].spd;
             if (mySpd > tSpd) {
-                state.p.total += Math.ceil(mySpd * 0.3); // Refund
+                state.p.total += Math.ceil(mySpd * 0.3); 
             }
 
             await updateDoc(roomRef, {
@@ -1147,87 +1195,56 @@
 
         function resolvePhase2_4P(data) {
             state.phase = 3;
-            // 4P Battle Logic
-            // Calculate damages locally for display
-            // Everyone is both attacker and defender
-            
+            // 4P: No instant kill rule yet to keep simple, just damage
             let battleLog = [];
-            
             data.players.forEach(attackerId => {
                 const targetId = state.targets[attackerId];
-                if (!targetId) return; // Should not happen
-                
+                if (!targetId) return; 
                 const atkP = state.players[attackerId];
                 const defP = state.players[targetId];
-                
-                // Bonus Check
                 const hasAdvantage = atkP.spd > defP.spd;
-                const finalAtk = Math.ceil(atkP.atk * (hasAdvantage ? 1.5 : 1.0));
+                const finalAtk = Math.ceil(atkP.atk * (hasAdvantage ? 1.2 : 1.0)); // 1.2x
                 const dmg = Math.max(0, finalAtk - defP.def);
-                
-                // Update HP
                 state.players[targetId].currHp = (state.players[targetId].hp) - dmg;
-                
                 battleLog.push({ atk: attackerId, def: targetId, dmg: dmg, adv: hasAdvantage });
             });
-            
-            // Visualize 4P Battle (Simplified)
-            // 1. Reveal All Stats
             el('4p-p-spd').innerText = state.players[userId].spd;
             el('4p-p-hp').innerText = state.players[userId].hp;
             el('4p-p-atk').innerText = state.players[userId].atk;
             el('4p-p-def').innerText = state.players[userId].def;
-            render4PArena(true); // Reveal opponents
+            render4PArena(true); 
 
-            // 2. Show Damage floats
             setTimeout(() => {
                 battleLog.forEach(log => {
-                    // If I took damage
                     if (log.def === userId) {
                          const attackerName = state.players[log.atk].name;
-                         hit('p', log.dmg); // Red float on me
+                         hit('p', log.dmg); 
                          el('notice-msg').innerText = `${attackerName} HIT YOU FOR ${log.dmg}!`;
                     }
-                    // If I dealt damage
                     if (log.atk === userId) {
-                        // Find the target card and float blue
-                        // Since we don't have individual IDs for dynamic cards easily in this simplified renderer,
-                        // we'll just show a generic float or notice.
                         const targetName = state.players[log.def].name;
                         el('notice-msg').innerText = `YOU HIT ${targetName} FOR ${log.dmg}!`;
                     }
                 });
             }, 1500);
 
-            // 3. End Round
             setTimeout(() => {
                 if (role === 'host') {
-                    // Calculate Wins
-                    const pIds = data.players;
-                    // Sort by remaining HP? Or just surviving? 
-                    // Rule: "HPが多い方がラウンド勝利" (Whoever has more HP wins round).
-                    // In 4P, we can give a win to top 2? Or just 1 winner?
-                    // Let's say top HP gets a win point.
-                    
                     let bestHp = -9999;
+                    const pIds = data.players;
                     pIds.forEach(pid => {
                         const hp = state.players[pid].currHp !== undefined ? state.players[pid].currHp : state.players[pid].hp;
                         if (hp > bestHp) bestHp = hp;
                     });
-                    
                     const winners = pIds.filter(pid => {
                         const hp = state.players[pid].currHp !== undefined ? state.players[pid].currHp : state.players[pid].hp;
                         return hp === bestHp;
                     });
-                    
-                    // Update Wins in Firestore
                     const updates = {};
                     winners.forEach(w => {
                         updates[`playerData.${w}.wins`] = (data.playerData[w].wins || 0) + 1;
-                        updates[`playerData.${w}.total`] = state.players[w].total; // Persist total changes
+                        updates[`playerData.${w}.total`] = state.players[w].total;
                     });
-                    
-                    // Reset round data
                     const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                     updateDoc(roomRef, {
                         ...updates,
@@ -1238,8 +1255,6 @@
                         targets: {},
                         [`playerData.${userId}.phase1`]: deleteField(),
                         [`playerData.${userId}.phase2`]: deleteField()
-                        // Ideally delete for all, but only host can easily write multiple fields.
-                        // Simplified: We just increment round. Clients will initRound when they see round change.
                     });
                 }
             }, 4000);
@@ -1249,25 +1264,17 @@
         function render4PArena(reveal = false) {
             const container = el('opp-list-4p');
             container.innerHTML = '';
-            
             const opponentIds = Object.keys(state.players).filter(id => id !== userId);
-            
             opponentIds.forEach(oppId => {
                 const p = state.players[oppId];
                 const isTargeted = Object.values(state.targets).includes(oppId);
                 const isMyTarget = state.targets[userId] === oppId;
-                
-                // Picking Logic
                 const currentPicker = state.pickOrder[state.pickIndex];
                 const isPicking = state.phase === 1.5 && currentPicker === userId;
                 const canPick = isPicking && !isTargeted;
-                
                 const cardClass = `opp-card-4p ${isTargeted ? 'targeted' : ''} ${isMyTarget ? 'my-target' : ''} ${canPick ? 'targetable' : ''}`;
-                
                 const onClick = canPick ? `pickTarget('${oppId}')` : '';
-                
                 const spdDisp = (state.phase >= 1.5) ? p.spd : '?';
-                
                 let statsHtml = '';
                 if (reveal) {
                     statsHtml = `
@@ -1280,8 +1287,6 @@
                 } else {
                     statsHtml = `<div class="text-[8px] text-gray-500 mt-1 tracking-widest">BUILDING...</div>`;
                 }
-
-                // Show target status
                 let statusBadge = '';
                 if (isTargeted) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-red-900 text-red-200 px-1">LOCKED</div>';
                 if (isMyTarget) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-blue-500 text-black px-1 font-bold">TARGET</div>';
@@ -1300,10 +1305,7 @@
                 `;
                 container.innerHTML += html;
             });
-            
-            // Render Self Stats in 4P mini view
-            el('4p-p-spd').innerText = state.inputs.spd; // Real-time input view
-            // Only update these if inputs change, handled by updateUI
+            el('4p-p-spd').innerText = state.inputs.spd; 
         }
 
         // --- Visual Helpers ---
@@ -1317,15 +1319,12 @@
         }
 
         function endRound(pHp, cHp) {
-            if (maxPlayers === 4) return; // 4P handled separately
-            
+            if (maxPlayers === 4) return;
             let title = "DRAW"; let color = "text-yellow-500";
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="cyber-text"; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
-            
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
-            
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             el('res-content').innerHTML = `
@@ -1348,8 +1347,7 @@
         }
 
         window.nextRound = () => {
-            if (maxPlayers === 4) return; // 4P auto loops
-            
+            if (maxPlayers === 4) return; 
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
