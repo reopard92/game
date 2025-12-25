@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：37</title>
+    <title>Resource Strategy Card Battle：38</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -120,12 +120,12 @@
             opacity: 0;
         }
         .cutin-container {
-            display: flex; flex-direction: row; gap: 16px; align-items: center; justify-content: center;
+            display: flex; flex-direction: row; gap: 12px; align-items: flex-start; justify-content: center;
             transform: scale(0.8); opacity: 0;
         }
         .cutin-box {
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            width: 120px;
+            width: 140px;
         }
         .cutin-label { font-family: 'Black Ops One'; font-size: 1.2rem; text-shadow: 0 0 5px currentColor; }
         .cutin-img-box {
@@ -137,11 +137,16 @@
         
         .cutin-img { width: 100%; height: 100%; object-fit: cover; }
         .cutin-name {
-            font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 0.9rem; color: #fff;
-            text-align: center; margin-top: 4px;
+            font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 1rem; color: #fff;
+            text-align: center; margin-top: 4px; text-shadow: 0 0 2px #000;
+        }
+        .cutin-desc-sm {
+            font-family: 'Noto Sans JP', sans-serif; font-size: 0.7rem; color: #cbd5e1;
+            text-align: center; line-height: 1.2; background: rgba(0,0,0,0.6);
+            padding: 2px 4px; border-radius: 4px; width: 100%;
         }
         
-        .vs-text { font-family: 'Black Ops One'; font-size: 3rem; color: #fbbf24; text-shadow: 0 0 10px #fbbf24; margin: 0 10px; }
+        .vs-text { font-family: 'Black Ops One'; font-size: 3rem; color: #fbbf24; text-shadow: 0 0 10px #fbbf24; margin-top: 30px; }
 
         @keyframes cutin-anim {
             0% { opacity: 0; }
@@ -191,7 +196,7 @@
 </head>
 <body class="select-none">
 
-    <!-- Cut-in Layer (New Dual Design) -->
+    <!-- Cut-in Layer (New Dual Design with Desc) -->
     <div id="item-cutin" class="">
         <div id="cutin-bg" class="cutin-overlay">
             <div class="cutin-container">
@@ -202,6 +207,7 @@
                         <img id="cutin-img-p" class="cutin-img" src="" alt="">
                     </div>
                     <div id="cutin-name-p" class="cutin-name">NO ITEM</div>
+                    <div id="cutin-desc-p" class="cutin-desc-sm"></div>
                 </div>
                 
                 <div class="vs-text">VS</div>
@@ -213,6 +219,7 @@
                         <img id="cutin-img-c" class="cutin-img" src="" alt="">
                     </div>
                     <div id="cutin-name-c" class="cutin-name">NO ITEM</div>
+                    <div id="cutin-desc-c" class="cutin-desc-sm"></div>
                 </div>
             </div>
         </div>
@@ -327,7 +334,7 @@
                     <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
                     <div class="item-grid">
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
-                            <div class="item-label">購入しない</div>
+                            <div class="item-label">アイテムなし</div>
                             <div class="item-cost">0 PT</div>
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
@@ -396,8 +403,8 @@
         </div>
 
         <div class="action-area">
-            <div class="text-[9px] text-center mb-1 text-gray-400">REMAIN</div>
-            <div id="sheet-resource" class="text-center font-tech font-bold text-blue-400 text-lg mb-2">1000</div>
+            <div class="text-[9px] text-center mb-1 text-gray-400">COST</div>
+            <div id="sheet-resource" class="text-center font-tech font-bold text-blue-400 text-lg mb-2">0</div>
             <button id="action-btn" class="btn-action-side" onclick="commitPhase()">
                 LOCK IN
             </button>
@@ -523,7 +530,7 @@
 
         // Item Defs (Japanese, PNG)
         const ITEMS = {
-            'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
@@ -568,8 +575,10 @@
             cutinName: el('cutin-name'),
             cutinImgP: el('cutin-img-p'),
             cutinNameP: el('cutin-name-p'),
+            cutinDescP: el('cutin-desc-p'), // desc ref added
             cutinImgC: el('cutin-img-c'),
             cutinNameC: el('cutin-name-c'),
+            cutinDescC: el('cutin-desc-c'), // desc ref added
             
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
@@ -645,10 +654,12 @@
                 }
 
                 ui.cutinNameP.innerText = pItem.name;
+                ui.cutinDescP.innerText = pItem.desc; // Set description
                 ui.cutinImgP.src = pItem.img || "";
                 ui.cutinImgP.style.display = pItem.img ? 'block' : 'none';
                 
                 ui.cutinNameC.innerText = cItem.name;
+                ui.cutinDescC.innerText = cItem.desc; // Set description
                 ui.cutinImgC.src = cItem.img || "";
                 ui.cutinImgC.style.display = cItem.img ? 'block' : 'none';
 
@@ -1020,17 +1031,21 @@
             }
 
             const remaining = state.p.total - currentCost;
-            ui.res.innerText = Math.floor(remaining);
-            ui.topRes.innerText = Math.floor(remaining);
+            
+            // --- UPDATED DISPLAY: Show COST instead of REMAIN ---
+            ui.res.innerText = Math.floor(currentCost);
+            // Color logic: if remaining < 0, show red text on COST to indicate "Over Budget"
+            if (remaining < 0) ui.res.classList.add('text-red-500');
+            else ui.res.classList.remove('text-red-500');
+
+            ui.topRes.innerText = Math.floor(remaining); // Header still shows remaining
             if (maxPlayers === 2) ui.cpuRes.innerText = Math.floor(state.c.total); 
             
             if (remaining < 0) {
-                ui.res.classList.add('text-red-500');
                 ui.btn.disabled = true;
                 ui.err.innerText = "OVER LIMIT";
                 return false;
             } else {
-                ui.res.classList.remove('text-red-500');
                 if (state.phase !== 1.5) ui.btn.disabled = false;
                 ui.err.innerText = "";
                 return true;
@@ -1041,8 +1056,17 @@
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
             
+            // --- Item Reset Logic ---
             state.p.item = 'none';
-            selectItem('none');
+            // Force UI update to 'none' state
+            ['none','fast','prot'].forEach(id => {
+                const btn = el('item-'+id);
+                if (id === 'none') btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+            const item = ITEMS['none'];
+            ui.infoTitle.innerText = item.name;
+            ui.infoDesc.innerText = item.desc;
             
             state.phase = 1;
             state.p.submitted = false;
