@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：36</title>
+    <title>Resource Strategy Card Battle：37</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -111,54 +111,54 @@
         .item-info-title { font-size: 10px; font-weight: bold; color: var(--neon-blue); margin-bottom: 2px; }
         .item-info-desc { font-size: 9px; color: #cbd5e1; line-height: 1.2; }
 
-        /* Item Cut-in Animation */
+        /* Updated Dual Cut-in */
         #item-cutin { pointer-events: none; }
         .cutin-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 60;
+            background: rgba(0,0,0,0.85); z-index: 60;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0;
         }
-        .cutin-content {
-            transform: scale(0.5); opacity: 0;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        .cutin-container {
+            display: flex; flex-direction: row; gap: 16px; align-items: center; justify-content: center;
+            transform: scale(0.8); opacity: 0;
         }
+        .cutin-box {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            width: 120px;
+        }
+        .cutin-label { font-family: 'Black Ops One'; font-size: 1.2rem; text-shadow: 0 0 5px currentColor; }
         .cutin-img-box {
-            width: 120px; height: 120px; border: 2px solid var(--neon-blue);
-            border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px var(--neon-blue);
-            background: #000;
+            width: 100px; height: 100px; border: 2px solid; border-radius: 8px; 
+            overflow: hidden; background: #000; position: relative;
         }
+        .cutin-img-box.p { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        .cutin-img-box.c { border-color: #ef4444; box-shadow: 0 0 15px #ef4444; }
+        
         .cutin-img { width: 100%; height: 100%; object-fit: cover; }
-        .cutin-text {
-            font-family: 'Black Ops One'; font-size: 2rem; color: #fff;
-            text-shadow: 0 0 10px var(--neon-blue); text-align: center;
+        .cutin-name {
+            font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 0.9rem; color: #fff;
+            text-align: center; margin-top: 4px;
         }
-        .cutin-sub {
-            font-family: 'Rajdhani'; font-size: 1rem; color: #cbd5e1;
-        }
-        .cutin-desc {
-            font-family: 'Noto Sans JP', sans-serif; font-size: 0.9rem; color: #fff;
-            background: rgba(0, 0, 0, 0.6); padding: 4px 12px; border-radius: 4px;
-            border: 1px solid #334155; max-width: 80%; text-align: center;
-        }
+        
+        .vs-text { font-family: 'Black Ops One'; font-size: 3rem; color: #fbbf24; text-shadow: 0 0 10px #fbbf24; margin: 0 10px; }
 
         @keyframes cutin-anim {
             0% { opacity: 0; }
             10% { opacity: 1; }
-            20% { opacity: 1; }
-            80% { opacity: 1; } /* Extended Duration */
+            90% { opacity: 1; } 
             100% { opacity: 0; }
         }
         
         @keyframes cutin-scale {
-            0% { transform: scale(2); opacity: 0; }
-            10% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(1.5); opacity: 0; }
+            15% { transform: scale(1); opacity: 1; }
             90% { transform: scale(1); opacity: 1; }
             100% { transform: scale(0.8); opacity: 0; }
         }
 
         .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
-        .animate-cutin .cutin-content { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
         /* Timer - Adjusted z-index and opacity */
         .phase-timer {
@@ -191,16 +191,29 @@
 </head>
 <body class="select-none">
 
-    <!-- Cut-in Layer -->
+    <!-- Cut-in Layer (New Dual Design) -->
     <div id="item-cutin" class="">
         <div id="cutin-bg" class="cutin-overlay">
-            <div class="cutin-content">
-                <div class="cutin-sub" id="cutin-user">PLAYER USED</div>
-                <div class="cutin-img-box">
-                    <img id="cutin-img" class="cutin-img" src="" alt="ITEM">
+            <div class="cutin-container">
+                <!-- Player Side -->
+                <div class="cutin-box">
+                    <div class="cutin-label text-blue-400">YOU</div>
+                    <div class="cutin-img-box p">
+                        <img id="cutin-img-p" class="cutin-img" src="" alt="">
+                    </div>
+                    <div id="cutin-name-p" class="cutin-name">NO ITEM</div>
                 </div>
-                <div id="cutin-name" class="cutin-text">ITEM NAME</div>
-                <div id="cutin-desc" class="cutin-desc">ITEM DESCRIPTION</div>
+                
+                <div class="vs-text">VS</div>
+
+                <!-- Opponent Side -->
+                <div class="cutin-box">
+                    <div class="cutin-label text-red-500">OPPONENT</div>
+                    <div class="cutin-img-box c">
+                        <img id="cutin-img-c" class="cutin-img" src="" alt="">
+                    </div>
+                    <div id="cutin-name-c" class="cutin-name">NO ITEM</div>
+                </div>
             </div>
         </div>
     </div>
@@ -511,7 +524,7 @@
         // Item Defs (Japanese, PNG)
         const ITEMS = {
             'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.png" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
 
@@ -552,9 +565,11 @@
             cutin: el('item-cutin'),
             cutinOverlay: el('cutin-bg'),
             cutinUser: el('cutin-user'),
-            cutinImg: el('cutin-img'),
             cutinName: el('cutin-name'),
-            cutinDesc: el('cutin-desc'), // Added ref
+            cutinImgP: el('cutin-img-p'),
+            cutinNameP: el('cutin-name-p'),
+            cutinImgC: el('cutin-img-c'),
+            cutinNameC: el('cutin-name-c'),
             
             cP: { spd: el('card-p-spd'), hp: el('card-p-hp'), atk: el('card-p-atk'), def: el('card-p-def') },
             cC: { spd: el('card-c-spd'), hp: el('card-c-hp'), atk: el('card-c-atk'), def: el('card-c-def') },
@@ -618,15 +633,25 @@
         };
 
         // --- Cut-in Logic ---
-        function showItemCutin(userType, itemId) {
-            const item = ITEMS[itemId];
-            if (!item || itemId === 'none') return Promise.resolve();
-
+        function showDualCutin(pItemKey, cItemKey) {
             return new Promise((resolve) => {
-                ui.cutinUser.innerText = userType === 'player' ? "YOU ACTIVATED" : "OPPONENT ACTIVATED";
-                ui.cutinName.innerText = item.name;
-                ui.cutinDesc.innerText = item.desc; // Set description
-                ui.cutinImg.src = item.img;
+                const pItem = ITEMS[pItemKey];
+                const cItem = ITEMS[cItemKey];
+                
+                // If both are none, skip animation
+                if (pItemKey === 'none' && cItemKey === 'none') {
+                    resolve();
+                    return;
+                }
+
+                ui.cutinNameP.innerText = pItem.name;
+                ui.cutinImgP.src = pItem.img || "";
+                ui.cutinImgP.style.display = pItem.img ? 'block' : 'none';
+                
+                ui.cutinNameC.innerText = cItem.name;
+                ui.cutinImgC.src = cItem.img || "";
+                ui.cutinImgC.style.display = cItem.img ? 'block' : 'none';
+
                 ui.cutin.classList.add('animate-cutin');
                 
                 setTimeout(() => {
@@ -1137,22 +1162,12 @@
             const pHasItem = state.p.item !== 'none';
             const cHasItem = state.c.item !== 'none';
             
-            let delay = 1000;
-            
-            if (pHasItem) {
-                setTimeout(async () => {
-                    await showItemCutin('player', state.p.item);
-                }, delay);
-                delay += 4500;
-            }
-            
-            if (cHasItem) {
-                setTimeout(async () => {
-                    await showItemCutin('cpu', state.c.item);
-                }, delay);
-                delay += 4500;
-            }
+            // Show Dual Cut-in
+            setTimeout(async () => {
+                await showDualCutin(state.p.item, state.c.item);
+            }, 1000);
 
+            // Wait for cutin (4s) + margin
             setTimeout(() => {
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
@@ -1175,7 +1190,7 @@
                 state.phase = 2;
                 state.p.submitted = false;
                 state.p.resolved = false;
-                if(isOnline && role === 'host') clearRoomInputs(); // Moved here to fix race condition
+                if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
 
                 setTimeout(() => {
                     ui.p1.classList.add('hidden');
@@ -1186,8 +1201,7 @@
                     updateUI();
                     
                     let time = 15;
-                    if (state.c.item === 'fast') time = 4;
-                    // Drone timer reduction removed
+                    if (state.c.item === 'fast') time = 7;
                     
                     if(time < 15) {
                         ui.timer.classList.add('text-red-500');
@@ -1196,7 +1210,23 @@
                     startTimer(time);
                 }, 1500);
 
-            }, delay + 500);
+            }, 5500); // 1000 delay + 4000 cutin + 500 margin
+        }
+
+        async function clearRoomInputs() {
+             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+             if (maxPlayers === 2) {
+                 // Fix: Don't overwrite playerData. Just nullify input for players.
+                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                 if(!snap.empty) {
+                     const d = snap.docs[0].data();
+                     const updates = {};
+                     d.players.forEach(p => updates[`playerData.${p}.input`] = null);
+                     await updateDoc(roomRef, updates);
+                 }
+             } else {
+                 // 4P cleanup logic handled separately or by round increment
+             }
         }
 
         function resolvePhase2() {
