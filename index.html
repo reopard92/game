@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：33</title>
+    <title>Resource Strategy Card Battle：34</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@600;700&family=Roboto:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -317,10 +317,10 @@
                             <div class="item-label text-red-400">早送り</div>
                             <div class="item-cost">50 PT</div>
                         </div>
-                        <div class="item-btn" id="item-drone" onclick="selectItem('drone')" oncontextmenu="return false;">
-                            <img src="ドローン.png" class="item-img" onerror="this.style.display='none'">
-                            <div class="item-label text-green-400">ドローン</div>
-                            <div class="item-cost">50 PT</div>
+                        <div class="item-btn" id="item-prot" onclick="selectItem('prot')" oncontextmenu="return false;">
+                            <img src="01プロテクション.png" class="item-img" onerror="this.style.display='none'">
+                            <div class="item-label text-blue-400">01プロテクション</div>
+                            <div class="item-cost">80 PT</div>
                         </div>
                     </div>
                     
@@ -507,7 +507,7 @@
         const ITEMS = {
             'none': { cost: 0, name: "購入しない", desc: "アイテムなし。通常の戦術で戦う。", img: "" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を4秒に短縮させる。", img: "早送り.png" },
-            'drone': { cost: 50, name: "ドローン", desc: "相手の合計消費リソースを暴き、時間を8秒にする。", img: "ドローン.png" }
+            'prot': { cost: 80, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
 
         let state = {
@@ -597,7 +597,7 @@
             state.p.item = itemId;
             
             // UI Update
-            ['none','fast','drone'].forEach(id => {
+            ['none','fast','prot'].forEach(id => {
                 const btn = el('item-'+id);
                 if (id === itemId) btn.classList.add('selected');
                 else btn.classList.remove('selected');
@@ -917,7 +917,7 @@
                     ui.blocks[k].style.opacity = opacity;
                 }
             });
-            ['none','fast','drone'].forEach(id => {
+            ['none','fast','prot'].forEach(id => {
                 el('item-'+id).style.pointerEvents = pointerEvent;
                 if(!enable) el('item-'+id).classList.add('disabled');
                 else el('item-'+id).classList.remove('disabled');
@@ -925,28 +925,15 @@
             ui.btn.disabled = !enable;
         }
 
-        // --- Timer Logic (Modified for Drone) ---
         function startTimer(seconds) {
             clearInterval(timerInterval);
             let count = seconds;
             ui.timer.innerText = count;
             ui.timer.classList.remove('hidden', 'timer-urgent');
-            
             timerInterval = setInterval(() => {
                 count--;
                 ui.timer.innerText = count;
-                
-                // --- Drone Effect: Reveal at remaining 7s (8s elapsed) ---
-                if (state.p.item === 'drone' && count === 7) {
-                     const used = state.c.hpCost + state.c.atk + state.c.def;
-                     el('notice-msg').innerText = `解析完了: 敵使用コスト ${used} PT`;
-                     ui.timer.classList.add('text-green-400'); // Visual clue
-                     setTimeout(()=>ui.timer.classList.remove('text-green-400'), 500);
-                }
-                
-                if (count <= 3) {
-                    ui.timer.classList.add('timer-urgent');
-                }
+                if (count <= 3) ui.timer.classList.add('timer-urgent');
                 if (count <= 0) {
                     clearInterval(timerInterval);
                     ui.timer.classList.add('hidden');
@@ -1161,7 +1148,7 @@
                     
                     let time = 15;
                     if (state.c.item === 'fast') time = 4;
-                    else if (state.c.item === 'drone') time = 8;
+                    // Drone timer reduction removed
                     
                     if(time < 15) {
                         ui.timer.classList.add('text-red-500');
@@ -1204,12 +1191,32 @@
                     let dead = false;
                     if(pFirst) { 
                         const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
-                        state.c.currHp = state.c.hp - dmg; updateHpVal(ui.cC.hp, state.c.currHp);
-                        if (state.c.currHp <= 0) dead = true; 
+                        state.c.currHp = state.c.hp - dmg; 
+                        
+                        // Protection Item Check
+                        if (state.c.currHp <= 0) {
+                            if (state.c.item === 'prot') {
+                                state.c.currHp = 1;
+                                el('notice-msg').innerText = "OPPONENT PROTECTION ACTIVATED!";
+                            } else {
+                                dead = true;
+                            }
+                        }
+                        updateHpVal(ui.cC.hp, state.c.currHp);
                     } else { 
                         const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
-                        state.p.currHp = state.p.hp - dmg; updateHpVal(ui.cP.hp, state.p.currHp);
-                        if (state.p.currHp <= 0) dead = true;
+                        state.p.currHp = state.p.hp - dmg; 
+                        
+                        // Protection Item Check
+                        if (state.p.currHp <= 0) {
+                            if (state.p.item === 'prot') {
+                                state.p.currHp = 1;
+                                el('notice-msg').innerText = "PROTECTION ACTIVATED!";
+                            } else {
+                                dead = true;
+                            }
+                        }
+                        updateHpVal(ui.cP.hp, state.p.currHp);
                     }
                     clearHighlights();
                     
@@ -1231,8 +1238,26 @@
                 { t: 8000, f: () => { if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
                 
                 { t: 9000, f: () => {
-                    if(!pFirst) { const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg; updateHpVal(ui.cC.hp, state.c.currHp); } 
-                    else { const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; updateHpVal(ui.cP.hp, state.p.currHp); }
+                    if(!pFirst) { 
+                        const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
+                        state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
+                        
+                        // Protection Check (2nd hit also protected? Usually once per battle or round)
+                        // If logic: "Survive lethal damage". 
+                        // Let's assume it works once per round. If triggered 1st hit, maybe not 2nd?
+                        // Simplified: It prevents death *this round*. So keep at 1.
+                        if (state.c.currHp <= 0 && state.c.item === 'prot') state.c.currHp = 1;
+                        
+                        updateHpVal(ui.cC.hp, state.c.currHp); 
+                    } 
+                    else { 
+                        const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
+                        state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; 
+                        
+                        if (state.p.currHp <= 0 && state.p.item === 'prot') state.p.currHp = 1;
+                        
+                        updateHpVal(ui.cP.hp, state.p.currHp); 
+                    }
                     clearHighlights();
                 }},
                 { t: 10500, f: () => {
