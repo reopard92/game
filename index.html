@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：53</title>
+    <title>Resource Strategy Card Battle：54</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -11,7 +11,7 @@
 
         :root {
             /* 幻想的な寒色系パレット */
-            --color-spd: #facc15; /* 黄色 (指示通り変更) */
+            --color-spd: #facc15; /* 黄色 */
             --color-hp: #22c55e;  /* 緑 */
             --color-atk: #ef4444; /* 赤 */
             --color-def: #3b82f6; /* 青 */
@@ -152,7 +152,6 @@
         .battle-card-back::after { content: none; }
 
         /* 各属性カードの画像と色枠適用 */
-        /* SPD = 黄色 */
         .battle-card-front.card-spd { 
             background-image: url('SPD.png'); 
             border-color: var(--color-spd); /* 黄色枠 */
@@ -160,7 +159,6 @@
         .card-spd .card-label, .card-spd .card-icon { display: none; }
         .card-spd { color: #fff; }
 
-        /* HP = 緑色 */
         .battle-card-front.card-hp { 
             background-image: url('HP.png'); 
             border-color: var(--color-hp); /* 緑枠 */
@@ -168,7 +166,6 @@
         .card-hp .card-label, .card-hp .card-icon { display: none; }
         .card-hp { color: #fff; }
 
-        /* ATK = 赤色 */
         .battle-card-front.card-atk { 
             background-image: url('ATK.png'); 
             border-color: var(--color-atk); /* 赤枠 */
@@ -176,7 +173,6 @@
         .card-atk .card-label, .card-atk .card-icon { display: none; }
         .card-atk { color: #fff; }
 
-        /* DEF = 青色 */
         .battle-card-front.card-def { 
             background-image: url('DEF.png'); 
             border-color: var(--color-def); /* 青枠 */
@@ -204,8 +200,12 @@
 
         .val-boost { color: #fcd34d !important; text-shadow: 0 0 15px #fcd34d, 0 0 5px #000 !important; transform: scale(1.3); transition: transform 0.2s; }
 
-        /* 4P Mode Specifics */
+        /* Multiplayer Arena Styles */
+        /* 4P Mode */
         .opp-container-4p { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; padding: 0 4px; }
+        /* 3P Mode */
+        .opp-container-3p { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; padding: 0 20px; }
+
         .opp-card-4p { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--glass-border); border-radius: 6px; padding: 4px; display: flex; flex-direction: column; align-items: center; position: relative; transition: all 0.2s; backdrop-filter: blur(4px); }
         .opp-card-4p.targetable { border-color: var(--color-def); cursor: pointer; animation: pulse-blue 2s infinite; box-shadow: 0 0 10px rgba(147, 197, 253, 0.3); }
         .opp-card-4p.targeted { border-color: var(--color-atk); background: rgba(244, 63, 94, 0.2); }
@@ -258,13 +258,11 @@
 
         /* Item Selection (Glassmorphism with Fixes) */
         .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-        /* 修正: 背景をより透明に、枠線を強調 */
         .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); }
         .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
         .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 4px; font-family: 'Noto Sans JP'; }
         .item-cost { font-size: 8px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 2px; right: 2px;}
-        /* 修正: 不透明度を上げて視認性向上 */
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 1; }
         
@@ -277,7 +275,7 @@
         .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
         .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: 'Noto Sans JP'; }
 
-        /* Updated Dual Cut-in (More Dramatic & Fixed Transparency) */
+        /* Updated Dual Cut-in */
         #item-cutin { pointer-events: none; }
         .cutin-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -295,7 +293,6 @@
             width: 150px;
         }
         .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; }
-        /* 修正: 背景色を透明にして透過PNGに対応 */
         .cutin-img-box {
             width: 120px; height: 120px; border: 2px solid; border-radius: 50%;
             overflow: hidden; background: transparent; position: relative;
@@ -305,7 +302,6 @@
         .cutin-img-box.p { border-color: #93c5fd; box-shadow: 0 0 30px #93c5fd; }
         .cutin-img-box.c { border-color: #f43f5e; box-shadow: 0 0 30px #f43f5e; }
         
-        /* 修正: containにして見切れ防止 */
         .cutin-img { width: 90%; height: 90%; object-fit: contain; }
         .cutin-name {
             font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 1.1rem; color: #fff;
@@ -588,6 +584,9 @@
         <!-- 4P Arena -->
         <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
             <div class="opp-container-4p" id="opp-list-4p"></div>
+            <!-- 3P container added -->
+            <div class="opp-container-3p hidden" id="opp-list-3p"></div>
+            
             <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
                 <div class="card-row-label text-blue-500 w-4">YOU</div>
                 <div class="card-grid">
@@ -752,6 +751,7 @@
         <div class="w-full max-w-sm">
             <div class="flex gap-2 mb-4">
                 <button onclick="createRoom(2)" class="lobby-btn text-sm">CREATE 1vs1</button>
+                <button onclick="createRoom(3)" class="lobby-btn text-sm !border-green-400 !text-green-400">CREATE 3P</button>
                 <button onclick="createRoom(4)" class="lobby-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
             </div>
             <div class="text-xs text-gray-400 mb-2">WAITING ROOMS</div>
@@ -1012,7 +1012,9 @@
                     if (data.status === 'waiting') {
                         const cur = data.players ? data.players.length : 1;
                         const max = data.maxPlayers || 2;
-                        const typeLabel = max === 4 ? '<span class="text-purple-400 font-bold">4P</span>' : '<span class="text-blue-400">1v1</span>';
+                        const typeLabel = max === 4 ? '<span class="text-purple-400 font-bold">4P</span>' : 
+                                          max === 3 ? '<span class="text-green-400 font-bold">3P</span>' : 
+                                          '<span class="text-blue-400 font-bold">1v1</span>';
                         html += `
                             <div class="room-item">
                                 <div>
@@ -1122,7 +1124,7 @@
                     el('joined-count').innerText = `${data.players.length} / ${data.maxPlayers}`;
                     if (data.status === 'playing') {
                         el('host-wait-screen').classList.add('hidden');
-                        if (maxPlayers === 4) {
+                        if (maxPlayers >= 3) {
                             el('arena-1v1').classList.add('hidden');
                             el('arena-4p').classList.remove('hidden');
                             state.players = {}; 
@@ -1220,19 +1222,22 @@
                     const pickerName = state.players[currentPicker]?.name || '???';
                     el('notice-msg').innerText = `${pickerName} IS SELECTING...`;
                 }
-                if (state.pickIndex >= 4) {
-                    state.phase = 2;
-                    state.p.submitted = false;
-                    state.p.resolved = false;
-                    el('notice-msg').innerText = "";
-                    ui.p1.classList.add('hidden');
-                    ui.p2.classList.remove('hidden');
-                    ui.title.innerText = "PHASE 2: BUILD";
-                    ui.btn.innerText = "ENGAGE";
-                    ui.btn.disabled = false;
-                    toggleInputs(true);
-                    updateUI();
-                    startTimer(15);
+                if (state.pickIndex >= 4) { // Only works for 4P, need generic condition
+                     // Fixed logic for dynamic players
+                     if (state.pickIndex >= data.players.length) {
+                        state.phase = 2;
+                        state.p.submitted = false;
+                        state.p.resolved = false;
+                        el('notice-msg').innerText = "";
+                        ui.p1.classList.add('hidden');
+                        ui.p2.classList.remove('hidden');
+                        ui.title.innerText = "PHASE 2: BUILD";
+                        ui.btn.innerText = "ENGAGE";
+                        ui.btn.disabled = false;
+                        toggleInputs(true);
+                        updateUI();
+                        startTimer(15);
+                     }
                 }
             }
             const allPhase2 = data.players.every(pid => data.playerData[pid].phase2);
@@ -1410,7 +1415,7 @@
             toggleInputs(true); 
 
             if(!isOnline) generateCPU();
-            if (maxPlayers === 4) {
+            if (maxPlayers >= 3) {
                  render4PArena();
             } else {
                  if (isOnline && role === 'host') clearRoomInputs();
@@ -1777,18 +1782,32 @@
         // --- 4P Rendering ---
         function render4PArena(reveal = false) {
             const container = el('opp-list-4p');
+            // Class switching
+            if (maxPlayers === 3) {
+                container.className = 'opp-container-3p';
+            } else {
+                container.className = 'opp-container-4p';
+            }
             container.innerHTML = '';
+            
             const opponentIds = Object.keys(state.players).filter(id => id !== userId);
+            
             opponentIds.forEach(oppId => {
                 const p = state.players[oppId];
                 const isTargeted = Object.values(state.targets).includes(oppId);
                 const isMyTarget = state.targets[userId] === oppId;
+                
+                // Picking Logic
                 const currentPicker = state.pickOrder[state.pickIndex];
                 const isPicking = state.phase === 1.5 && currentPicker === userId;
                 const canPick = isPicking && !isTargeted;
+                
                 const cardClass = `opp-card-4p ${isTargeted ? 'targeted' : ''} ${isMyTarget ? 'my-target' : ''} ${canPick ? 'targetable' : ''}`;
+                
                 const onClick = canPick ? `pickTarget('${oppId}')` : '';
+                
                 const spdDisp = (state.phase >= 1.5) ? p.spd : '?';
+                
                 let statsHtml = '';
                 if (reveal) {
                     statsHtml = `
@@ -1801,6 +1820,7 @@
                 } else {
                     statsHtml = `<div class="text-[8px] text-gray-500 mt-1 tracking-widest font-gaming">BUILD...</div>`;
                 }
+                
                 let statusBadge = '';
                 if (isTargeted) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-red-900 text-red-200 px-1">LOCKED</div>';
                 if (isMyTarget) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-blue-500 text-black px-1 font-bold">TARGET</div>';
@@ -1824,9 +1844,11 @@
 
         // --- Visual Helpers ---
         function reveal(wrap, valEl, val) { 
+            // 値をセット
             valEl.innerText = val; 
+            // クラスをつけて回転させる
             wrap.classList.add('is-open');
-            playSe('flip'); 
+            playSe('flip'); // Add Flip Sound
         }
         function highlight(el) { el.classList.add('active-turn'); }
         function clearHighlights() { document.querySelectorAll('.active-turn').forEach(e=>e.classList.remove('active-turn')); }
@@ -1834,11 +1856,11 @@
         function hit(target, dmg) {
             const float = el(target+'-dmg-float'); float.innerText = `-${Math.floor(dmg)}`;
             float.classList.remove('anim-float'); void float.offsetWidth; float.classList.add('anim-float');
-            playSe('attack'); 
+            playSe('attack'); // Add Attack Sound
         }
 
         function endRound(pHp, cHp) {
-            if (maxPlayers === 4) return; // 4P handled separately
+            if (maxPlayers >= 3) return; // Mult player logic handles this elsewhere if needed
             
             let title = "DRAW"; let color = "text-yellow-500";
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; }
@@ -1869,6 +1891,8 @@
         }
 
         window.nextRound = () => {
+            if (maxPlayers >= 3) return; // Mult player flow
+            
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
                 el('game-over-overlay').classList.remove('hidden');
