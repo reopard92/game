@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：51</title>
+    <title>Resource Strategy Card Battle：52</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -119,7 +119,7 @@
             transform: rotateY(180deg);
         }
 
-        /* Front & Back */
+        /* Front & Back - 共通設定の調整 */
         .battle-card-front, .battle-card-back {
             position: absolute;
             width: 100%;
@@ -130,12 +130,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(30, 41, 59, 0.7); /* 半透明 */
-            border: 1px solid var(--glass-border);
+            /* 画像表示のためにリセット */
+            background: transparent;
+            border: none;
+            box-shadow: none;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 0 10px rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px);
+            /* 画像設定の共通部分 */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
         }
 
         .battle-card-front {
@@ -143,40 +147,63 @@
             z-index: 2;
         }
 
+        /* 裏面デザインの変更 */
         .battle-card-back {
             transform: rotateY(180deg);
-            background: rgba(15, 23, 42, 0.9);
-            border-color: #475569;
-            /* 魔法陣のような幾何学模様 */
-            background-image: 
-                radial-gradient(circle at 50% 50%, transparent 40%, rgba(255,255,255,0.03) 41%, transparent 42%),
-                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.03) 49%, transparent 51%);
-            color: #64748b;
-            font-family: 'Cinzel';
-            font-size: 1.5rem;
-            display: flex; align-items: center; justify-content: center;
+            background-image: url('裏面.png'); /* 画像を指定 */
+            /* 既存の模様定義を削除 */
         }
-        .battle-card-back::after { content: '✧'; font-size: 2rem; color: rgba(148, 163, 184, 0.5); text-shadow: 0 0 10px rgba(148, 163, 184, 0.5); }
+        /* 裏面のマークを削除 */
+        .battle-card-back::after { content: none; }
 
-        /* Color Borders & Glows */
-        .card-spd { border-color: var(--color-spd); color: var(--color-spd); box-shadow: 0 0 10px rgba(216, 180, 254, 0.1); }
-        .card-hp { border-color: var(--color-hp); color: var(--color-hp); box-shadow: 0 0 10px rgba(110, 231, 183, 0.1); }
-        .card-atk { border-color: var(--color-atk); color: var(--color-atk); box-shadow: 0 0 10px rgba(252, 165, 165, 0.1); }
-        .card-def { border-color: var(--color-def); color: var(--color-def); box-shadow: 0 0 10px rgba(147, 197, 253, 0.1); }
+        /* 各属性カードの画像適用と既存装飾の非表示化 */
+        /* SPD */
+        .battle-card-front.card-spd { background-image: url('SPD.png'); }
+        .card-spd .card-label, .card-spd .card-icon { display: none; }
+        .card-spd { color: #fff; /* 数値の色を白に */ }
+
+        /* HP */
+        .battle-card-front.card-hp { background-image: url('HP.png'); }
+        .card-hp .card-label, .card-hp .card-icon { display: none; }
+        .card-hp { color: #fff; }
+
+        /* ATK */
+        .battle-card-front.card-atk { background-image: url('ATK.png'); }
+        .card-atk .card-label, .card-atk .card-icon { display: none; }
+        .card-atk { color: #fff; }
+
+        /* DEF */
+        .battle-card-front.card-def { background-image: url('DEF.png'); }
+        .card-def .card-label, .card-def .card-icon { display: none; }
+        .card-def { color: #fff; }
+
+        /* 不要になった古いクラス定義（念のため残すが上書きされる） */
+        /* .card-spd { border-color: var(--color-spd); color: var(--color-spd); box-shadow: 0 0 10px rgba(216, 180, 254, 0.1); } */
+        /* .card-hp { border-color: var(--color-hp); color: var(--color-hp); box-shadow: 0 0 10px rgba(110, 231, 183, 0.1); } */
+        /* .card-atk { border-color: var(--color-atk); color: var(--color-atk); box-shadow: 0 0 10px rgba(252, 165, 165, 0.1); } */
+        /* .card-def { border-color: var(--color-def); color: var(--color-def); box-shadow: 0 0 10px rgba(147, 197, 253, 0.1); } */
 
         .card-label { position: absolute; top: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; opacity: 0.9; font-family: 'Cinzel'; letter-spacing: 1px; }
-        .card-val { font-family: 'Cinzel', serif; font-size: 1.5rem; z-index: 10; text-shadow: 0 0 8px currentColor; transition: transform 0.2s; margin-top: 4px; font-weight: bold; } 
+        /* 数値の視認性調整 */
+        .card-val { 
+            font-family: 'Cinzel', serif; font-size: 1.5rem; z-index: 10; 
+            text-shadow: 0 0 5px #000, 1px 1px 2px rgba(0,0,0,0.8); /* 強い黒影を追加 */
+            transition: transform 0.2s; margin-top: 0; /* マージン調整 */
+            font-weight: bold; 
+            /* 位置を中央に寄せる */
+            display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;
+        } 
         .card-icon { position: absolute; bottom: 4px; font-size: 0.9rem; opacity: 0.8; filter: drop-shadow(0 0 2px currentColor); } 
 
-        /* Active Effect */
+        /* Active Effect - 画像に合わせて調整 */
         .battle-card-wrapper.active-turn { transform: scale(1.15) translateY(-5px); z-index: 20; }
         .battle-card-wrapper.active-turn .battle-card-front {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #fff;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            /* 既存の背景・枠線上書きを削除し、光沢感だけ追加 */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            filter: brightness(1.1); /* 少し明るくする */
         }
 
-        .val-boost { color: #fcd34d; text-shadow: 0 0 15px #fcd34d; transform: scale(1.2); transition: transform 0.2s; }
+        .val-boost { color: #fcd34d !important; text-shadow: 0 0 15px #fcd34d, 0 0 5px #000 !important; transform: scale(1.3); transition: transform 0.2s; }
 
         /* 4P Mode Specifics */
         .opp-container-4p { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; padding: 0 4px; }
@@ -367,13 +394,11 @@
     </style>
 </head>
 <body class="select-none">
-    <!-- Firefly Particles (Dynamically added via JS or minimal CSS impl above) -->
     <div class="firefly" style="animation-delay: 0s; top: 80%; left: 20%;"></div>
     <div class="firefly" style="animation-delay: 2s; top: 60%; left: 80%;"></div>
     <div class="firefly" style="animation-delay: 4s; top: 40%; left: 40%;"></div>
     <div class="firefly" style="animation-delay: 6s; top: 90%; left: 60%;"></div>
 
-    <!-- Audio Elements (No BGM) -->
     <audio id="se-flip">
         <source src="ページめくり2.mp3" type="audio/mpeg">
     </audio>
@@ -384,11 +409,9 @@
         <source src="選択5.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Cut-in Layer (New Dual Design with Desc) -->
     <div id="item-cutin" class="">
         <div id="cutin-bg" class="cutin-overlay">
             <div class="cutin-container">
-                <!-- Player Side -->
                 <div class="cutin-box">
                     <div class="cutin-label text-blue-300">YOU</div>
                     <div class="cutin-img-box p">
@@ -400,7 +423,6 @@
                 
                 <div class="vs-text">VS</div>
 
-                <!-- Opponent Side -->
                 <div class="cutin-box">
                     <div class="cutin-label text-red-400">OPPONENT</div>
                     <div class="cutin-img-box c">
@@ -413,14 +435,12 @@
         </div>
     </div>
     
-    <!-- Ready Fight Layer -->
     <div id="ready-fight" class="">
         <div id="rf-bg" class="rf-overlay">
             <div id="rf-text" class="rf-text">ROUND 1</div>
         </div>
     </div>
 
-    <!-- Header -->
     <header class="flex justify-between items-center px-4 py-2 h-14">
         <div class="flex flex-col">
             <div class="text-[10px] text-gray-400 font-bold tracking-widest font-gaming">
@@ -445,18 +465,14 @@
         </div>
     </header>
 
-    <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
         <div id="phase-timer" class="phase-timer hidden">15</div>
         <div id="notice-msg" class="absolute top-2 w-full text-center text-[11px] text-yellow-400 font-bold z-50 tracking-wider shadow-black drop-shadow-md"></div>
 
-        <!-- 1vs1 / CPU Arena -->
         <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-4 w-full max-w-md mx-auto relative z-10">
-            <!-- CPU Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
                 <div class="card-grid">
-                    <!-- SPD -->
                     <div class="battle-card-wrapper" id="card-c-spd-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-spd">
@@ -464,10 +480,9 @@
                                 <div class="card-val" style="color:var(--color-spd)" id="card-c-spd">?</div>
                                 <div class="card-icon">⚡</div>
                             </div>
-                            <div class="battle-card-back card-spd">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- HP -->
                     <div class="battle-card-wrapper" id="card-c-hp-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-hp">
@@ -475,10 +490,9 @@
                                 <div class="card-val" style="color:var(--color-hp)" id="card-c-hp">?</div>
                                 <div class="card-icon">♥</div>
                             </div>
-                            <div class="battle-card-back card-hp">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- ATK -->
                     <div class="battle-card-wrapper" id="card-c-atk-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-atk">
@@ -486,10 +500,9 @@
                                 <div class="card-val" style="color:var(--color-atk)" id="card-c-atk">?</div>
                                 <div class="card-icon">⚔</div>
                             </div>
-                            <div class="battle-card-back card-atk">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- DEF -->
                     <div class="battle-card-wrapper" id="card-c-def-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-def">
@@ -497,7 +510,7 @@
                                 <div class="card-val" style="color:var(--color-def)" id="card-c-def">?</div>
                                 <div class="card-icon">🛡</div>
                             </div>
-                            <div class="battle-card-back card-def">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
                 </div>
@@ -507,11 +520,9 @@
                 <div id="adv-badge" class="hidden bg-yellow-600 text-white font-gaming text-[12px] px-6 py-1 rounded border border-yellow-300 shadow-xl absolute z-30 opacity-0 tracking-widest">INITIATIVE WIN!</div>
             </div>
 
-            <!-- Player Row -->
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-blue-400 w-4">YOU</div>
                 <div class="card-grid">
-                    <!-- SPD -->
                     <div class="battle-card-wrapper" id="card-p-spd-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-spd">
@@ -519,10 +530,9 @@
                                 <div class="card-val" style="color:var(--color-spd)" id="card-p-spd">-</div>
                                 <div class="card-icon">⚡</div>
                             </div>
-                            <div class="battle-card-back card-spd">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- HP -->
                     <div class="battle-card-wrapper" id="card-p-hp-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-hp">
@@ -530,10 +540,9 @@
                                 <div class="card-val" style="color:var(--color-hp)" id="card-p-hp">-</div>
                                 <div class="card-icon">♥</div>
                             </div>
-                            <div class="battle-card-back card-hp">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- ATK -->
                     <div class="battle-card-wrapper" id="card-p-atk-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-atk">
@@ -541,10 +550,9 @@
                                 <div class="card-val" style="color:var(--color-atk)" id="card-p-atk">-</div>
                                 <div class="card-icon">⚔</div>
                             </div>
-                            <div class="battle-card-back card-atk">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
-                    <!-- DEF -->
                     <div class="battle-card-wrapper" id="card-p-def-wrap">
                         <div class="battle-card-inner">
                             <div class="battle-card-front card-def">
@@ -552,14 +560,13 @@
                                 <div class="card-val" style="color:var(--color-def)" id="card-p-def">-</div>
                                 <div class="card-icon">🛡</div>
                             </div>
-                            <div class="battle-card-back card-def">?</div>
+                            <div class="battle-card-back"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 4P Arena -->
         <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
             <div class="opp-container-4p" id="opp-list-4p"></div>
             <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
@@ -577,14 +584,11 @@
         <div id="p-dmg-float" class="dmg-float text-red-500" style="top:75%"></div>
     </main>
 
-    <!-- Input Panel (Bottom) -->
     <section id="input-panel" class="input-panel">
         <div class="input-controls">
             <div class="phase-title-text" id="phase-title">PHASE 1: SPEED INPUT</div>
             
-            <!-- Phase 1 (Modified with Items) -->
             <div id="input-group-spd" class="w-full flex flex-col h-full">
-                <!-- Speed Slider on Top -->
                 <div class="control-block border-purple-500 mb-2" id="blk-spd">
                     <div class="control-row">
                         <div class="control-label" style="color:var(--color-spd)">SPD</div>
@@ -599,7 +603,6 @@
                     </div>
                 </div>
                 
-                <!-- Item Selection Area -->
                 <div class="flex-1 border-t border-gray-700 pt-1 flex flex-col">
                     <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
                     <div class="item-grid">
@@ -620,7 +623,6 @@
                         </div>
                     </div>
                     
-                    <!-- Fixed Description Area -->
                     <div id="item-info-area" class="item-info-box">
                         <div id="info-title" class="item-info-title">NO ITEM</div>
                         <div id="info-desc" class="item-info-desc">アイテムなし。通常の戦術で戦う。</div>
@@ -628,7 +630,6 @@
                 </div>
             </div>
 
-            <!-- Phase 2 -->
             <div id="input-group-build" class="hidden w-full flex flex-col gap-1 justify-start h-full pt-1">
                 <div class="control-block" id="blk-hp">
                     <div class="control-row">
@@ -683,20 +684,17 @@
         </div>
     </section>
 
-    <!-- Name Entry Screen -->
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming text-white mb-8 tracking-widest text-shadow">PLAYER NAME</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
         <button onclick="submitName()" class="lobby-btn">ENTER</button>
     </div>
 
-    <!-- Wait Overlay -->
     <div id="wait-overlay" class="overlay hidden">
         <div class="text-2xl font-gaming text-blue-300 animate-pulse mb-4">OPPONENT THINKING...</div>
         <div class="text-sm text-gray-400 font-tech">INPUT LOCKED</div>
     </div>
 
-    <!-- Home Screen -->
     <div id="home-screen" class="overlay p-6 text-center">
         <h1 class="text-5xl font-gaming text-white mb-2 tracking-widest" style="text-shadow:0 0 15px rgba(255,255,255,0.5);">RESOURCE BATTLE</h1>
         <div class="text-xs text-gray-400 mb-8 tracking-widest">- STRATEGY CARD GAME -</div>
@@ -720,7 +718,6 @@
         </div>
     </div>
 
-    <!-- Lobby Screen -->
     <div id="lobby-screen" class="overlay hidden p-6">
         <h2 class="text-3xl font-gaming text-white mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
@@ -737,7 +734,6 @@
         </div>
     </div>
 
-    <!-- Waiting for Guest Screen -->
     <div id="host-wait-screen" class="overlay hidden p-6 text-center">
         <h2 class="text-2xl font-gaming text-white mb-2">ROOM CREATED</h2>
         <div class="text-4xl font-bold text-white mb-2 tracking-widest font-gaming" id="room-id-disp">...</div>
@@ -747,21 +743,18 @@
         <button onclick="cancelRoom()" class="mt-12 text-red-500 text-sm border border-red-900 px-4 py-2 rounded">CANCEL</button>
     </div>
 
-    <!-- Result Overlay -->
     <div id="result-overlay" class="overlay hidden p-6 text-center">
         <h1 id="res-title" class="text-4xl font-gaming text-white mb-6" style="text-shadow:0 0 10px white;">VICTORY</h1>
         <div id="res-content" class="text-gray-300 mb-8 space-y-2 font-tech text-lg"></div>
         <button onclick="nextRound()" class="w-full max-w-xs h-14 bg-yellow-600 text-black font-bold text-xl rounded font-gaming border border-yellow-400 shadow-lg">NEXT ROUND</button>
     </div>
 
-    <!-- Game Over Overlay -->
     <div id="game-over-overlay" class="overlay hidden">
         <h1 id="final-result-title" class="text-6xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
         <p class="text-gray-500 tracking-[0.5em] mb-8 font-tech">BATTLE FINISHED</p>
         <button onclick="location.reload()" class="px-12 py-4 bg-blue-800 text-white font-bold rounded border border-blue-500 shadow-lg">RETURN TO TITLE</button>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1858,3 +1851,4 @@
     </script>
 </body>
 </html>
+```eof
