@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：55</title>
+    <title>Resource Strategy Card Battle：56</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -708,14 +708,14 @@
         </div>
     </section>
 
-    <!-- Name Entry Screen (New) -->
+    <!-- Name Entry Screen -->
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming text-white mb-8 tracking-widest text-shadow">PLAYER NAME</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
         <button onclick="submitName()" class="lobby-btn">ENTER</button>
     </div>
 
-    <!-- Wait Overlay (Online) -->
+    <!-- Wait Overlay -->
     <div id="wait-overlay" class="overlay hidden">
         <div class="text-2xl font-gaming text-blue-300 animate-pulse mb-4">OPPONENT THINKING...</div>
         <div class="text-sm text-gray-400 font-tech">INPUT LOCKED</div>
@@ -1210,7 +1210,25 @@
             if (state.phase === 1 && allPhase1 && !state.p.resolved) {
                 state.p.resolved = true;
                 ui.wait.classList.add('hidden');
-                resolvePhase1_4P(data);
+                
+                // HOST: Pick Order を決めて書き込む
+                if (role === 'host' && (!data.pickOrder || data.pickOrder.length === 0)) {
+                    const pIds = data.players;
+                    const speeds = pIds.map(pid => ({ id: pid, spd: state.players[pid].spd }));
+                    speeds.sort((a,b) => b.spd - a.spd || Math.random() - 0.5);
+                    
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                    updateDoc(roomRef, {
+                        pickOrder: speeds.map(s => s.id),
+                        pickIndex: 0,
+                        targets: {}
+                    });
+                }
+                
+                // CLIENT: Pick Order が届いたら画面遷移
+                if (data.pickOrder && data.pickOrder.length > 0) {
+                     resolvePhase1_4P(data);
+                }
             }
             if (state.phase === 1.5) {
                 ui.title.innerText = "PHASE 1.5: TARGET";
@@ -1680,7 +1698,9 @@
             const speeds = pIds.map(pid => ({ id: pid, spd: state.players[pid].spd }));
             speeds.sort((a,b) => b.spd - a.spd || Math.random() - 0.5);
             
-            if (role === 'host') {
+            // 修正: ホストは pickOrder が決まっていなければ決める
+            // 既に決まっていれば書き込まない (重複書き込み防止)
+            if (role === 'host' && (!data.pickOrder || data.pickOrder.length === 0)) {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                 await updateDoc(roomRef, {
                     pickOrder: speeds.map(s => s.id),
@@ -1688,6 +1708,8 @@
                     targets: {}
                 });
             }
+            
+            // クライアント側はここで画面を切り替えてよい (handle4pUpdate内で制御されているのでここは描画のみ)
             state.phase = 1.5; 
             render4PArena();
         }
