@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：63</title>
+    <title>Resource Strategy Card Battle：64</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -138,7 +138,7 @@
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
         .btn-row-wrapper { display: flex; gap: 2px; height: 32px; width: 100%; justify-content: space-between; margin-top: 4px; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
         .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
         
         .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
@@ -514,9 +514,9 @@
         let timerInterval = null;
 
         const ITEMS_DEF = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.jpg" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.jpg" },
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.jpg" },
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
             'shield': { cost: 50, name: "シールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "シールド.png" },
@@ -602,7 +602,7 @@
             el('home-screen').classList.add('hidden');
             el('arena-1v1').classList.remove('hidden');
             el('arena-4p').classList.add('hidden');
-            // Mock items for CPU game
+            // Mock items for CPU game (Pick 3 random + none)
             const allRoundsItems = [];
             for(let i=0; i<MAX_ROUNDS; i++) {
                 const pool = [...ITEM_POOL_KEYS].sort(() => 0.5 - Math.random());
@@ -628,8 +628,6 @@
             ui.blocks.atk.style.pointerEvents = 'auto'; ui.blocks.atk.style.opacity = '1';
             ui.blocks.def.style.pointerEvents = 'auto'; ui.blocks.def.style.opacity = '1';
 
-            // Apply locks based on selection (will be applied in phase 2 toggleInputs as well)
-            
             // Update UI
             state.roundItems.forEach(key => {
                 const btn = el('item-'+key);
@@ -1254,8 +1252,6 @@
 
             ui.btn.innerText = "REVEALING...";
             
-            await showDualCutin(state.p.item, state.c.item);
-
             setTimeout(() => {
                 reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd); 
                 reveal(ui.wrapsP.spd, ui.cP.spd, state.p.spd); 
@@ -1430,9 +1426,11 @@
                         state.c.currHp = state.c.hp - dmg; 
                         
                         if (state.c.currHp <= 0) {
-                            if (!state.cNullified && (state.c.item === 'prot' || state.c.item === 'boost')) {
+                             if (!state.cNullified && (state.c.item === 'prot' || state.c.item === 'boost')) {
+                                // Boost: HP stays <= 0 but alive for now (logic handles this in death check)
+                                // Prot: HP becomes 1
                                 if (state.c.item === 'prot') state.c.currHp = 1;
-                                else state.c.currHp = 0; 
+                                else state.c.currHp = 0; // Boost keeps it at 0 (alive for counter)
                                 el('notice-msg').innerText = "OPPONENT SURVIVED!";
                             } else {
                                 dead = true;
