@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：64</title>
+    <title>Resource Strategy Card Battle：65</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -137,10 +137,9 @@
         .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
-        .btn-row-wrapper { display: flex; gap: 2px; height: 32px; width: 100%; justify-content: space-between; margin-top: 4px; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
+        .btn-row-wrapper { display: flex; gap: 4px; height: 32px; width: 100%; justify-content: space-between; margin-top: 4px; }
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
         .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
-        
         .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
         .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
@@ -526,6 +525,7 @@
             'handmirror': { cost: 100, name: "手鏡", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "手鏡.png" },
             'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" }
         };
+        // All items except 'none' for random pool
         const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify'];
 
         let state = {
@@ -628,6 +628,8 @@
             ui.blocks.atk.style.pointerEvents = 'auto'; ui.blocks.atk.style.opacity = '1';
             ui.blocks.def.style.pointerEvents = 'auto'; ui.blocks.def.style.opacity = '1';
 
+            // Apply locks based on selection (will be applied in phase 2 toggleInputs as well)
+            
             // Update UI
             state.roundItems.forEach(key => {
                 const btn = el('item-'+key);
@@ -848,6 +850,16 @@
                         
                         initRound();
                         isGameStarted = true;
+                    }
+
+                    // ROUND SYNC CHECK
+                    if (data.round > state.round) {
+                        state.round = data.round;
+                        el('current-round').innerText = state.round;
+                        el('result-overlay').classList.add('hidden');
+                        el('wait-overlay').classList.add('hidden');
+                        initRound();
+                        return;
                     }
 
                     if (maxPlayers >= 3) handle4pUpdate(data);
@@ -1539,6 +1551,11 @@
                 
                 setTimeout(() => {
                     state.round++; // increment back to current to re-init
+                    if (isOnline && role === 'host') {
+                         // Reset round in DB for rewind
+                         const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                         updateDoc(roomRef, { round: state.round }); 
+                    }
                     initRound();
                 }, 2000);
                 return;
@@ -1570,7 +1587,7 @@
             el('result-overlay').classList.remove('hidden');
         }
 
-        window.nextRound = () => {
+        window.nextRound = async () => {
             if (maxPlayers >= 3) return; 
             
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
@@ -1581,10 +1598,36 @@
                 el('final-result-title').className = win ? "text-6xl font-gaming mb-4 text-yellow-400" : "text-6xl font-gaming mb-4 text-red-500";
                 return;
             }
-            state.round++;
-            el('current-round').innerText = state.round;
-            el('result-overlay').classList.add('hidden');
-            initRound();
+
+            if (isOnline) {
+                if (role === 'host') {
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                    const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                    if (!snap.empty) {
+                        const d = snap.docs[0].data();
+                        const updates = {
+                            round: state.round + 1,
+                            phase: 1,
+                            pickOrder: [],
+                            pickIndex: 0,
+                            targets: {}
+                        };
+                        d.players.forEach(p => {
+                            updates[`playerData.${p}.input`] = null;
+                            updates[`playerData.${p}.phase1`] = null;
+                            updates[`playerData.${p}.phase2`] = null;
+                        });
+                        await updateDoc(roomRef, updates);
+                    }
+                }
+                el('result-overlay').classList.add('hidden'); 
+                el('wait-overlay').classList.remove('hidden'); 
+            } else {
+                state.round++;
+                el('current-round').innerText = state.round;
+                el('result-overlay').classList.add('hidden');
+                initRound();
+            }
         };
 
     </script>
