@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：50</title>
+    <title>Resource Strategy Card Battle：51</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -88,10 +88,12 @@
         .action-area { width: 70px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
         /* カード (Flip Animation 対応) */
+        /* max-widthを260pxに縮小し、gapも少し詰めました */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
         .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 9px; letter-spacing: 2px; color: #94a3b8; font-family: 'Cinzel'; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
 
         /* 3D Container */
+        /* アスペクト比を3/4から4/5に変更して縦幅を少し短縮 */
         .battle-card-wrapper {
             aspect-ratio: 4/5; 
             perspective: 1000px;
@@ -209,7 +211,7 @@
             height: 24px; 
             width: 24px; 
             background: none;
-            background-image: url('ダイヤ.jpg');
+            background-image: url('ダイヤ.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -604,15 +606,15 @@
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
                             <div class="item-label">アイテムなし</div>
                             <div class="item-cost">0 PT</div>
-                            <img src="アイテムなし.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="アイテムなし.png" class="item-img" onerror="this.style.display='none'">
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
-                            <img src="早送り.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-red-400">早送り</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                         <div class="item-btn" id="item-prot" onclick="selectItem('prot')" oncontextmenu="return false;">
-                            <img src="01プロテクション.jpg" class="item-img" onerror="this.style.display='none'">
+                            <img src="01プロテクション.png" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-blue-400">01プロテクション</div>
                             <div class="item-cost">200 PT</div>
                         </div>
@@ -826,9 +828,9 @@
 
         // Item Defs (Restored Names)
         const ITEMS = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.jpg" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.jpg" },
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.jpg" }
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
 
         let state = {
@@ -856,12 +858,8 @@
             cpuRes: el('cpu-resource'),
             wait: el('wait-overlay'),
             timer: el('phase-timer'),
-            
-            // Info Area Refs
             infoTitle: el('info-title'),
             infoDesc: el('info-desc'),
-            
-            // Cut-in Refs
             cutin: el('item-cutin'),
             cutinOverlay: el('cutin-bg'),
             cutinUser: el('cutin-user'),
@@ -1812,6 +1810,8 @@
         }
 
         function endRound(pHp, cHp) {
+            if (maxPlayers === 4) return; // 4P handled separately
+            
             let title = "DRAW"; let color = "text-yellow-500";
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
