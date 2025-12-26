@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：46</title>
+    <title>Resource Strategy Card Battle：47</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -1112,12 +1112,17 @@
                 if (!state.p.resolved) {
                     state.p.resolved = true;
                     ui.wait.classList.add('hidden');
-                    state.c.spd = oppData.input.spd || 0;
+                    
+                    // Fix: SPD persistence logic
+                    if (oppData.input.spd !== undefined) {
+                        state.c.spd = oppData.input.spd;
+                    }
+                    
                     state.c.hp = oppData.input.hp || 0;
                     state.c.atk = oppData.input.atk || 0;
                     state.c.def = oppData.input.def || 0;
                     state.c.total = oppData.input.total || state.c.total;
-                    state.c.item = oppData.input.item || 'none'; 
+                    if(oppData.input.item) state.c.item = oppData.input.item; 
                     
                     if (state.phase === 1) resolvePhase1();
                     else resolvePhase2();
@@ -1336,17 +1341,12 @@
             
             // --- FLIP LOGIC INIT ---
             ['spd','hp','atk','def'].forEach(k => {
-                // Reset Values
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
                 
-                // Reset Flip Classes
-                // Player: START CLOSED (Fixing previous issue)
                 ui.wrapsP[k].classList.remove('is-open');
-                // Opponent: Always closed (face down) initially
                 ui.wrapsC[k].classList.remove('is-open');
                 
-                // Visual resets
                 ui.cP[k].classList.remove('val-boost');
                 ui.cC[k].classList.remove('val-boost');
                 ui.wrapsP[k].classList.remove('active-turn');
