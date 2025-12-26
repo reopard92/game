@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：49</title>
+    <title>Resource Strategy Card Battle：50</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Serif JP (日本語明朝体) */
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+        /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
 
         :root {
-            /* MTG風ハイファンタジーパレット (落ち着いた色合い) */
-            --color-spd: #c084fc; /* 神秘の紫 */
-            --color-hp: #22c55e;  /* 森の緑 */
-            --color-atk: #ef4444; /* ドラゴンの赤 */
-            --color-def: #3b82f6; /* 深海の青 */
+            /* 幻想的な寒色系パレット */
+            --color-spd: #d8b4fe; /* 薄紫 */
+            --color-hp: #6ee7b7;  /* エメラルド */
+            --color-atk: #fca5a5; /* 淡い赤 */
+            --color-def: #93c5fd; /* 淡い青 */
             
-            --bg-wood: #2a1a12;   /* 古木のダークブラウン */
-            --bg-panel: #1a120b;  /* 革張りの黒茶 */
-            --border-gold: #b8860b; /* くすんだ金 */
-            --border-silver: #a0a0a0; /* 鈍い銀 */
-            --text-main: #e5e5e5; /* 羊皮紙の文字色 */
-            --text-gold: #ffd700;
+            --bg-deep: #0f172a;   /* 深海のような紺 */
+            --glass-bg: rgba(255, 255, 255, 0.05); /* すりガラス背景 */
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-glow: rgba(147, 197, 253, 0.6); /* 青白い発光 */
+            --text-main: #e2e8f0;
         }
 
         body {
-            font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
-            background-color: var(--bg-wood);
+            font-family: 'Cormorant Garamond', 'Noto Sans JP', serif;
+            background-color: var(--bg-deep);
             color: var(--text-main);
             overflow: hidden;
             touch-action: none;
@@ -34,47 +33,44 @@
             width: 100vw;
             display: flex;
             flex-direction: column;
-            /* 背景：古い木のテーブル風テクスチャ */
-            background-image: 
-                repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 40px),
-                radial-gradient(circle at 50% 50%, #3e2723, #1a0f05);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8); /* 四隅を暗く */
+            /* 背景グラデーション */
+            background-image: radial-gradient(circle at 50% 10%, #1e293b, #0f172a 80%);
         }
 
-        /* パーティクル（魔法の粉） */
+        /* パーティクル（蛍）アニメーション */
         .firefly {
             position: fixed;
             left: 50%;
             top: 50%;
-            width: 3px;
-            height: 3px;
+            width: 4px;
+            height: 4px;
             margin: -2px 0 0 -2px;
             pointer-events: none;
             border-radius: 50%;
-            background-color: #ffd700; /* 金色の粉 */
-            box-shadow: 0 0 6px #ffd700;
-            animation: drift 15s ease-in-out infinite alternate, flash 4s ease-in-out infinite;
+            background-color: #a5f3fc; /* シアン色の光 */
+            box-shadow: 0 0 10px #a5f3fc;
+            animation: drift 10s ease-in-out infinite alternate, flash 3s ease-in-out infinite;
             opacity: 0;
             z-index: 0;
         }
         @keyframes drift {
             0% { transform: translate(0, 0); }
-            100% { transform: translate(30px, -80px); }
+            100% { transform: translate(20px, -50px); }
         }
         @keyframes flash {
             0%, 100% { opacity: 0; }
-            50% { opacity: 0.4; }
+            50% { opacity: 0.6; }
         }
 
-        .font-gaming { font-family: 'Cinzel', serif; letter-spacing: 1px; font-weight: 700; } 
+        .font-gaming { font-family: 'Cinzel', serif; letter-spacing: 1px; } 
         .font-tech { font-family: 'Cormorant Garamond', serif; font-weight: bold; }
         
         /* レイアウト */
         header { 
             flex-shrink: 0; z-index: 50; 
-            background: linear-gradient(to bottom, #2b1d16, #1a1008); 
-            border-bottom: 2px solid var(--border-gold); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--glass-border); 
         }
         .arena-panel { 
             flex: 3.5; display: flex; flex-direction: column; justify-content: center; 
@@ -82,17 +78,18 @@
         }
         .input-panel { 
             flex: 6.5; display: flex; flex-direction: row; 
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E"), #1c130d;
+            background: rgba(15, 23, 42, 0.85); /* 半透明 */
+            backdrop-filter: blur(10px); /* すりガラス効果 */
             overflow: hidden; padding: 4px; gap: 4px; 
-            border-top: 3px double var(--border-gold); 
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.6);
+            border-top: 1px solid var(--glass-border); 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 2px; justify-content: center; }
         .action-area { width: 70px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
 
-        /* カード (重厚な枠デザイン) */
+        /* カード (Flip Animation 対応) */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
-        .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 9px; letter-spacing: 2px; color: #a8a29e; font-family: 'Cinzel'; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .card-row-label { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 9px; letter-spacing: 2px; color: #94a3b8; font-family: 'Cinzel'; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
 
         /* 3D Container */
         .battle-card-wrapper {
@@ -107,10 +104,9 @@
             width: 100%;
             height: 100%;
             text-align: center;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* バウンドするようなリッチな回転 */
             transform-style: preserve-3d;
-            border-radius: 6px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            border-radius: 8px;
         }
 
         /* Flip Action */
@@ -132,12 +128,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* 紙や石の質感 */
-            background: linear-gradient(135deg, #3d342b, #292019);
-            border: 2px solid #57534e;
-            border-radius: 6px;
+            background: rgba(30, 41, 59, 0.7); /* 半透明 */
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 0 10px rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
         }
 
         .battle-card-front {
@@ -147,151 +143,120 @@
 
         .battle-card-back {
             transform: rotateY(180deg);
-            background: #1a120b;
-            border-color: #854d0e; /* 茶色の枠 */
-            /* 魔導書の装丁のようなデザイン */
+            background: rgba(15, 23, 42, 0.9);
+            border-color: #475569;
+            /* 魔法陣のような幾何学模様 */
             background-image: 
-                radial-gradient(circle, transparent 20%, #1a120b 120%),
-                repeating-linear-gradient(45deg, rgba(133, 77, 14, 0.1) 0, rgba(133, 77, 14, 0.1) 2px, transparent 2px, transparent 8px);
-            color: #78350f;
+                radial-gradient(circle at 50% 50%, transparent 40%, rgba(255,255,255,0.03) 41%, transparent 42%),
+                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.03) 49%, transparent 51%);
+            color: #64748b;
             font-family: 'Cinzel';
             font-size: 1.5rem;
             display: flex; align-items: center; justify-content: center;
         }
-        .battle-card-back::after { content: '⚜'; font-size: 2.5rem; color: rgba(180, 83, 9, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .battle-card-back::after { content: '✧'; font-size: 2rem; color: rgba(148, 163, 184, 0.5); text-shadow: 0 0 10px rgba(148, 163, 184, 0.5); }
 
-        /* Color Borders & Glows (彩度低め、重厚感) */
-        .card-spd { border-color: var(--color-spd); color: var(--color-spd); background: linear-gradient(to bottom right, #2e1065, #000); }
-        .card-hp { border-color: var(--color-hp); color: var(--color-hp); background: linear-gradient(to bottom right, #064e3b, #000); }
-        .card-atk { border-color: var(--color-atk); color: var(--color-atk); background: linear-gradient(to bottom right, #7f1d1d, #000); }
-        .card-def { border-color: var(--color-def); color: var(--color-def); background: linear-gradient(to bottom right, #1e3a8a, #000); }
+        /* Color Borders & Glows */
+        .card-spd { border-color: var(--color-spd); color: var(--color-spd); box-shadow: 0 0 10px rgba(216, 180, 254, 0.1); }
+        .card-hp { border-color: var(--color-hp); color: var(--color-hp); box-shadow: 0 0 10px rgba(110, 231, 183, 0.1); }
+        .card-atk { border-color: var(--color-atk); color: var(--color-atk); box-shadow: 0 0 10px rgba(252, 165, 165, 0.1); }
+        .card-def { border-color: var(--color-def); color: var(--color-def); box-shadow: 0 0 10px rgba(147, 197, 253, 0.1); }
 
-        /* カード内の文字装飾 */
-        .card-label { 
-            position: absolute; top: 3px; left: 0; width: 100%;
-            font-size: 9px; font-weight: bold; text-transform: uppercase; 
-            opacity: 0.9; font-family: 'Cinzel'; letter-spacing: 1px; 
-            text-shadow: 0 2px 2px rgba(0,0,0,1);
-            background: rgba(0,0,0,0.3); padding: 1px 0;
-        }
-        .card-val { 
-            font-family: 'Cinzel', serif; font-size: 1.6rem; z-index: 10; 
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.8); 
-            transition: transform 0.2s; margin-top: 6px; font-weight: 700; 
-        } 
-        .card-icon { 
-            position: absolute; bottom: 3px; font-size: 1rem; 
-            opacity: 0.6; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); 
-        } 
+        .card-label { position: absolute; top: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; opacity: 0.9; font-family: 'Cinzel'; letter-spacing: 1px; }
+        .card-val { font-family: 'Cinzel', serif; font-size: 1.5rem; z-index: 10; text-shadow: 0 0 8px currentColor; transition: transform 0.2s; margin-top: 4px; font-weight: bold; } 
+        .card-icon { position: absolute; bottom: 4px; font-size: 0.9rem; opacity: 0.8; filter: drop-shadow(0 0 2px currentColor); } 
 
         /* Active Effect */
         .battle-card-wrapper.active-turn { transform: scale(1.15) translateY(-5px); z-index: 20; }
         .battle-card-wrapper.active-turn .battle-card-front {
-            border-color: #fbbf24; /* 金枠 */
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
 
-        .val-boost { color: #fcd34d; text-shadow: 0 0 10px #fcd34d, 2px 2px 0 #000; transform: scale(1.2); transition: transform 0.2s; }
+        .val-boost { color: #fcd34d; text-shadow: 0 0 15px #fcd34d; transform: scale(1.2); transition: transform 0.2s; }
 
-        /* 4P Mode */
+        /* 4P Mode Specifics */
         .opp-container-4p { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; padding: 0 4px; }
-        .opp-card-4p { background: #2c1a0f; border: 1px solid #78350f; border-radius: 6px; padding: 4px; display: flex; flex-direction: column; align-items: center; position: relative; transition: all 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .opp-card-4p.targetable { border-color: var(--color-def); cursor: pointer; animation: pulse-blue 2s infinite; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-        .opp-card-4p.targeted { border-color: var(--color-atk); background: rgba(185, 28, 28, 0.3); }
-        .opp-card-4p.my-target { border: 2px solid var(--color-def); background: rgba(29, 78, 216, 0.3); }
+        .opp-card-4p { background: rgba(30, 41, 59, 0.8); border: 1px solid var(--glass-border); border-radius: 6px; padding: 4px; display: flex; flex-direction: column; align-items: center; position: relative; transition: all 0.2s; backdrop-filter: blur(4px); }
+        .opp-card-4p.targetable { border-color: var(--color-def); cursor: pointer; animation: pulse-blue 2s infinite; box-shadow: 0 0 10px rgba(147, 197, 253, 0.3); }
+        .opp-card-4p.targeted { border-color: var(--color-atk); background: rgba(244, 63, 94, 0.2); }
+        .opp-card-4p.my-target { border: 2px solid var(--color-def); background: rgba(96, 165, 250, 0.2); }
         @keyframes pulse-blue { 0%,100% { box-shadow: 0 0 5px var(--color-def); } 50% { box-shadow: 0 0 20px var(--color-def); } }
         
         /* Animation */
         @keyframes floatUp { 
             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } 
-            20% { transform: translate(-50%, -120%) scale(1.2); opacity: 1; text-shadow: 0 0 20px currentColor, 2px 2px 0 #000; } 
+            20% { transform: translate(-50%, -120%) scale(1.2); opacity: 1; text-shadow: 0 0 20px currentColor; } 
             100% { transform: translate(-50%, -200%) scale(1); opacity: 0; } 
         }
-        .dmg-float { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: 'Cinzel'; font-weight: bold; font-size: 3rem; color: #fff; text-shadow: 2px 2px 0 #000; pointer-events: none; z-index: 100; white-space: nowrap; }
+        .dmg-float { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: 'Cinzel'; font-weight: bold; font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px var(--color-atk); pointer-events: none; z-index: 100; white-space: nowrap; }
         .anim-float { animation: floatUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes pulse-red { 0%, 100% { color: rgba(255,255,255,0.5); text-shadow: 0 0 5px white; } 50% { color: var(--color-atk); text-shadow: 0 0 20px var(--color-atk); transform: translate(-50%, -50%) scale(1.1); } }
+        @keyframes pulse-red { 0%, 100% { color: rgba(255,255,255,0.3); text-shadow: 0 0 5px white; } 50% { color: var(--color-atk); text-shadow: 0 0 20px var(--color-atk); transform: translate(-50%, -50%) scale(1.1); } }
         .timer-urgent { animation: pulse-red 0.5s infinite; color: var(--color-atk) !important; }
 
-        /* Inputs - Physical artifact style */
-        .control-block { 
-            display: flex; flex-direction: column; gap: 0px; padding: 2px 8px; 
-            background: rgba(0,0,0,0.4); /* 暗い背景 */
-            border-radius: 4px; margin-bottom: 2px; 
-            border: 1px solid #44403c;
-            border-left-width: 4px; 
-            flex-shrink: 0; transition: opacity 0.3s; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .control-block.disabled { opacity: 0.5; pointer-events: none; filter: sepia(0.5) grayscale(0.5); }
+        /* Inputs - Compact Mode for Mobile */
+        .control-block { display: flex; flex-direction: column; gap: 0px; padding: 2px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 2px; border-left-width: 3px; flex-shrink: 0; transition: opacity 0.3s; }
+        .control-block.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(0.8); }
         .control-row { display: flex; align-items: center; justify-content: space-between; height: 20px; }
-        .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; text-shadow: 1px 1px 0 #000; }
-        .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 1px 1px 0 #000; }
+        .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
+        .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 18px; margin: 2px 0; }
-        /* レール：溝 */
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #0c0a09; border-radius: 2px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        /* つまみ：宝石 */
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; background: #fcd34d; margin-top: -6px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.8); border: 1px solid #b45309; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+        /* スライダーの宝石化 */
+        input[type=range]::-webkit-slider-thumb { 
+            -webkit-appearance: none; 
+            height: 24px; 
+            width: 24px; 
+            background: none;
+            background-image: url('ダイヤ.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-top: -11px; 
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
         
         .btn-row { display: flex; gap: 4px; justify-content: space-between; margin-top: 2px; height: 28px; }
-        /* ボタン：石のプレート */
-        .btn-mini { 
-            flex: 1; height: 100%; 
-            background: linear-gradient(to bottom, #44403c, #292524); 
-            border: 1px solid #57534e; border-bottom-width: 2px;
-            color: #d6d3d1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; 
-            display: flex; align-items: center; justify-content: center; border-radius: 4px; 
-            transition: all 0.1s; text-shadow: 1px 1px 0 #000;
-        }
-        .btn-mini:active { background: #1c1917; border-top-width: 2px; border-bottom-width: 1px; transform: translateY(1px); color: #fbbf24; }
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
+        .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
         
-        .btn-action-side { 
-            height: 100%; width: 100%; 
-            background: linear-gradient(135deg, #b45309 0%, #78350f 100%); /* 銅・革のような色 */
-            border: 2px solid #fcd34d; 
-            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; 
-            writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; 
-            text-shadow: 0 2px 2px rgba(0,0,0,0.8); box-shadow: 0 4px 6px rgba(0,0,0,0.5); 
-            border-radius: 6px; letter-spacing: 2px; transition: all 0.1s; 
-        }
-        .btn-action-side:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.5); background: #78350f; }
-        .btn-action-side:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; border-color: #57534e; background: #292524; }
-        .phase-title-text { font-size: 12px; color: #a8a29e; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 4px; text-align: center; letter-spacing: 2px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
+        .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
+        .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        .phase-title-text { font-size: 10px; color: #94a3b8; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 2px; text-align: center; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
 
-        /* Item Selection */
+        /* Item Selection (Glassmorphism with Fixes) */
         .item-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-        .item-btn { 
-            position: relative; aspect-ratio: 1/1; 
-            background: #292524; 
-            border: 2px solid #44403c; border-radius: 6px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            transition: all 0.2s; overflow: hidden; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-        .item-btn.selected { border-color: #fcd34d; background: #451a03; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        /* 修正: 背景をより透明に、枠線を強調 */
+        .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); }
+        .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
-        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 4px #000, 1px 1px 0 #000; text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 4px; font-family: 'Noto Sans JP'; }
-        .item-cost { font-size: 8px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 4px #000, 1px 1px 0 #000; position: absolute; top: 2px; right: 2px;}
-        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.6; z-index: 1; transition: opacity 0.2s; }
+        .item-label { font-size: 9px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 4px; font-family: 'Noto Sans JP'; }
+        .item-cost { font-size: 8px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 2px; right: 2px;}
+        /* 修正: 不透明度を上げて視認性向上 */
+        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 1; }
         
         /* New Item Info Area */
         .item-info-box {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid #44403c; border-top: none;
-            padding: 8px; margin-top: 6px; border-radius: 0 0 6px 6px;
+            background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px;
             min-height: 40px; display: flex; flex-direction: column; justify-content: center;
         }
-        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; text-shadow: 1px 1px 0 #000; }
-        .item-info-desc { font-size: 10px; color: #d6d3d1; line-height: 1.2; font-family: 'Noto Sans JP'; }
+        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
+        .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: 'Noto Sans JP'; }
 
-        /* Updated Dual Cut-in */
+        /* Updated Dual Cut-in (More Dramatic & Fixed Transparency) */
         #item-cutin { pointer-events: none; }
         .cutin-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(20, 10, 5, 0.9); z-index: 60;
+            background: rgba(15, 23, 42, 0.9); z-index: 60;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0;
-            /* パターンオーバーレイ */
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 10px, transparent 10px, transparent 20px);
+            backdrop-filter: blur(10px);
         }
         .cutin-container {
             display: flex; flex-direction: row; gap: 20px; align-items: flex-start; justify-content: center;
@@ -301,29 +266,30 @@
             display: flex; flex-direction: column; align-items: center; gap: 8px;
             width: 150px;
         }
-        .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 2px 2px 0 #000; letter-spacing: 2px; }
-        /* 枠: 金属っぽい装飾 */
+        .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; }
+        /* 修正: 背景色を透明にして透過PNGに対応 */
         .cutin-img-box {
-            width: 120px; height: 120px; border: 4px solid; border-radius: 50%;
-            overflow: hidden; background: rgba(0,0,0,0.5); position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            display: flex; align-items: center; justify-content: center;
+            width: 120px; height: 120px; border: 2px solid; border-radius: 50%;
+            overflow: hidden; background: transparent; position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; /* センタリング */
         }
-        .cutin-img-box.p { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.4); }
-        .cutin-img-box.c { border-color: #f87171; box-shadow: 0 0 20px rgba(248, 113, 113, 0.4); }
+        .cutin-img-box.p { border-color: #93c5fd; box-shadow: 0 0 30px #93c5fd; }
+        .cutin-img-box.c { border-color: #f43f5e; box-shadow: 0 0 30px #f43f5e; }
         
+        /* 修正: containにして見切れ防止 */
         .cutin-img { width: 90%; height: 90%; object-fit: contain; }
         .cutin-name {
-            font-family: 'Noto Serif JP', serif; font-weight: bold; font-size: 1.1rem; color: #fff;
-            text-align: center; margin-top: 8px; text-shadow: 2px 2px 0 #000;
+            font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 1.1rem; color: #fff;
+            text-align: center; margin-top: 8px; text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         .cutin-desc-sm {
             font-family: 'Noto Sans JP', sans-serif; font-size: 0.8rem; color: #e2e8f0;
-            text-align: center; line-height: 1.4; background: rgba(0,0,0,0.6);
-            padding: 6px; border-radius: 4px; width: 100%; border: 1px solid #44403c;
+            text-align: center; line-height: 1.4; background: rgba(255,255,255,0.05);
+            padding: 6px; border-radius: 6px; width: 100%; border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .vs-text { font-family: 'Cinzel'; font-size: 4rem; color: #fcd34d; text-shadow: 3px 3px 0 #000; margin-top: 35px; font-weight: bold; font-style: italic; }
+        .vs-text { font-family: 'Cinzel'; font-size: 4rem; color: #fcd34d; text-shadow: 0 0 30px #fcd34d; margin-top: 35px; font-weight: bold; font-style: italic; }
 
         @keyframes cutin-anim {
             0% { opacity: 0; }
@@ -347,14 +313,15 @@
         .rf-overlay {
             position: absolute; inset: 0; z-index: 55;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.5); opacity: 0;
+            background: rgba(0,0,0,0.3); opacity: 0;
+            backdrop-filter: blur(2px);
         }
         .rf-text {
-            font-family: 'Cinzel'; font-weight: bold; font-size: 5rem; color: #fcd34d;
-            text-shadow: 4px 4px 0 #000, 0 0 20px #fcd34d; letter-spacing: 0.1em;
+            font-family: 'Cinzel'; font-weight: bold; font-size: 5rem; color: #fff;
+            text-shadow: 0 0 30px #fcd34d; letter-spacing: 0.1em;
             transform: scale(0);
         }
-        .rf-text.fight { color: #ef4444; text-shadow: 4px 4px 0 #000, 0 0 30px #ef4444; font-size: 6rem; }
+        .rf-text.fight { color: #f43f5e; text-shadow: 0 0 40px #f43f5e; font-size: 6rem; }
 
         @keyframes rf-pop {
             0% { transform: scale(0); opacity: 0; }
@@ -366,38 +333,29 @@
         .anim-rf { animation: rf-pop 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
 
-        /* Timer */
+        /* Timer - Adjusted z-index and opacity */
         .phase-timer {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Cinzel'; font-weight: bold; font-size: 12rem; color: rgba(255,255,255,0.1);
-            pointer-events: none; z-index: 50; 
-            text-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            font-family: 'Cinzel'; font-weight: bold; font-size: 12rem; color: rgba(255,255,255,0.08);
+            pointer-events: none; z-index: 50; /* Above cards */
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
         }
 
         /* Utility */
         .hidden { display: none !important; }
-        .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(20, 10, 5, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .lobby-btn { width: 100%; height: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transition: all 0.3s; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+        .lobby-btn:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+        .lobby-btn:active { transform: scale(0.95); background: #fcd34d; color: #000; box-shadow: 0 0 30px #fcd34d; }
         
-        /* Lobby Button */
-        .lobby-btn { 
-            width: 100%; height: 60px; 
-            background: #2a1a12; border: 2px solid #b45309; 
-            color: #e5e5e5; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
-            border-radius: 4px; margin-bottom: 12px; 
-            box-shadow: 0 4px 0 #1a0f0a, 0 10px 10px rgba(0,0,0,0.5); 
-            transition: all 0.1s; text-shadow: 1px 1px 0 #000; 
-        }
-        .lobby-btn:hover { background: #3e2718; border-color: #fcd34d; color: #fff; }
-        .lobby-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #1a0f0a, inset 0 0 10px rgba(0,0,0,0.5); }
-        
-        .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 2px solid #44403c; border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.5); }
-        .room-item { padding: 12px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
+        .room-item { padding: 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
-        .join-btn { padding: 4px 12px; background: #1d4ed8; border: 1px solid #60a5fa; color: #fff; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; text-shadow: 1px 1px 0 #000; box-shadow: 0 2px 0 #1e3a8a; }
-        .join-btn:active { transform: translateY(2px); box-shadow: none; }
+        .join-btn { padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: all 0.2s; }
+        .join-btn:hover { background: rgba(147, 197, 253, 0.4); color: #fff; box-shadow: 0 0 10px #93c5fd; }
         
-        .name-input { background: rgba(0,0,0,0.5); border: 2px solid #b45309; color: white; font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 24px; width: 80%; max-width: 300px; transition: all 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .name-input:focus { border-color: #fcd34d; outline: none; background: rgba(0,0,0,0.7); }
+        .name-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 24px; width: 80%; max-width: 300px; transition: all 0.3s; }
+        .name-input:focus { border-color: #fcd34d; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); outline: none; }
         
         /* Specific borders for control blocks */
         #blk-spd { border-left-color: var(--color-spd); }
@@ -407,7 +365,7 @@
     </style>
 </head>
 <body class="select-none">
-    <!-- Firefly Particles -->
+    <!-- Firefly Particles (Dynamically added via JS or minimal CSS impl above) -->
     <div class="firefly" style="animation-delay: 0s; top: 80%; left: 20%;"></div>
     <div class="firefly" style="animation-delay: 2s; top: 60%; left: 80%;"></div>
     <div class="firefly" style="animation-delay: 4s; top: 40%; left: 40%;"></div>
@@ -424,7 +382,7 @@
         <source src="選択5.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Cut-in Layer -->
+    <!-- Cut-in Layer (New Dual Design with Desc) -->
     <div id="item-cutin" class="">
         <div id="cutin-bg" class="cutin-overlay">
             <div class="cutin-container">
@@ -488,7 +446,7 @@
     <!-- Arena (Top) -->
     <main id="main-arena" class="arena-panel">
         <div id="phase-timer" class="phase-timer hidden">15</div>
-        <div id="notice-msg" class="absolute top-2 w-full text-center text-[11px] text-yellow-400 font-bold z-50 tracking-wider shadow-black drop-shadow-md" style="text-shadow: 2px 2px 0 #000;"></div>
+        <div id="notice-msg" class="absolute top-2 w-full text-center text-[11px] text-yellow-400 font-bold z-50 tracking-wider shadow-black drop-shadow-md"></div>
 
         <!-- 1vs1 / CPU Arena -->
         <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-4 w-full max-w-md mx-auto relative z-10">
@@ -622,9 +580,10 @@
         <div class="input-controls">
             <div class="phase-title-text" id="phase-title">PHASE 1: SPEED INPUT</div>
             
-            <!-- Phase 1 -->
+            <!-- Phase 1 (Modified with Items) -->
             <div id="input-group-spd" class="w-full flex flex-col h-full">
-                <div class="control-block mb-2" id="blk-spd">
+                <!-- Speed Slider on Top -->
+                <div class="control-block border-purple-500 mb-2" id="blk-spd">
                     <div class="control-row">
                         <div class="control-label" style="color:var(--color-spd)">SPD</div>
                         <div class="control-val" style="color:var(--color-spd)" id="disp-spd">0</div>
@@ -638,26 +597,28 @@
                     </div>
                 </div>
                 
-                <div class="flex-1 border-t border-[#44403c] pt-2 flex flex-col">
-                    <div class="text-[9px] text-gray-400 text-center mb-1 font-gaming">ITEMS</div>
+                <!-- Item Selection Area -->
+                <div class="flex-1 border-t border-gray-700 pt-1 flex flex-col">
+                    <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
                     <div class="item-grid">
                         <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
                             <div class="item-label">アイテムなし</div>
                             <div class="item-cost">0 PT</div>
-                            <img src="アイテムなし.png" class="item-img" onerror="this.style.display='none'">
+                            <img src="アイテムなし.jpg" class="item-img" onerror="this.style.display='none'">
                         </div>
                         <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
-                            <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
+                            <img src="早送り.jpg" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-red-400">早送り</div>
                             <div class="item-cost">50 PT</div>
                         </div>
                         <div class="item-btn" id="item-prot" onclick="selectItem('prot')" oncontextmenu="return false;">
-                            <img src="01プロテクション.png" class="item-img" onerror="this.style.display='none'">
+                            <img src="01プロテクション.jpg" class="item-img" onerror="this.style.display='none'">
                             <div class="item-label text-blue-400">01プロテクション</div>
                             <div class="item-cost">200 PT</div>
                         </div>
                     </div>
                     
+                    <!-- Fixed Description Area -->
                     <div id="item-info-area" class="item-info-box">
                         <div id="info-title" class="item-info-title">NO ITEM</div>
                         <div id="info-desc" class="item-info-desc">アイテムなし。通常の戦術で戦う。</div>
@@ -865,9 +826,9 @@
 
         // Item Defs (Restored Names)
         const ITEMS = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.jpg" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.jpg" },
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.jpg" }
         };
 
         let state = {
@@ -895,8 +856,12 @@
             cpuRes: el('cpu-resource'),
             wait: el('wait-overlay'),
             timer: el('phase-timer'),
+            
+            // Info Area Refs
             infoTitle: el('info-title'),
             infoDesc: el('info-desc'),
+            
+            // Cut-in Refs
             cutin: el('item-cutin'),
             cutinOverlay: el('cutin-bg'),
             cutinUser: el('cutin-user'),
@@ -1354,13 +1319,11 @@
 
             const remaining = state.p.total - currentCost;
             
-            // --- UPDATED DISPLAY: Show COST instead of REMAIN ---
             ui.res.innerText = Math.floor(currentCost);
-            // Color logic: if remaining < 0, show red text on COST to indicate "Over Budget"
             if (remaining < 0) ui.res.classList.add('text-red-500');
             else ui.res.classList.remove('text-red-500');
 
-            ui.topRes.innerText = Math.floor(remaining); // Header still shows remaining
+            ui.topRes.innerText = Math.floor(remaining); 
             if (maxPlayers === 2) ui.cpuRes.innerText = Math.floor(state.c.total); 
             
             if (remaining < 0) {
@@ -1380,9 +1343,7 @@
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             ['spd','hp','atk','def'].forEach(k => { if(el('range-'+k)) el('range-'+k).value = 0; });
             
-            // --- Item Reset Logic ---
             state.p.item = 'none';
-            // Force UI update to 'none' state
             ['none','fast','prot'].forEach(id => {
                 const btn = el('item-'+id);
                 if (id === 'none') btn.classList.add('selected');
@@ -1403,17 +1364,12 @@
             
             // --- FLIP LOGIC INIT ---
             ['spd','hp','atk','def'].forEach(k => {
-                // Reset Values
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
                 ui.cC[k].innerText = (k==='spd' ? '?' : '?');
                 
-                // Reset Flip Classes
-                // Player: START CLOSED (Fixing previous issue)
                 ui.wrapsP[k].classList.remove('is-open');
-                // Opponent: Always closed (face down) initially
                 ui.wrapsC[k].classList.remove('is-open');
                 
-                // Visual resets
                 ui.cP[k].classList.remove('val-boost');
                 ui.cC[k].classList.remove('val-boost');
                 ui.wrapsP[k].classList.remove('active-turn');
@@ -1447,23 +1403,21 @@
                 budget = Math.max(0, Math.min(state.c.total, avg + variance));
             }
             
-            // --- Item Logic ---
             state.c.item = 'none';
             let itemCost = 0;
-            // CPU tries to buy item if budget allows
             if (budget > 300) {
                 const roll = Math.random();
-                if (roll < 0.2) { // 20% chance for Fast Forward
+                if (roll < 0.2) { 
                     state.c.item = 'fast';
                     itemCost = 50;
-                } else if (roll < 0.4) { // 20% chance for Protection
+                } else if (roll < 0.4) { 
                     state.c.item = 'prot';
                     itemCost = 200;
                 }
             }
             
             let rem = budget - itemCost;
-            if (rem < 0) rem = 0; // Safety check
+            if (rem < 0) rem = 0;
 
             const spd = Math.ceil(Math.random() * (rem * 0.3)); rem -= spd;
             const atk = Math.ceil(Math.random() * (rem * 0.5)); rem -= atk;
@@ -1480,7 +1434,6 @@
             toggleInputs(false); 
             stopTimer();
             
-            // Player Card Flip (Close for Reveal Effect)
             if (state.phase === 1) {
                  ui.wrapsP.spd.classList.remove('is-open');
             }
@@ -1506,23 +1459,19 @@
 
         async function resolvePhase1() {
             if(!isOnline) {
-                // Deduct cost for CPU
                 const cpuItemCost = ITEMS[state.c.item].cost;
                 state.c.total -= (state.c.spd + cpuItemCost); 
             }
 
             ui.btn.innerText = "REVEALING...";
             
-            // 1. Show Item Cut-in First (Correction: Reveal Items FIRST)
             await showDualCutin(state.p.item, state.c.item);
 
-            // 2. Reveal SPD (Flip Cards)
             setTimeout(() => {
-                reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd); // Opponent
-                reveal(ui.wrapsP.spd, ui.cP.spd, state.p.spd); // Player
+                reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd); 
+                reveal(ui.wrapsP.spd, ui.cP.spd, state.p.spd); 
             }, 500);
 
-            // 3. Logic & Transition
             setTimeout(async () => {
                 state.pAdv = false; state.cAdv = false;
                 if (state.p.spd > state.c.spd) {
@@ -1545,9 +1494,8 @@
                 state.phase = 2;
                 state.p.submitted = false;
                 state.p.resolved = false;
-                if(isOnline && role === 'host') clearRoomInputs(); // Fix: Moved here
+                if(isOnline && role === 'host') clearRoomInputs(); 
                 
-                // READY -> FIGHT Animation
                 await showTextCutin("READY", "BUILD!");
 
                 setTimeout(() => {
@@ -1568,13 +1516,12 @@
                     startTimer(time);
                 }, 100);
 
-            }, 2000); // Wait after reveal
+            }, 2000); 
         }
 
         async function clearRoomInputs() {
              const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
              if (maxPlayers === 2) {
-                 // Fix: Don't overwrite playerData. Just nullify input for players.
                  const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
                  if(!snap.empty) {
                      const d = snap.docs[0].data();
@@ -1583,7 +1530,6 @@
                      await updateDoc(roomRef, updates);
                  }
              } else {
-                 // 4P cleanup logic handled separately or by round increment
              }
         }
 
@@ -1620,11 +1566,10 @@
                         const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
                         state.c.currHp = state.c.hp - dmg; 
                         
-                        // Protection Item Check
                         if (state.c.currHp <= 0) {
                             if (state.c.item === 'prot') {
                                 state.c.currHp = 1;
-                                el('notice-msg').innerText = "OPPONENT PROTECTION ACTIVATED!";
+                                el('notice-msg').innerText = "OPPONENT WARD ACTIVATED!";
                             } else {
                                 dead = true;
                             }
@@ -1634,11 +1579,10 @@
                         const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
                         state.p.currHp = state.p.hp - dmg; 
                         
-                        // Protection Item Check
                         if (state.p.currHp <= 0) {
                             if (state.p.item === 'prot') {
                                 state.p.currHp = 1;
-                                el('notice-msg').innerText = "PROTECTION ACTIVATED!";
+                                el('notice-msg').innerText = "SPIRIT WARD ACTIVATED!";
                             } else {
                                 dead = true;
                             }
