@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：54</title>
+    <title>Resource Strategy Card Battle：55</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント: Cinzel (タイトル), Cormorant Garamond (本文), Noto Sans JP (日本語) */
@@ -1222,22 +1222,21 @@
                     const pickerName = state.players[currentPicker]?.name || '???';
                     el('notice-msg').innerText = `${pickerName} IS SELECTING...`;
                 }
-                if (state.pickIndex >= 4) { // Only works for 4P, need generic condition
-                     // Fixed logic for dynamic players
-                     if (state.pickIndex >= data.players.length) {
-                        state.phase = 2;
-                        state.p.submitted = false;
-                        state.p.resolved = false;
-                        el('notice-msg').innerText = "";
-                        ui.p1.classList.add('hidden');
-                        ui.p2.classList.remove('hidden');
-                        ui.title.innerText = "PHASE 2: BUILD";
-                        ui.btn.innerText = "ENGAGE";
-                        ui.btn.disabled = false;
-                        toggleInputs(true);
-                        updateUI();
-                        startTimer(15);
-                     }
+                
+                // 修正: 参加人数で判定するように変更
+                if (state.pickIndex >= data.players.length) {
+                    state.phase = 2;
+                    state.p.submitted = false;
+                    state.p.resolved = false;
+                    el('notice-msg').innerText = "";
+                    ui.p1.classList.add('hidden');
+                    ui.p2.classList.remove('hidden');
+                    ui.title.innerText = "PHASE 2: BUILD";
+                    ui.btn.innerText = "ENGAGE";
+                    ui.btn.disabled = false;
+                    toggleInputs(true);
+                    updateUI();
+                    startTimer(15);
                 }
             }
             const allPhase2 = data.players.every(pid => data.playerData[pid].phase2);
