@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：61</title>
+    <title>Resource Strategy Card Battle：62</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -136,10 +136,10 @@
         .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
-        /* Updated Buttons (No +/- 50) */
-        .btn-row-wrapper { display: flex; gap: 4px; height: 32px; width: 100%; justify-content: space-between; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
+        .btn-row-wrapper { display: flex; gap: 4px; height: 36px; width: 100%; justify-content: space-between; margin-top: 4px; }
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
         .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
+        
         .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
         .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
         .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
@@ -183,7 +183,7 @@
         @keyframes rf-pop { 0% { transform: scale(0); opacity: 0; } 20% { transform: scale(1.1); opacity: 1; } 40% { transform: scale(1); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
         .anim-rf { animation: rf-pop 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
 
-        /* Timer - Adjusted to be above cards and semi-transparent */
+        /* Timer - Adjusted */
         .phase-timer {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-family: 'Cinzel'; font-weight: bold; font-size: 10rem; color: rgba(255,255,255,0.15);
@@ -303,22 +303,8 @@
                 </div>
                 <div class="flex-1 border-t border-gray-700 pt-1 flex flex-col">
                     <div class="text-[9px] text-gray-400 text-center mb-1">TACTICAL ITEMS</div>
-                    <div class="item-grid">
-                        <div class="item-btn selected" id="item-none" onclick="selectItem('none')" oncontextmenu="return false;">
-                            <div class="item-label">アイテムなし</div>
-                            <div class="item-cost">0 PT</div>
-                            <img src="アイテムなし.png" class="item-img" onerror="this.style.display='none'">
-                        </div>
-                        <div class="item-btn" id="item-fast" onclick="selectItem('fast')" oncontextmenu="return false;">
-                            <img src="早送り.png" class="item-img" onerror="this.style.display='none'">
-                            <div class="item-label text-red-400">早送り</div>
-                            <div class="item-cost">50 PT</div>
-                        </div>
-                        <div class="item-btn" id="item-prot" onclick="selectItem('prot')" oncontextmenu="return false;">
-                            <img src="01プロテクション.png" class="item-img" onerror="this.style.display='none'">
-                            <div class="item-label text-blue-400">01プロテクション</div>
-                            <div class="item-cost">200 PT</div>
-                        </div>
+                    <div class="item-grid" id="item-list-container">
+                        <!-- Dynamic Items -->
                     </div>
                     <div id="item-info-area" class="item-info-box">
                         <div id="info-title" class="item-info-title">NO ITEM</div>
@@ -526,15 +512,21 @@
         let maxPlayers = 2; 
         let timerInterval = null;
 
-        const ITEMS = {
+        const ITEMS_DEF = {
             'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
+            'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
+            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
+            'shield': { cost: 50, name: "シールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "シールド.png" },
+            'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない。", img: "増強剤.png" }
         };
+        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost'];
 
         let state = {
             round: 1,
             phase: 1, 
+            roundItems: [], // keys ['none', 'rand1', 'rand2']
             p: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, item: 'none', currHp: undefined, submitted: false, resolved: false },
             c: { total: START_PTS, wins: 0, spd: 0, hp: 0, atk: 0, def: 0, hpCost: 0, item: 'none', currHp: undefined, submitted: false, resolved: false },
             players: {}, 
@@ -575,6 +567,7 @@
             wrapsP: { spd: el('card-p-spd-wrap'), hp: el('card-p-hp-wrap'), atk: el('card-p-atk-wrap'), def: el('card-p-def-wrap') },
             wrapsC: { spd: el('card-c-spd-wrap'), hp: el('card-c-hp-wrap'), atk: el('card-c-atk-wrap'), def: el('card-c-def-wrap') },
             oppContainer: el('opp-list-4p'),
+            itemContainer: el('item-list-container'),
             blocks: { spd: el('blk-spd'), hp: el('blk-hp'), atk: el('blk-atk'), def: el('blk-def') }
         };
 
@@ -604,6 +597,13 @@
             el('home-screen').classList.add('hidden');
             el('arena-1v1').classList.remove('hidden');
             el('arena-4p').classList.add('hidden');
+            // Mock items for CPU game
+            const allRoundsItems = [];
+            for(let i=0; i<MAX_ROUNDS; i++) {
+                const pool = [...ITEM_POOL_KEYS].sort(() => 0.5 - Math.random());
+                allRoundsItems.push(['none', pool[0], pool[1]]);
+            }
+            state.allRoundsItems = allRoundsItems;
             initRound();
         };
 
@@ -617,12 +617,21 @@
             playSe('select');
             if (state.phase !== 1) return;
             state.p.item = itemId;
-            ['none','fast','prot'].forEach(id => {
-                const btn = el('item-'+id);
-                if (id === itemId) btn.classList.add('selected');
-                else btn.classList.remove('selected');
+            
+            // Check shield
+            if (itemId === 'shield') {
+                // Lock DEF input in phase 2 (handled in updateUI/toggle)
+            }
+
+            // Update UI
+            state.roundItems.forEach(key => {
+                const btn = el('item-'+key);
+                if (btn) {
+                    if (key === itemId) btn.classList.add('selected');
+                    else btn.classList.remove('selected');
+                }
             });
-            const item = ITEMS[itemId];
+            const item = ITEMS_DEF[itemId];
             ui.infoTitle.innerText = item.name;
             ui.infoDesc.innerText = item.desc;
             updateUI();
@@ -630,9 +639,9 @@
 
         function showDualCutin(pItemKey, cItemKey) {
             return new Promise((resolve) => {
-                const pItem = ITEMS[pItemKey];
-                const cItem = ITEMS[cItemKey];
-                if (pItemKey === 'none' && cItemKey === 'none') { resolve(); return; }
+                const pItem = ITEMS_DEF[pItemKey];
+                const cItem = ITEMS_DEF[cItemKey];
+                // Always show even if none to confirm choices
                 ui.cutinNameP.innerText = pItem.name;
                 ui.cutinDescP.innerText = pItem.desc; 
                 ui.cutinImgP.src = pItem.img || "";
@@ -710,13 +719,23 @@
             const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
             const newRoomRef = doc(roomsRef);
             roomId = newRoomRef.id;
+            
+            // Generate Items for all rounds
+            const allRoundsItems = [];
+            for(let i=0; i<MAX_ROUNDS; i++) {
+                const pool = [...ITEM_POOL_KEYS].sort(() => 0.5 - Math.random());
+                allRoundsItems.push(['none', pool[0], pool[1]]);
+            }
+            state.allRoundsItems = allRoundsItems;
+
             const roomData = {
                 hostId: userId,
                 maxPlayers: max,
                 status: 'waiting',
                 players: [userId],
                 playerData: { [userId]: { name: userName, ready: false } },
-                round: 1, phase: 1, targets: {}, updatedAt: serverTimestamp()
+                round: 1, phase: 1, targets: {}, updatedAt: serverTimestamp(),
+                allRoundsItems: allRoundsItems
             };
             await setDoc(newRoomRef, roomData);
             el('lobby-screen').classList.add('hidden');
@@ -792,6 +811,7 @@
                 if (!data) return;
                 
                 if (data.maxPlayers) maxPlayers = data.maxPlayers;
+                if (data.allRoundsItems) state.allRoundsItems = data.allRoundsItems;
 
                 if (data.status === 'waiting') {
                     if (role === 'host') {
@@ -971,10 +991,13 @@
                     ui.blocks[k].style.opacity = opacity;
                 }
             });
-            ['none','fast','prot'].forEach(id => {
-                el('item-'+id).style.pointerEvents = pointerEvent;
-                if(!enable) el('item-'+id).classList.add('disabled');
-                else el('item-'+id).classList.remove('disabled');
+            state.roundItems.forEach(id => {
+                const b = el('item-'+id);
+                if(b) {
+                    b.style.pointerEvents = pointerEvent;
+                    if(!enable) b.classList.add('disabled');
+                    else b.classList.remove('disabled');
+                }
             });
             ui.btn.disabled = !enable;
         }
@@ -989,12 +1012,7 @@
                 count--;
                 ui.timer.innerText = count;
                 
-                if (state.p.item === 'drone' && count === 7) {
-                     const used = state.c.hpCost + state.c.atk + state.c.def;
-                     el('notice-msg').innerText = `解析完了: 敵使用コスト ${used} PTS`;
-                     ui.timer.classList.add('text-green-400'); 
-                     setTimeout(()=>ui.timer.classList.remove('text-green-400'), 500);
-                }
+                // --- Drone Effect Removed ---
                 
                 if (count <= 3) {
                     ui.timer.classList.add('timer-urgent');
@@ -1032,8 +1050,8 @@
             let currentCost = 0;
             if (state.phase === 1) {
                 currentCost = state.inputs.spd;
-                if (state.p.item && ITEMS[state.p.item]) {
-                    currentCost += ITEMS[state.p.item].cost;
+                if (state.p.item && ITEMS_DEF[state.p.item]) {
+                    currentCost += ITEMS_DEF[state.p.item].cost;
                 }
             } else {
                 currentCost = state.inputs.hp + state.inputs.atk + state.inputs.def;
@@ -1046,7 +1064,7 @@
             else ui.res.classList.remove('text-red-500');
 
             ui.topRes.innerText = Math.floor(remaining); 
-            if (maxPlayers === 2) ui.cpuRes.innerText = Math.floor(state.c.total); 
+            // OPP RES hidden
             
             if (remaining < 0) {
                 ui.btn.disabled = true;
@@ -1064,16 +1082,30 @@
 
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
             
-            state.p.item = 'none';
-            ['none','fast','prot'].forEach(id => {
-                const btn = el('item-'+id);
-                if (id === 'none') btn.classList.add('selected');
-                else btn.classList.remove('selected');
-            });
-            const item = ITEMS['none'];
-            ui.infoTitle.innerText = item.name;
-            ui.infoDesc.innerText = item.desc;
+            // Set Items for this round
+            state.roundItems = state.allRoundsItems ? state.allRoundsItems[state.round-1] : ['none', 'fast', 'prot']; // default fallback
             
+            // Render Item Buttons
+            ui.itemContainer.innerHTML = '';
+            state.roundItems.forEach(key => {
+                const item = ITEMS_DEF[key];
+                ui.itemContainer.innerHTML += `
+                    <div class="item-btn" id="item-${key}" onclick="selectItem('${key}')" oncontextmenu="return false;">
+                        <img src="${item.img}" class="item-img" onerror="this.style.display='none'">
+                        <div class="item-label text-blue-100">${item.name}</div>
+                        <div class="item-cost">${item.cost} PT</div>
+                    </div>
+                `;
+            });
+
+            // Select None
+            state.p.item = 'none';
+            selectItem('none');
+            
+            // Re-enable DEF input if it was disabled by shield
+            ui.blocks.def.style.pointerEvents = 'auto';
+            ui.blocks.def.style.opacity = '1';
+
             state.phase = 1;
             state.p.submitted = false;
             state.p.resolved = false;
@@ -1124,18 +1156,20 @@
                 budget = Math.max(0, Math.min(state.c.total, avg + variance));
             }
             
+            // --- Item Logic ---
             state.c.item = 'none';
-            let itemCost = 0;
-            if (budget > 300) {
-                const roll = Math.random();
-                if (roll < 0.2) { 
-                    state.c.item = 'fast';
-                    itemCost = 50;
-                } else if (roll < 0.4) { 
-                    state.c.item = 'prot';
-                    itemCost = 200;
-                }
+            // CPU random choice from available items
+            const available = state.roundItems.filter(k => k !== 'none');
+            if (budget > 300 && available.length > 0) {
+                 if (Math.random() < 0.4) {
+                     const choice = available[Math.floor(Math.random() * available.length)];
+                     // Check cost
+                     if (ITEMS_DEF[choice].cost <= 100) { // simple check
+                         state.c.item = choice;
+                     }
+                 }
             }
+            const itemCost = ITEMS_DEF[state.c.item].cost;
             
             let rem = budget - itemCost;
             if (rem < 0) rem = 0;
@@ -1161,7 +1195,7 @@
 
             if (state.phase === 1) {
                 state.p.spd = state.inputs.spd;
-                const itemCost = ITEMS[state.p.item].cost;
+                const itemCost = ITEMS_DEF[state.p.item].cost;
                 state.p.total -= (state.p.spd + itemCost);
                 
                 if(isOnline) sendInput({ spd: state.p.spd, item: state.p.item });
@@ -1180,14 +1214,13 @@
 
         async function resolvePhase1() {
             if(!isOnline) {
-                const cpuItemCost = ITEMS[state.c.item].cost;
+                const cpuItemCost = ITEMS_DEF[state.c.item].cost;
                 state.c.total -= (state.c.spd + cpuItemCost); 
             }
 
             ui.btn.innerText = "REVEALING...";
             
-            await showDualCutin(state.p.item, state.c.item);
-
+            // Only reveal SPD now, Items revealed later
             setTimeout(() => {
                 reveal(ui.wrapsC.spd, ui.cC.spd, state.c.spd); 
                 reveal(ui.wrapsP.spd, ui.cP.spd, state.p.spd); 
@@ -1232,6 +1265,12 @@
                     toggleInputs(true); 
                     updateUI();
                     
+                    // Shield Item logic
+                    if (state.p.item === 'shield') {
+                        ui.blocks.def.style.pointerEvents = 'none';
+                        ui.blocks.def.style.opacity = '0.5';
+                    }
+
                     let time = 15;
                     if (state.c.item === 'fast') time = 7;
                     
@@ -1259,14 +1298,31 @@
              }
         }
 
-        function resolvePhase2() {
+        async function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
+            
+            // Show Item Reveal here
+            await showDualCutin(state.p.item, state.c.item);
+            
+            // Apply Scope Effect (Notify if player has scope)
+            if (state.p.item === 'scope' && state.c.total !== undefined) {
+                 el('notice-msg').innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} MANA`;
+            }
+
             startBattleSequence();
         }
 
         function startBattleSequence() {
             state.p.currHp = undefined; state.c.currHp = undefined;
             
+            // Swap Logic
+            if (state.p.item === 'swap') { [state.c.atk, state.c.def] = [state.c.def, state.c.atk]; }
+            if (state.c.item === 'swap') { [state.p.atk, state.p.def] = [state.p.def, state.p.atk]; }
+
+            // Shield Logic
+            if (state.p.item === 'shield') { state.p.def = state.c.def; ui.cP.def.innerText = state.p.def; }
+            if (state.c.item === 'shield') { state.c.def = state.p.def; ui.cC.def.innerText = state.c.def; }
+
             let pFirst = false;
             if (state.p.spd === 0 && state.c.spd === 0) {
                 pFirst = state.p.total >= state.c.total;
@@ -1302,7 +1358,7 @@
                         state.c.currHp = state.c.hp - dmg; 
                         
                         if (state.c.currHp <= 0) {
-                            if (state.c.item === 'prot') {
+                            if (state.c.item === 'prot' || state.c.item === 'boost') {
                                 state.c.currHp = 1;
                                 el('notice-msg').innerText = "OPPONENT WARD ACTIVATED!";
                             } else {
@@ -1315,7 +1371,7 @@
                         state.p.currHp = state.p.hp - dmg; 
                         
                         if (state.p.currHp <= 0) {
-                            if (state.p.item === 'prot') {
+                            if (state.p.item === 'prot' || state.p.item === 'boost') {
                                 state.p.currHp = 1;
                                 el('notice-msg').innerText = "SPIRIT WARD ACTIVATED!";
                             } else {
@@ -1348,7 +1404,7 @@
                         const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
                         state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
                         
-                        if (state.c.currHp <= 0 && state.c.item === 'prot') state.c.currHp = 1;
+                        if (state.c.currHp <= 0 && (state.c.item === 'prot' || state.c.item === 'boost')) state.c.currHp = 1;
                         
                         updateHpVal(ui.cC.hp, state.c.currHp); 
                     } 
@@ -1356,7 +1412,7 @@
                         const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
                         state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; 
                         
-                        if (state.p.currHp <= 0 && state.p.item === 'prot') state.p.currHp = 1;
+                        if (state.p.currHp <= 0 && (state.p.item === 'prot' || state.p.item === 'boost')) state.p.currHp = 1;
                         
                         updateHpVal(ui.cP.hp, state.p.currHp); 
                     }
@@ -1501,7 +1557,6 @@
                 const isTargeted = Object.values(state.targets).includes(oppId);
                 const isMyTarget = state.targets[userId] === oppId;
                 
-                // Picking Logic
                 const currentPicker = state.pickOrder[state.pickIndex];
                 const isPicking = state.phase === 1.5 && currentPicker === userId;
                 const canPick = isPicking && !isTargeted;
@@ -1526,7 +1581,7 @@
                 }
                 
                 let statusBadge = '';
-                if (isTargeted) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-red-900 text-red-200 px-1 font-gaming">LOCKED</div>';
+                if (isTargeted) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-red-900 text-red-200 px-1">LOCKED</div>';
                 if (isMyTarget) statusBadge = '<div class="absolute top-0 right-0 text-[8px] bg-blue-500 text-black px-1 font-bold">TARGET</div>';
 
                 const html = `
@@ -1547,16 +1602,11 @@
         }
 
         function endRound(pHp, cHp) {
-            if (maxPlayers >= 3) return; // Mult player logic handles this elsewhere if needed
+            if (maxPlayers >= 3) return; 
             
             let title = "DRAW"; let color = "text-yellow-500";
-            let win = false;
-
-            if(pHp > cHp) { 
-                state.p.wins++; title="VICTORY"; color="text-yellow-400"; win = true;
-            } else if(cHp > pHp) { 
-                state.c.wins++; title="DEFEAT"; color="text-red-500"; 
-            }
+            if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; }
+            else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; }
             
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
@@ -1564,9 +1614,7 @@
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             
-            // Online Check for masking MANA
-            const oppManaDisplay = isOnline ? "???" : Math.floor(state.c.total);
-
+            // OPP REM Hidden
             el('res-content').innerHTML = `
                 <div class="grid grid-cols-2 gap-4 text-sm mb-4 border-b border-gray-700 pb-4">
                     <div class="text-right border-r border-gray-700 pr-4">
@@ -1579,7 +1627,7 @@
                         <div class="text-red-500 font-bold mb-1 font-gaming">OPP</div>
                         <div class="text-2xl font-bold text-white font-gaming">${state.c.wins} WINS</div>
                         <div class="text-xs text-gray-400 mt-2 font-tech">HP: ${Math.floor(cHp)}</div>
-                        <div class="text-xs text-gray-400 font-tech">MANA: ${oppManaDisplay}</div>
+                        <div class="text-xs text-gray-400 font-tech">MANA: ???</div>
                     </div>
                 </div>
             `;
@@ -1587,7 +1635,7 @@
         }
 
         window.nextRound = () => {
-            if (maxPlayers >= 3) return; // Mult player flow
+            if (maxPlayers >= 3) return; 
             
             if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
                 el('result-overlay').classList.add('hidden');
