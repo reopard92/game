@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：70</title>
+    <title>Resource Strategy Card Battle：71</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* ... existing styles ... */
         /* ファンタジー向けフォント */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
 
@@ -907,15 +908,24 @@
                         return;
                     }
                     
-                    // Host Logic for Round Transition (1vs1) - Moved up & Guarded
-                    if (role === 'host' && isOnline && data.status === 'playing') {
-                         const isAllReady = data.players.every(pid => data.playerData[pid]?.ready === true);
-                         const dbRound = data.round || 1;
-                         
-                         // Only update if everyone is ready AND the DB round hasn't advanced yet
-                         if (isAllReady && dbRound === state.round) {
-                             console.log("Host advancing round...");
+                    // Determine if current user is host safely
+                    const isHost = data.hostId === userId;
+
+                    // Host Logic for Round Transition (1vs1)
+                    if (isHost && isOnline && data.status === 'playing' && data.maxPlayers === 2 && data.players && data.players.length === 2) {
+                         const currentDbRound = data.round || 1;
+                         // Check if everyone is ready
+                         const allReady = data.players.every(pid => {
+                             const pData = data.playerData[pid];
+                             return pData && pData.ready === true;
+                         });
+
+                         // Only advance if everyone is ready AND we haven't advanced yet
+                         if (allReady && currentDbRound === state.round) {
+                             console.log("All players ready. Advancing to round", state.round + 1);
                              const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                             
+                             // Prepare updates
                              const updates = {
                                 round: state.round + 1,
                                 phase: 1,
@@ -923,13 +933,16 @@
                                 targets: {},
                                 pickIndex: 0
                              };
+                             
+                             // Reset player states
                              data.players.forEach(p => {
                                  updates[`playerData.${p}.input`] = null;
                                  updates[`playerData.${p}.phase1`] = null; 
                                  updates[`playerData.${p}.phase2`] = null; 
                                  updates[`playerData.${p}.ready`] = false;
                              });
-                             updateDoc(roomRef, updates).catch(e => console.error("Round update error", e));
+
+                             updateDoc(roomRef, updates).catch(e => console.error("Round advancement failed", e));
                          }
                     }
 
@@ -945,6 +958,11 @@
             const oppData = data.playerData[oppId];
             
             if (oppData && oppData.name) el('header-opp-label').innerHTML = `OPP: ${oppData.name} <span id="cpu-resource">???</span> PTS`;
+
+            // SKIP UI UPDATE IF WAITING FOR ROUND TRANSITION
+            if (myData && myData.ready === true) {
+                return;
+            }
 
             // If input is null (new round), do NOT show wait overlay yet
             if (myData && myData.input === null) {
@@ -1691,6 +1709,10 @@
                 el('result-overlay').classList.add('hidden'); 
                 el('wait-overlay').classList.remove('hidden');
                 
+                // ★追加: 待機メッセージを変更してユーザーに状態を伝える
+                const waitMsg = el('wait-overlay').querySelector('.font-gaming');
+                if(waitMsg) waitMsg.innerText = "WAITING FOR OPPONENT...";
+
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                 // Ready flag update
                 await updateDoc(roomRef, { [`playerData.${userId}.ready`]: true });
