@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：66</title>
+    <title>Resource Strategy Card Battle：67</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -437,7 +437,7 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs, deleteField, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Config
@@ -458,18 +458,29 @@
         let roomId = null;
         let unsubscribeRoom = null;
 
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                console.log("Signed in:", userId);
+            } else {
+                userId = null;
+            }
+        });
+
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
+                try {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } catch (e) {
+                    console.error("Custom token auth failed, falling back to anonymous", e);
+                    await signInAnonymously(auth);
+                }
             } else {
                 await signInAnonymously(auth);
             }
         };
 
-        initAuth().then(() => {
-            userId = auth.currentUser.uid;
-            console.log("Signed in:", userId);
-        }).catch((error) => console.error(error));
+        initAuth();
         
         const audio = {
             flip: document.getElementById('se-flip'),
@@ -586,7 +597,7 @@
         };
 
         window.enterOnlineMode = () => {
-            if (!userId) return alert("Connecting...");
+            if (!userId) return alert("認証サーバーに接続中... しばらくしてから再度お試しください。");
             unlockAudio(); 
             el('home-screen').classList.add('hidden');
             el('name-screen').classList.remove('hidden');
@@ -727,61 +738,80 @@
 
         window.createRoom = async (max = 2) => {
             playSe('select');
-            role = 'host';
-            isOnline = true;
-            maxPlayers = max;
-            const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
-            const newRoomRef = doc(roomsRef);
-            roomId = newRoomRef.id;
-            
-            // Generate Items for all rounds (4 items total including none)
-            const allRoundsItems = [];
-            for(let i=0; i<MAX_ROUNDS; i++) {
-                const pool = [...ITEM_POOL_KEYS].sort(() => 0.5 - Math.random());
-                allRoundsItems.push(['none', pool[0], pool[1], pool[2]]);
+            if (!userId) {
+                alert("認証エラー: 再読み込みしてください。");
+                return;
             }
-            state.allRoundsItems = allRoundsItems;
+            try {
+                role = 'host';
+                isOnline = true;
+                maxPlayers = max;
+                const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
+                const newRoomRef = doc(roomsRef);
+                roomId = newRoomRef.id;
+                
+                // Generate Items for all rounds (4 items total including none)
+                const allRoundsItems = [];
+                for(let i=0; i<MAX_ROUNDS; i++) {
+                    const pool = [...ITEM_POOL_KEYS].sort(() => 0.5 - Math.random());
+                    allRoundsItems.push(['none', pool[0], pool[1], pool[2]]);
+                }
+                state.allRoundsItems = allRoundsItems;
 
-            const roomData = {
-                hostId: userId,
-                maxPlayers: max,
-                status: 'waiting',
-                players: [userId],
-                playerData: { [userId]: { name: userName, ready: false } },
-                round: 1, phase: 1, targets: {}, updatedAt: serverTimestamp(),
-                allRoundsItems: allRoundsItems
-            };
-            await setDoc(newRoomRef, roomData);
-            el('lobby-screen').classList.add('hidden');
-            el('host-wait-screen').classList.remove('hidden');
-            el('room-id-disp').innerText = roomId.substr(0,4);
-            el('room-type-disp').innerText = `TYPE: ${max} PLAYERS`;
-            el('joined-count').innerText = `1 / ${max}`;
-            subscribeRoom(roomId);
+                const roomData = {
+                    hostId: userId,
+                    maxPlayers: max,
+                    status: 'waiting',
+                    players: [userId],
+                    playerData: { [userId]: { name: userName, ready: false } },
+                    round: 1, phase: 1, targets: {}, updatedAt: serverTimestamp(),
+                    allRoundsItems: allRoundsItems
+                };
+                await setDoc(newRoomRef, roomData);
+                el('lobby-screen').classList.add('hidden');
+                el('host-wait-screen').classList.remove('hidden');
+                el('room-id-disp').innerText = roomId.substr(0,4);
+                el('room-type-disp').innerText = `TYPE: ${max} PLAYERS`;
+                el('joined-count').innerText = `1 / ${max}`;
+                subscribeRoom(roomId);
+            } catch (e) {
+                console.error("Failed to create room:", e);
+                alert("ルーム作成エラー: " + e.message);
+                isOnline = false; // reset
+            }
         };
 
         window.joinRoom = async (id, max) => {
             playSe('select');
-            role = 'guest';
-            isOnline = true;
-            roomId = id;
-            maxPlayers = max;
-            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-            const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
-            if (snap.empty) return alert("Room gone");
-            const data = snap.docs[0].data();
-            if (data.players.includes(userId)) { } 
-            else if (data.players.length < data.maxPlayers) {
-                const newPlayers = [...data.players, userId];
-                const newPD = { ...data.playerData, [userId]: { name: userName, ready: false } };
-                const updates = { players: newPlayers, playerData: newPD };
-                if (newPlayers.length >= data.maxPlayers) {
-                    updates.status = 'playing'; updates.round = 1; updates.phase = 1;
-                }
-                await updateDoc(roomRef, updates);
-            } else { return alert("Room Full"); }
-            el('lobby-screen').classList.add('hidden');
-            subscribeRoom(roomId);
+            if (!userId) {
+                alert("認証エラー: 再読み込みしてください。");
+                return;
+            }
+            try {
+                role = 'guest';
+                isOnline = true;
+                roomId = id;
+                maxPlayers = max;
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                if (snap.empty) return alert("Room gone");
+                const data = snap.docs[0].data();
+                if (data.players.includes(userId)) { } 
+                else if (data.players.length < data.maxPlayers) {
+                    const newPlayers = [...data.players, userId];
+                    const newPD = { ...data.playerData, [userId]: { name: userName, ready: false } };
+                    const updates = { players: newPlayers, playerData: newPD };
+                    if (newPlayers.length >= data.maxPlayers) {
+                        updates.status = 'playing'; updates.round = 1; updates.phase = 1;
+                    }
+                    await updateDoc(roomRef, updates);
+                } else { return alert("Room Full"); }
+                el('lobby-screen').classList.add('hidden');
+                subscribeRoom(roomId);
+            } catch(e) {
+                console.error("Join Room Error:", e);
+                alert("ルーム参加エラー: " + e.message);
+            }
         };
 
         window.deleteRoom = async () => {
