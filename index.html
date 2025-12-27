@@ -907,14 +907,21 @@
                         return;
                     }
                     
-                    // Host Logic for Round Transition (1vs1)
-                    if (role === 'host' && maxPlayers === 2 && isOnline && data.players.length === 2) {
-                         const allReady = data.players.every(pid => data.playerData[pid] && data.playerData[pid].ready === true);
-                         if (allReady) {
+                    // Host Logic for Round Transition (1vs1) - Moved up & Guarded
+                    if (role === 'host' && isOnline && data.status === 'playing') {
+                         const isAllReady = data.players.every(pid => data.playerData[pid]?.ready === true);
+                         const dbRound = data.round || 1;
+                         
+                         // Only update if everyone is ready AND the DB round hasn't advanced yet
+                         if (isAllReady && dbRound === state.round) {
+                             console.log("Host advancing round...");
                              const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                              const updates = {
                                 round: state.round + 1,
-                                phase: 1
+                                phase: 1,
+                                pickOrder: [],
+                                targets: {},
+                                pickIndex: 0
                              };
                              data.players.forEach(p => {
                                  updates[`playerData.${p}.input`] = null;
@@ -922,8 +929,7 @@
                                  updates[`playerData.${p}.phase2`] = null; 
                                  updates[`playerData.${p}.ready`] = false;
                              });
-                             // Use try-catch for critical host update
-                             updateDoc(roomRef, updates).catch(err => console.error("Round update failed:", err));
+                             updateDoc(roomRef, updates).catch(e => console.error("Round update error", e));
                          }
                     }
 
