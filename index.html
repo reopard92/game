@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：69</title>
+    <title>Resource Strategy Card Battle：70</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -855,13 +855,15 @@
                 if (!data) return;
                 
                 if (data.maxPlayers) maxPlayers = data.maxPlayers;
-                if (data.allRoundsItems) {
-                    if (typeof data.allRoundsItems === 'string') {
-                         state.allRoundsItems = JSON.parse(data.allRoundsItems);
-                    } else {
-                         state.allRoundsItems = data.allRoundsItems;
+                try {
+                    if (data.allRoundsItems) {
+                        if (typeof data.allRoundsItems === 'string') {
+                             state.allRoundsItems = JSON.parse(data.allRoundsItems);
+                        } else {
+                             state.allRoundsItems = data.allRoundsItems;
+                        }
                     }
-                }
+                } catch(e){ console.log("Items parse error", e); }
 
                 if (data.status === 'waiting') {
                     if (role === 'host') {
@@ -906,8 +908,8 @@
                     }
                     
                     // Host Logic for Round Transition (1vs1)
-                    if (role === 'host' && maxPlayers === 2 && isOnline) {
-                         const allReady = data.players.every(pid => data.playerData[pid]?.ready);
+                    if (role === 'host' && maxPlayers === 2 && isOnline && data.players.length === 2) {
+                         const allReady = data.players.every(pid => data.playerData[pid] && data.playerData[pid].ready === true);
                          if (allReady) {
                              const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                              const updates = {
@@ -920,7 +922,8 @@
                                  updates[`playerData.${p}.phase2`] = null; 
                                  updates[`playerData.${p}.ready`] = false;
                              });
-                             updateDoc(roomRef, updates);
+                             // Use try-catch for critical host update
+                             updateDoc(roomRef, updates).catch(err => console.error("Round update failed:", err));
                          }
                     }
 
@@ -936,6 +939,12 @@
             const oppData = data.playerData[oppId];
             
             if (oppData && oppData.name) el('header-opp-label').innerHTML = `OPP: ${oppData.name} <span id="cpu-resource">???</span> PTS`;
+
+            // If input is null (new round), do NOT show wait overlay yet
+            if (myData && myData.input === null) {
+                 ui.wait.classList.add('hidden');
+                 return;
+            }
 
             if (myData && oppData && myData.input && oppData.input) {
                 if (!state.p.resolved) {
