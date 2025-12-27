@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：68</title>
+    <title>Resource Strategy Card Battle：69</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -904,6 +904,25 @@
                         initRound();
                         return;
                     }
+                    
+                    // Host Logic for Round Transition (1vs1)
+                    if (role === 'host' && maxPlayers === 2 && isOnline) {
+                         const allReady = data.players.every(pid => data.playerData[pid]?.ready);
+                         if (allReady) {
+                             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                             const updates = {
+                                round: state.round + 1,
+                                phase: 1
+                             };
+                             data.players.forEach(p => {
+                                 updates[`playerData.${p}.input`] = null;
+                                 updates[`playerData.${p}.phase1`] = null; 
+                                 updates[`playerData.${p}.phase2`] = null; 
+                                 updates[`playerData.${p}.ready`] = false;
+                             });
+                             updateDoc(roomRef, updates);
+                         }
+                    }
 
                     if (maxPlayers >= 3) handle4pUpdate(data);
                     else handle1v1Update(data);
@@ -1654,28 +1673,12 @@
             }
 
             if (isOnline) {
-                if (role === 'host') {
-                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-                    const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
-                    if (!snap.empty) {
-                        const d = snap.docs[0].data();
-                        const updates = {
-                            round: state.round + 1,
-                            phase: 1,
-                            pickOrder: [],
-                            pickIndex: 0,
-                            targets: {}
-                        };
-                        d.players.forEach(p => {
-                            updates[`playerData.${p}.input`] = null;
-                            updates[`playerData.${p}.phase1`] = null;
-                            updates[`playerData.${p}.phase2`] = null;
-                        });
-                        await updateDoc(roomRef, updates);
-                    }
-                }
                 el('result-overlay').classList.add('hidden'); 
-                el('wait-overlay').classList.remove('hidden'); 
+                el('wait-overlay').classList.remove('hidden');
+                
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                // Ready flag update
+                await updateDoc(roomRef, { [`playerData.${userId}.ready`]: true });
             } else {
                 state.round++;
                 el('current-round').innerText = state.round;
