@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：71</title>
+    <title>Resource Strategy Card Battle：72</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ... existing styles ... */
         /* ファンタジー向けフォント */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@500;700&family=Noto+Sans+JP:wght@400;700&display=swap');
 
@@ -855,6 +854,9 @@
                 const data = doc.data();
                 if (!data) return;
                 
+                // ホスト判定をここで行う
+                const isHost = data.hostId === userId;
+
                 if (data.maxPlayers) maxPlayers = data.maxPlayers;
                 try {
                     if (data.allRoundsItems) {
@@ -908,24 +910,24 @@
                         return;
                     }
                     
-                    // Determine if current user is host safely
-                    const isHost = data.hostId === userId;
-
                     // Host Logic for Round Transition (1vs1)
-                    if (isHost && isOnline && data.status === 'playing' && data.maxPlayers === 2 && data.players && data.players.length === 2) {
+                    if (isHost && isOnline && data.status === 'playing' && maxPlayers === 2) {
                          const currentDbRound = data.round || 1;
-                         // Check if everyone is ready
-                         const allReady = data.players.every(pid => {
-                             const pData = data.playerData[pid];
-                             return pData && pData.ready === true;
-                         });
+                         
+                         // プレイヤーデータの確認
+                         let allReady = false;
+                         if (data.players && data.players.length === 2) {
+                             allReady = data.players.every(pid => {
+                                 return data.playerData[pid] && data.playerData[pid].ready === true;
+                             });
+                         }
 
-                         // Only advance if everyone is ready AND we haven't advanced yet
+                         // 全員Ready かつ DB上のラウンドが現在のラウンドと同じなら更新
                          if (allReady && currentDbRound === state.round) {
-                             console.log("All players ready. Advancing to round", state.round + 1);
-                             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                             // UIに更新中であることを表示（一瞬だが）
+                             el('notice-msg').innerText = "SYNCING NEXT ROUND...";
                              
-                             // Prepare updates
+                             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                              const updates = {
                                 round: state.round + 1,
                                 phase: 1,
@@ -933,8 +935,7 @@
                                 targets: {},
                                 pickIndex: 0
                              };
-                             
-                             // Reset player states
+                             // 各プレイヤーの状態リセット
                              data.players.forEach(p => {
                                  updates[`playerData.${p}.input`] = null;
                                  updates[`playerData.${p}.phase1`] = null; 
@@ -942,7 +943,13 @@
                                  updates[`playerData.${p}.ready`] = false;
                              });
 
-                             updateDoc(roomRef, updates).catch(e => console.error("Round advancement failed", e));
+                             // 念のため少し遅延させて、連打防止＆他クライアントとの同期猶予
+                             setTimeout(() => {
+                                 updateDoc(roomRef, updates).catch(e => {
+                                     console.error("Round update failed", e);
+                                     alert("ラウンド更新エラー: " + e.message);
+                                 });
+                             }, 500);
                          }
                     }
 
