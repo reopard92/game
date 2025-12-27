@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：67</title>
+    <title>Resource Strategy Card Battle：68</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -765,7 +765,7 @@
                     players: [userId],
                     playerData: { [userId]: { name: userName, ready: false } },
                     round: 1, phase: 1, targets: {}, updatedAt: serverTimestamp(),
-                    allRoundsItems: allRoundsItems
+                    allRoundsItems: JSON.stringify(allRoundsItems) // Fix: Multidimensional array not supported
                 };
                 await setDoc(newRoomRef, roomData);
                 el('lobby-screen').classList.add('hidden');
@@ -855,7 +855,13 @@
                 if (!data) return;
                 
                 if (data.maxPlayers) maxPlayers = data.maxPlayers;
-                if (data.allRoundsItems) state.allRoundsItems = data.allRoundsItems;
+                if (data.allRoundsItems) {
+                    if (typeof data.allRoundsItems === 'string') {
+                         state.allRoundsItems = JSON.parse(data.allRoundsItems);
+                    } else {
+                         state.allRoundsItems = data.allRoundsItems;
+                    }
+                }
 
                 if (data.status === 'waiting') {
                     if (role === 'host') {
