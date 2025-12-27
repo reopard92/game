@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：73</title>
+    <title>Resource Strategy Card Battle：74</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -137,8 +137,8 @@
         .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
-        .btn-row-wrapper { display: flex; gap: 2px; height: 32px; width: 100%; justify-content: space-between; margin-top: 4px; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 10px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
+        .btn-row-wrapper { display: flex; gap: 2px; height: 48px; width: 100%; justify-content: space-between; margin-top: 4px; } /* Height increased for better touch */
+        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 11px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
         .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
         .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
         .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
@@ -146,11 +146,11 @@
         .phase-title-text { font-size: 10px; color: #94a3b8; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 2px; text-align: center; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
 
         .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
-        .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); }
-        .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
+        .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); opacity: 0.5; filter: grayscale(0.5); transform: scale(0.96); } /* Default faded state */
+        .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); opacity: 1; filter: none; transform: scale(1); }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
-        .item-cost { font-size: 8px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
+        .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 1; }
         
@@ -380,6 +380,7 @@
             <button onclick="startCpuGame()" class="lobby-btn">PRACTICE (CPU)</button>
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
         </div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 74</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -543,10 +544,11 @@
             'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する。", img: "巻き戻し.png" },
             'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
             'handmirror': { cost: 100, name: "手鏡", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "手鏡.png" },
-            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" }
+            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
+            'crystal': { cost: 60, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" }
         };
         // All items except 'none' for random pool
-        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify'];
+        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal'];
 
         let state = {
             round: 1,
@@ -1416,6 +1418,14 @@
                     ui.btn.innerText = "ENGAGE";
                     toggleInputs(true); 
                     updateUI();
+                    
+                    // 水晶玉の効果：相手のアイテムを表示
+                    if (state.p.item === 'crystal') {
+                         const enemyItemName = ITEMS_DEF[state.c.item] ? ITEMS_DEF[state.c.item].name : "不明";
+                         el('notice-msg').innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`;
+                         el('notice-msg').classList.add('text-purple-400');
+                         setTimeout(() => el('notice-msg').classList.remove('text-purple-400'), 4000);
+                    }
                     
                     // Item Logic: Lock inputs for specific items
                     if (state.p.item === 'shield') {
