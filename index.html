@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：65</title>
+    <title>Resource Strategy Card Battle：66</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -91,7 +91,7 @@
             background-position: center; background-size: cover;
         }
         .battle-card-front { transform: rotateY(0deg); z-index: 2; }
-        .battle-card-back { transform: rotateY(180deg); background-image: url('裏面.png'); }
+        .battle-card-back { transform: rotateY(180deg); background-image: url('裏面.png'); background-color: #1e293b; }
 
         .battle-card-front.card-spd { background-image: url('SPD.png'); border-color: var(--color-spd); }
         .card-spd { color: #fff; }
@@ -437,11 +437,11 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, updateDoc, serverTimestamp, query, where, getDocs, deleteField, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Config
-        const firebaseConfig = {
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
           apiKey: "AIzaSyDBLlMDGCT3IO-tgIJkeFJIta6r-XB3zgs",
           authDomain: "card-battle-game-415d1.firebaseapp.com",
           projectId: "card-battle-game-415d1",
@@ -458,8 +458,16 @@
         let roomId = null;
         let unsubscribeRoom = null;
 
-        signInAnonymously(auth).then((userCredential) => {
-            userId = userCredential.user.uid;
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        };
+
+        initAuth().then(() => {
+            userId = auth.currentUser.uid;
             console.log("Signed in:", userId);
         }).catch((error) => console.error(error));
         
@@ -511,6 +519,7 @@
         let role = 'host'; 
         let maxPlayers = 2; 
         let timerInterval = null;
+        let battleTimers = []; // 追加: バトル演出用タイマー配列
 
         const ITEMS_DEF = {
             'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
@@ -1117,7 +1126,15 @@
             }
         }
 
+        function clearBattleTimers() { // 追加: バトル演出タイマーを一括クリア
+            battleTimers.forEach(id => clearTimeout(id));
+            battleTimers = [];
+        }
+
         window.initRound = async () => {
+            clearBattleTimers(); // 追加: ラウンド開始時に前の演出をキャンセル
+            if(timerInterval) clearInterval(timerInterval); // 念のためここでも
+
             // First, reset cards immediately to prevent leaking previous round data
             ['spd','hp','atk','def'].forEach(k => {
                 ui.cP[k].innerText = (k==='spd' ? '-' : '-');
@@ -1512,7 +1529,12 @@
                     endRound(pHp, cHp);
                 }}
             ];
-            seq.forEach(s => setTimeout(s.f, s.t));
+            
+            // 変更: タイマーIDを保存
+            seq.forEach(s => {
+                const tid = setTimeout(s.f, s.t);
+                battleTimers.push(tid);
+            });
         }
 
         // --- Rewind Logic ---
