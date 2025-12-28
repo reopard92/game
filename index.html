@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：75</title>
+    <title>Resource Strategy Card Battle：76</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -400,7 +400,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 75</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 76</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -563,7 +563,7 @@
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
-            'shield': { cost: 50, name: "シールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "シールド.png" },
+            'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "シールド.png" },
             'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
             'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
             'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
@@ -917,7 +917,15 @@
                 } catch(e){ console.log("Items parse error", e); }
                 
                 // Sync rewindUsed state
+                // Detect change
+                let rewindTriggered = false;
                 if (data.rewindUsed) {
+                    if (!state.rewindUsed) state.rewindUsed = [];
+                    // Check if length increased, meaning someone used rewind
+                    // Also check if round is same (rewind stays on same round)
+                    if (data.round === state.round && data.rewindUsed.length > state.rewindUsed.length) {
+                        rewindTriggered = true;
+                    }
                     state.rewindUsed = data.rewindUsed;
                 }
 
@@ -951,6 +959,15 @@
                         
                         initRound();
                         isGameStarted = true;
+                    }
+
+                    // REWIND CHECK (Before Round Check)
+                    if (rewindTriggered) {
+                         el('result-overlay').classList.add('hidden');
+                         el('wait-overlay').classList.add('hidden');
+                         el('notice-msg').innerText = "REWIND ACTIVATED!";
+                         setTimeout(() => initRound(), 1000);
+                         return;
                     }
 
                     // ROUND SYNC CHECK
@@ -1742,19 +1759,41 @@
 
                  // If online host, sync this usage to DB
                  if (isOnline && role === 'host') {
-                     const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
-                     // Add user to rewindUsed array in DB
-                     updateDoc(roomRef, { 
-                         round: state.round, // Keep same round
-                         rewindUsed: arrayUnion(userWhoRewound) 
-                     });
+                     // 非同期で実行
+                     (async () => {
+                         const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                         try {
+                             // プレイヤーリスト取得のため最新を取得
+                             const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                             if(!snap.empty) {
+                                 const d = snap.docs[0].data();
+                                 const updates = {
+                                     round: state.round,
+                                     rewindUsed: arrayUnion(userWhoRewound),
+                                     phase: 1
+                                 };
+                                 // 入力リセット
+                                 if(d.players) {
+                                     d.players.forEach(p => {
+                                         updates[`playerData.${p}.input`] = null;
+                                         updates[`playerData.${p}.phase1`] = null; 
+                                         updates[`playerData.${p}.phase2`] = null; 
+                                         updates[`playerData.${p}.ready`] = false;
+                                     });
+                                 }
+                                 await updateDoc(roomRef, updates);
+                             }
+                         } catch(e) { console.error("Rewind sync error", e); }
+                     })();
                  }
                  
                  // If offline, just restart
-                 setTimeout(() => {
-                     // In offline, initRound will use local state.rewindUsed
-                     initRound();
-                 }, 2000);
+                 if (!isOnline) {
+                    setTimeout(() => {
+                        // In offline, initRound will use local state.rewindUsed
+                        initRound();
+                    }, 2000);
+                 }
              }
              return replayed;
         }
@@ -1782,6 +1821,7 @@
             el('res-title').innerText = title;
             el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
             
+            // OPP REM Hidden
             el('res-content').innerHTML = `
                 <div class="grid grid-cols-2 gap-4 text-sm mb-4 border-b border-gray-700 pb-4">
                     <div class="text-right border-r border-gray-700 pr-4">
@@ -1817,10 +1857,12 @@
                 el('result-overlay').classList.add('hidden'); 
                 el('wait-overlay').classList.remove('hidden');
                 
+                // ★追加: 待機メッセージを変更してユーザーに状態を伝える
                 const waitMsg = el('wait-overlay').querySelector('.font-gaming');
                 if(waitMsg) waitMsg.innerText = "WAITING FOR OPPONENT...";
 
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                // Ready flag update
                 await updateDoc(roomRef, { [`playerData.${userId}.ready`]: true });
             } else {
                 state.round++;
