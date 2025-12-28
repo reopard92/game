@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：77</title>
+    <title>Resource Strategy Card Battle：78</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -400,7 +400,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 77</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 78</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1752,9 +1752,12 @@
              }
 
              if (replayed && userWhoRewound) {
-                 // Add to local used list immediately for UI feedback
-                 if (!state.rewindUsed.includes(userWhoRewound)) {
-                     state.rewindUsed.push(userWhoRewound);
+                 // 修正: オンライン時はここでローカルstateを更新しない。onSnapshotに任せる。
+                 if (!isOnline) {
+                     // オフライン時は即座に反映
+                     if (!state.rewindUsed.includes(userWhoRewound)) {
+                         state.rewindUsed.push(userWhoRewound);
+                     }
                  }
 
                  // If online host, sync this usage to DB
