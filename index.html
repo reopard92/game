@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：78</title>
+    <title>Resource Strategy Card Battle：79</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -400,7 +400,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 78</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 79</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -563,7 +563,7 @@
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
-            'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "シールド.png" },
+            'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "ミラーシールド.png" },
             'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
             'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
             'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
@@ -1623,9 +1623,8 @@
             if(state.pAdv || state.cAdv) {
                 el('adv-badge').classList.remove('hidden');
                 el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.5" : "OPP: ATK x1.5";
-            } else if (state.p.spd === 0 && state.c.spd === 0) {
-                 el('notice-msg').innerText = pFirst ? "RESOURCE ADVANTAGE: YOU ATTACK FIRST" : "RESOURCE ADVANTAGE: OPPONENT ATTACKS FIRST";
-            }
+            } 
+            // REMOVED RESOURCE ADVANTAGE DISPLAY
 
             const seq = [
                 { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
