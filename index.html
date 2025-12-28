@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：83</title>
+    <title>Resource Strategy Card Battle：84</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -33,6 +33,8 @@
             display: flex;
             flex-direction: column;
             background-image: radial-gradient(circle at 50% 10%, #1e293b, #0f172a 80%);
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         /* Firefly Particles */
@@ -145,7 +147,7 @@
             align-items: flex-start;
         }
         
-        /* Button Press Effect Mixin Style */
+        /* Button Press Effect Mixin Style - Changed to use JS class .active-press */
         .btn-mini { 
             flex: 1; height: 48px; /* Fixed height part */
             background: rgba(255,255,255,0.05); 
@@ -156,8 +158,10 @@
             box-shadow: 0 4px 0 #000000; /* Darker Shadow for depth */
             transform: translateY(0);
             transition: none; /* Instant reaction */
+            cursor: pointer;
+            user-select: none;
         }
-        .btn-mini:active { 
+        .btn-mini.active-press { 
             background: rgba(255,255,255,0.2); color: #fff; 
             box-shadow: 0 0 0 #000000; /* Remove shadow */
             transform: translateY(4px); /* Move down */
@@ -176,8 +180,10 @@
             box-shadow: 0 4px 0 #000000; /* Darker Shadow */
             transform: translateY(0);
             transition: none; /* Instant */
+            cursor: pointer;
+            user-select: none;
         }
-        .btn-action-side:active { 
+        .btn-action-side.active-press { 
             background: rgba(255,255,255,0.2); 
             box-shadow: 0 0 0 #000000; 
             transform: translateY(4px); 
@@ -199,8 +205,10 @@
             box-shadow: 0 4px 0 rgba(0,0,0,0.8); 
             transform: translateY(0) scale(0.96); 
             transition: none;
+            cursor: pointer;
+            user-select: none;
         } 
-        .item-btn:active {
+        .item-btn.active-press {
             box-shadow: 0 0 0 rgba(0,0,0,0);
             transform: translateY(4px) scale(0.96);
         }
@@ -210,7 +218,7 @@
             transform: translateY(0) scale(1);
             box-shadow: 0 4px 0 rgba(0,0,0,1); /* Selected shadow */
         }
-        .item-btn.selected:active {
+        .item-btn.selected.active-press {
             box-shadow: 0 0 0 rgba(0,0,0,0);
             transform: translateY(4px) scale(1);
         }
@@ -225,7 +233,7 @@
             box-shadow: 0 4px 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5); /* Gold shadow */
             animation: rare-pulse 2s infinite;
         }
-        .item-btn.item-rare:active {
+        .item-btn.item-rare.active-press {
             box-shadow: 0 0 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5);
             transform: translateY(4px) scale(1);
         }
@@ -285,6 +293,7 @@
 
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
         .lobby-btn { 
             width: 100%; height: 60px; 
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
@@ -293,9 +302,11 @@
             text-shadow: 0 0 5px rgba(255,255,255,0.3); 
             box-shadow: 0 4px 0 #000000; 
             transform: translateY(0);
+            cursor: pointer;
+            user-select: none;
         }
         .lobby-btn:hover { background: rgba(255,255,255,0.1); }
-        .lobby-btn:active { 
+        .lobby-btn.active-press { 
             transform: translateY(4px); 
             box-shadow: 0 0 0 rgba(0,0,0,0);
             background: #fcd34d; color: #000; 
@@ -304,12 +315,15 @@
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
         .room-item { padding: 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
+        
         .join-btn { 
             padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
             color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: none; 
             box-shadow: 0 3px 0 #000000; transform: translateY(0);
+            cursor: pointer;
+            user-select: none;
         }
-        .join-btn:active { 
+        .join-btn.active-press { 
             transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0);
             background: rgba(147, 197, 253, 0.4); color: #fff; 
         }
@@ -504,7 +518,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 83</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 84</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -642,6 +656,48 @@
         // Global definition of el for safety
         const el = (id) => document.getElementById(id);
         window.el = el;
+        
+        // --- BUTTON EFFECT & AUDIO HANDLING (Global Event Delegation) ---
+        let audioUnlocked = false;
+        function unlockAllAudio() {
+            if (audioUnlocked) return;
+            const ids = ['se-flip', 'se-attack', 'se-select'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.volume = 0;
+                    el.play().then(() => {
+                        el.pause();
+                        el.currentTime = 0;
+                        el.volume = 1;
+                    }).catch(() => {});
+                }
+            });
+            audioUnlocked = true;
+        }
+
+        document.addEventListener('pointerdown', (e) => {
+            if (!e.target || typeof e.target.closest !== 'function') return;
+
+            const btn = e.target.closest('.btn-mini, .btn-action-side, .lobby-btn, .join-btn, .item-btn');
+            if (btn && !btn.disabled && !btn.classList.contains('disabled')) {
+                // Audio Unlock Hack on first interaction
+                unlockAllAudio();
+                
+                btn.classList.add('active-press');
+                playSe('select');
+            }
+        }, { passive: false });
+
+        const clearEffect = () => {
+            document.querySelectorAll('.active-press').forEach(btn => {
+                btn.classList.remove('active-press');
+            });
+        };
+        document.addEventListener('pointerup', clearEffect);
+        document.addEventListener('pointerleave', clearEffect);
+        document.addEventListener('pointercancel', clearEffect);
+
 
         // Visual Helpers
         window.reveal = (wrap, valEl, val) => { 
@@ -735,13 +791,11 @@
 
         window.enterOnlineMode = () => {
             if (!userId) return alert("認証サーバーに接続中... しばらくしてから再度お試しください。");
-            unlockAudio(); 
             el('home-screen').classList.add('hidden');
             el('name-screen').classList.remove('hidden');
         };
 
         window.showItemBook = () => {
-            playSe('select');
             const cont = el('item-book-content');
             cont.innerHTML = '';
             Object.keys(ITEMS_DEF).forEach(k => {
@@ -760,7 +814,6 @@
         };
 
         window.submitName = () => {
-            playSe('select');
             const input = el('player-name-input').value.trim();
             if (input) {
                 userName = input.toUpperCase().substr(0, 8);
@@ -771,7 +824,6 @@
         };
 
         window.startCpuGame = () => {
-            unlockAudio(); 
             isOnline = false;
             role = 'cpu';
             maxPlayers = 2;
@@ -789,7 +841,6 @@
         };
 
         window.backToHome = () => {
-            playSe('select');
             el('lobby-screen').classList.add('hidden');
             el('home-screen').classList.remove('hidden');
         };
@@ -799,7 +850,6 @@
             const btn = el('item-'+itemId);
             if (btn && btn.classList.contains('banned')) return;
 
-            playSe('select');
             if (state.phase !== 1) return;
             state.p.item = itemId;
             
@@ -896,7 +946,6 @@
         }
 
         window.createRoom = async (max = 2) => {
-            playSe('select');
             if (!userId) {
                 alert("認証エラー: 再読み込みしてください。");
                 return;
@@ -942,7 +991,6 @@
         };
 
         window.joinRoom = async (id, max) => {
-            playSe('select');
             if (!userId) {
                 alert("認証エラー: 再読み込みしてください。");
                 return;
@@ -982,7 +1030,6 @@
         }
 
         window.cancelRoom = async () => {
-            playSe('select');
             await window.deleteRoom();
             location.reload();
         }
@@ -1360,7 +1407,7 @@
         };
 
         window.step = (key, delta) => {
-            playSe('select');
+            // playSeRemoved
             state.inputs[key] = Math.max(0, state.inputs[key] + delta);
             updateUI();
         };
@@ -1388,7 +1435,6 @@
             else ui.res.classList.remove('text-red-500');
 
             ui.topRes.innerText = Math.floor(remaining); 
-            // OPP RES hidden
             
             if (remaining < 0) {
                 ui.btn.disabled = true;
@@ -1457,7 +1503,14 @@
             // Select None
             state.p.item = 'none';
             // If none is somehow banned (impossible), pick first available
-            selectItem('none');
+            // Manual selection call (no sound needed here as it is init)
+            state.p.item = 'none';
+            // Update UI for none selection manually to avoid sound
+            const noneBtn = el('item-none');
+            if(noneBtn) noneBtn.classList.add('selected');
+            ui.infoTitle.innerText = ITEMS_DEF['none'].name;
+            ui.infoDesc.innerText = ITEMS_DEF['none'].desc;
+            updateUI();
             
             // Re-enable inputs
             ui.blocks.def.style.pointerEvents = 'auto'; ui.blocks.def.style.opacity = '1';
@@ -1535,7 +1588,7 @@
 
         window.commitPhase = () => {
             if(!updateUI()) return;
-            playSe('select'); 
+            // playSeRemoved
             toggleInputs(false); 
             stopTimer();
             
