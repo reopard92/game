@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：76</title>
+    <title>Resource Strategy Card Battle：77</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -400,7 +400,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 76</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 77</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -585,7 +585,8 @@
             pickOrder: [], 
             pickIndex: 0,
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 },
-            rewindUsed: [] // List of userIds who used rewind in this round
+            rewindUsed: [],
+            roomPlayers: [] // Stores player ID list
         };
 
         const ui = {
@@ -906,6 +907,10 @@
                 const isHost = userId && data.hostId === userId;
 
                 if (data.maxPlayers) maxPlayers = data.maxPlayers;
+                
+                // Store room players list for 1v1 opponent lookup
+                state.roomPlayers = data.players || [];
+                
                 try {
                     if (data.allRoundsItems) {
                         if (typeof data.allRoundsItems === 'string') {
@@ -1735,16 +1740,11 @@
                      replayed = true;
                  }
              } else if (pWin && !state.cNullified && state.c.item === 'rewind') {
-                 // Opponent uses rewind
-                 // In online 1v1, c.item is opponent's item.
-                 const oppId = isOnline ? state.c.playerId : 'cpu'; 
-                 // Note: state.c.playerId is not explicitly stored, infer from context or simplified logic
-                 const targetId = isOnline ? (role === 'host' ? (state.players.find(p=>p!==userId)||'guest') : 'host') : 'cpu'; // Simplification needed?
-                 // Better to check if opponent is in rewindUsed list.
-                 // In CPU mode, targetId is 'cpu'. In online, we need opponent ID.
-                 const actualOppId = isOnline ? Object.keys(state.players || {}).find(k => k !== userId) : 'cpu';
+                 // Opponent uses rewind (Modified Logic: Find actual Opponent ID)
+                 // state.roomPlayers is always populated by subscribeRoom
+                 const actualOppId = isOnline ? (state.roomPlayers || []).find(p => p !== userId) : 'cpu';
 
-                 if (!state.rewindUsed.includes(actualOppId)) {
+                 if (actualOppId && !state.rewindUsed.includes(actualOppId)) {
                      el('notice-msg').innerText = "OPPONENT REWIND ACTIVATED! REPLAYING ROUND...";
                      userWhoRewound = actualOppId;
                      replayed = true;
