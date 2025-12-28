@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：81</title>
+    <title>Resource Strategy Card Battle：82</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -137,30 +137,91 @@
         .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
-        /* Adjusted Button Height */
+        /* Adjusted Button Height & Press Effect */
         .btn-row-wrapper { display: flex; gap: 2px; height: 48px; width: 100%; justify-content: space-between; margin-top: 4px; }
-        .btn-mini { flex: 1; height: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 11px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; padding: 0; min-width: 0; }
-        .btn-mini:active { background: rgba(255,255,255,0.2); color: #fff; transform: scale(0.95); }
-        .btn-action-side { height: 100%; width: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(0,0,0,0.2); border-radius: 8px; letter-spacing: 2px; transition: all 0.2s; backdrop-filter: blur(4px); }
-        .btn-action-side:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
-        .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        
+        /* Button Press Effect Mixin Style */
+        .btn-mini { 
+            flex: 1; height: 100%; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 11px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 4px; transition: all 0.1s; padding: 0; min-width: 0; 
+            box-shadow: 0 3px 0 rgba(0,0,0,0.5); /* Shadow for depth */
+            transform: translateY(0);
+        }
+        .btn-mini:active { 
+            background: rgba(255,255,255,0.2); color: #fff; 
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* Remove shadow */
+            transform: translateY(3px); /* Move down */
+        }
+        
+        .btn-action-side { 
+            height: 100%; width: 100%; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; 
+            writing-mode: vertical-rl; text-orientation: mixed; 
+            display: flex; align-items: center; justify-content: center; 
+            text-shadow: 0 0 10px rgba(255,255,255,0.5); 
+            border-radius: 8px; letter-spacing: 2px; 
+            transition: all 0.1s; backdrop-filter: blur(4px); 
+            box-shadow: 0 4px 0 rgba(0,0,0,0.6); /* Shadow for depth */
+            transform: translateY(0);
+        }
+        .btn-action-side:active { 
+            background: rgba(255,255,255,0.2); 
+            box-shadow: 0 0 0 rgba(0,0,0,0); 
+            transform: translateY(4px); 
+        }
+        .btn-action-side:disabled { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; box-shadow: none; transform: none; }
+        
         .phase-title-text { font-size: 10px; color: #94a3b8; font-family: 'Cinzel'; font-weight: bold; margin-bottom: 2px; text-align: center; letter-spacing: 2px; text-shadow: 0 0 5px rgba(255,255,255,0.1); }
 
         .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
         
-        /* Adjusted Item Styles */
-        .item-btn { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.2s; overflow: hidden; backdrop-filter: blur(2px); opacity: 0.5; filter: grayscale(0.5); transform: scale(0.96); } 
-        .item-btn.selected { border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); opacity: 1; filter: none; transform: scale(1); }
-        .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+        /* Item Button Press Effect */
+        .item-btn { 
+            position: relative; aspect-ratio: 1/1; 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: all 0.1s; overflow: hidden; backdrop-filter: blur(2px); 
+            opacity: 0.5; filter: grayscale(0.5); 
+            box-shadow: 0 3px 0 rgba(0,0,0,0.5); 
+            transform: translateY(0) scale(0.96); 
+        } 
+        .item-btn:active {
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            transform: translateY(3px) scale(0.96);
+        }
+        .item-btn.selected { 
+            border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); 
+            opacity: 1; filter: none; 
+            transform: translateY(0) scale(1);
+            box-shadow: 0 3px 0 rgba(251, 191, 36, 0.3); /* Selected shadow */
+        }
+        .item-btn.selected:active {
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            transform: translateY(3px) scale(1);
+        }
+        .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; box-shadow: none; transform: none; }
+        
         /* Ban Style for Used Rewind */
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
         /* Rare Item Effect */
         .item-btn.item-rare {
             border-color: #ffd700 !important;
-            box-shadow: 0 0 15px #ffd700, inset 0 0 10px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 3px 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5); /* Gold shadow */
             animation: rare-pulse 2s infinite;
         }
+        .item-btn.item-rare:active {
+            box-shadow: 0 0 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5);
+            transform: translateY(3px) scale(1);
+        }
+
         .item-btn.item-rare::after {
             content: ''; position: absolute; top: -150%; left: -150%; width: 400%; height: 400%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
@@ -168,7 +229,7 @@
             animation: rare-shine 3s infinite;
             pointer-events: none;
         }
-        @keyframes rare-pulse { 0%, 100% { box-shadow: 0 0 10px #ffd700; } 50% { box-shadow: 0 0 20px #ffd700, 0 0 10px #fff; } }
+        @keyframes rare-pulse { 0%, 100% { border-color: #ffd700; } 50% { border-color: #fff; } }
         @keyframes rare-shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
@@ -216,15 +277,34 @@
 
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .lobby-btn { width: 100%; height: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transition: all 0.3s; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
-        .lobby-btn:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-        .lobby-btn:active { transform: scale(0.95); background: #fcd34d; color: #000; box-shadow: 0 0 30px #fcd34d; }
+        .lobby-btn { 
+            width: 100%; height: 60px; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
+            border-radius: 4px; margin-bottom: 12px; transition: all 0.1s; 
+            text-shadow: 0 0 5px rgba(255,255,255,0.3); 
+            box-shadow: 0 4px 0 rgba(0,0,0,0.5); 
+            transform: translateY(0);
+        }
+        .lobby-btn:hover { background: rgba(255,255,255,0.1); }
+        .lobby-btn:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            background: #fcd34d; color: #000; 
+        }
         
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
         .room-item { padding: 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
-        .join-btn { padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: all 0.2s; }
-        .join-btn:hover { background: rgba(147, 197, 253, 0.4); color: #fff; box-shadow: 0 0 10px #93c5fd; }
+        .join-btn { 
+            padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
+            color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: all 0.1s; 
+            box-shadow: 0 3px 0 rgba(30, 64, 175, 0.5); transform: translateY(0);
+        }
+        .join-btn:active { 
+            transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0);
+            background: rgba(147, 197, 253, 0.4); color: #fff; 
+        }
         
         .name-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 24px; width: 80%; max-width: 300px; transition: all 0.3s; }
         .name-input:focus { border-color: #fcd34d; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); outline: none; }
@@ -416,7 +496,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 81</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 82</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -540,8 +620,14 @@
         
         function playSe(name) {
             if (audio[name]) {
-                audio[name].currentTime = 0;
-                audio[name].play().catch(e => console.log("SE play failed", e));
+                const clone = audio[name].cloneNode();
+                clone.volume = 1; 
+                clone.play().catch(e => console.log("SE play failed", e));
+
+                // Vibration API
+                if (navigator.vibrate) {
+                    navigator.vibrate(10); 
+                }
             }
         }
 
