@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：90</title>
+    <title>Resource Strategy Card Battle：91</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -69,7 +69,7 @@
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 2px; justify-content: center; }
-        .action-area { width: 70px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0; }
+        .action-area { width: 70px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 6px; flex-shrink: 0; }
 
         /* Card Styles */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
@@ -95,13 +95,21 @@
         .battle-card-front { transform: rotateY(0deg); z-index: 2; }
         .battle-card-back { transform: rotateY(180deg); background-image: url('裏面.png'); background-color: #1e293b; }
 
+        /* Front Card Border Colors */
         .battle-card-front.card-spd { background-image: url('SPD.png'); border-color: var(--color-spd); }
-        .card-spd { color: #fff; }
         .battle-card-front.card-hp { background-image: url('HP.png'); border-color: var(--color-hp); }
-        .card-hp { color: #fff; }
         .battle-card-front.card-atk { background-image: url('ATK.png'); border-color: var(--color-atk); }
-        .card-atk { color: #fff; }
         .battle-card-front.card-def { background-image: url('DEF.png'); border-color: var(--color-def); }
+
+        /* Back Card Border Colors */
+        .battle-card-back.card-spd { border-color: var(--color-spd); }
+        .battle-card-back.card-hp { border-color: var(--color-hp); }
+        .battle-card-back.card-atk { border-color: var(--color-atk); }
+        .battle-card-back.card-def { border-color: var(--color-def); }
+
+        .card-spd { color: #fff; }
+        .card-hp { color: #fff; }
+        .card-atk { color: #fff; }
         .card-def { color: #fff; }
 
         .card-label { position: absolute; top: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; opacity: 0.9; font-family: 'Cinzel'; letter-spacing: 1px; }
@@ -147,7 +155,7 @@
             align-items: flex-start;
         }
         
-        /* Button Press Effect Mixin Style */
+        /* Button Press Effect Mixin Style - Changed to use JS class .active-press */
         .btn-mini { 
             flex: 1; height: 48px;
             background: rgba(255,255,255,0.05); 
@@ -168,7 +176,8 @@
         }
         
         .btn-action-side { 
-            height: 100%; width: 100%; 
+            width: 100%; 
+            height: 140px; /* Reduced height from 100% to fixed */
             background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); 
             border: 1px solid rgba(255,255,255,0.2); 
             color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; 
@@ -182,6 +191,7 @@
             transition: none;
             cursor: pointer;
             user-select: none;
+            margin-top: auto; /* Align bottom */
         }
         .btn-action-side.active-press { 
             background: rgba(255,255,255,0.2); 
@@ -251,6 +261,11 @@
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 1; }
         
+        .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
+        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
+        /* Removed font-family for item desc to use inherited font */
+        .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: inherit; }
+
         /* Modified Battle Info Box Style & Position */
         .battle-info-box {
             width: 100%;
@@ -266,7 +281,7 @@
             font-size: 0.7rem;
             color: #fff;
             padding: 2px;
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: inherit;
             text-shadow: 0 0 4px rgba(0,0,0,0.8);
             line-height: 1.2;
         }
@@ -288,10 +303,14 @@
         @keyframes cutin-scale { 0% { transform: scale(1.3); opacity: 0; } 15% { transform: scale(1); opacity: 1; } 90% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0; } }
         .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+        /* Mobile adjust for Cutin */
+        @media (max-width: 640px) {
+            .cutin-container { transform: scale(0.55); }
+        }
 
         #ready-fight { pointer-events: none; }
         .rf-overlay { position: absolute; inset: 0; z-index: 55; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); opacity: 0; backdrop-filter: blur(2px); }
-        .rf-text { font-family: 'Cinzel'; font-weight: bold; font-size: 5rem; color: #fff; text-shadow: 0 0 30px #fcd34d; letter-spacing: 0.1em; transform: scale(0); }
+        .rf-text { font-family: 'Cinzel'; font-weight: bold; font-size: 15vw; color: #fff; text-shadow: 0 0 30px #fcd34d; letter-spacing: 0.1em; transform: scale(0); white-space: nowrap; } /* Scaled font size */
         .rf-text.fight { color: #f43f5e; text-shadow: 0 0 40px #f43f5e; font-size: 6rem; }
         @keyframes rf-pop { 0% { transform: scale(0); opacity: 0; } 20% { transform: scale(1.1); opacity: 1; } 40% { transform: scale(1); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
         .anim-rf { animation: rf-pop 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
@@ -536,7 +555,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 90</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 91</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -690,7 +709,7 @@
         document.addEventListener('pointerdown', (e) => {
             if (!e.target || typeof e.target.closest !== 'function') return;
 
-            const btn = e.target.closest('.btn-mini, .btn-action-side, .lobby-btn, .join-btn, .item-btn');
+            const btn = e.target.closest('[data-action]');
             if (btn && !btn.disabled && !btn.classList.contains('disabled')) {
                 // Audio Unlock Hack on first interaction
                 unlockAllAudio();
@@ -704,22 +723,10 @@
                         playSe('select');
                         step(btn.dataset.key, parseInt(btn.dataset.val));
                     } else if (action === 'selectItem') {
-                        // アイテム選択は selectItem 内で音を鳴らすか、ここで鳴らすか。
-                        // 以前のロジックでは selectItem 内で playSe('select') していたが、
-                        // ここで一括管理するなら、selectItem からは playSe を削除してここで鳴らす。
                         playSe('select');
                         const itemId = btn.id.replace('item-', '');
                         selectItem(itemId);
                     } else if (action === 'commitPhase') {
-                         // commitPhase内で playSe('decide') を呼ぶことになっているのでここでは鳴らさない
-                         // あるいはここで鳴らすなら commitPhase 内のを削除する。
-                         // commitPhase は条件(updateUI)によって実行されない場合もあるため、
-                         // 成功時のみ鳴らすなら commitPhase 内が良いが、
-                         // 「押した瞬間」のフィードバックとしてはここで鳴らすのが良い。
-                         // ただし、LockIn は決定音なので select 音ではない。
-                         // ここでは汎用的なクリック音(select)を鳴らさず、個別に任せるか？
-                         // 指示は「pointerdown ... の中にロジックを組み込みます」なので
-                         // ここで分岐させて処理を呼ぶ。
                          commitPhase(); 
                     } else if (action === 'startCpuGame') {
                         playSe('select');
@@ -741,12 +748,8 @@
                         createRoom(parseInt(btn.dataset.val));
                     } else if (action === 'joinRoom') {
                         playSe('select');
-                        // room list generation needs to add data attributes
-                        // joinRoom(id, max) is complex, handled in refreshRoomList
-                        // We need to parse from dataset
-                        // But joinRoom buttons are generated dynamically.
-                        // Let's assume joinRoom buttons have correct dataset.
-                        // See refreshRoomList modification below.
+                        // logic handled in refreshRoomList or separate
+                        joinRoom(btn.dataset.id, btn.dataset.max);
                     } else if (action === 'backToHome') {
                         playSe('select');
                         backToHome();
@@ -757,16 +760,12 @@
                         playSe('select');
                         cancelRoom();
                     } else if (action === 'nextRound') {
-                        // nextRound may play logic sounds? No, just transition.
                         playSe('select');
                         nextRound();
                     }
                 }
             }
         }, { passive: false });
-
-        // Handle dynamic Join Button separately if needed or ensure refreshRoomList adds data attributes
-        // We will modify refreshRoomList to add data attributes.
 
         const clearEffect = () => {
             document.querySelectorAll('.active-press').forEach(btn => {
@@ -877,7 +876,6 @@
         };
 
         window.showItemBook = () => {
-            // Sound played in pointerdown
             const cont = el('item-book-content');
             cont.innerHTML = '';
             // コスト順にソートして表示
@@ -911,7 +909,7 @@
         };
 
         window.startCpuGame = () => {
-            // Sound played in pointerdown
+            unlockAudio(); 
             isOnline = false;
             role = 'cpu';
             maxPlayers = 2;
@@ -1081,8 +1079,6 @@
         // Modified joinRoom to accept arguments or from dataset in pointerdown
         window.joinRoom = async (id, max) => {
             // id and max are passed from pointerdown event
-            // But here we just redefine the function for logic reuse
-            // The actual call happens in pointerdown event using dataset
             if (!id && !max) return; // safety
 
             if (!userId) {
@@ -1115,9 +1111,6 @@
                 alert("ルーム参加エラー: " + e.message);
             }
         };
-
-        // Pointerdown listener for joinRoom logic moved to main listener
-        // The joinRoom function above is just a logic container now.
 
         window.deleteRoom = async () => {
             if (roomId && role === 'host') {
