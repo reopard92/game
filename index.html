@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：92</title>
+    <title>Resource Strategy Card Battle：93</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -319,7 +319,15 @@
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
         /* Mobile adjust for Cutin */
         @media (max-width: 640px) {
-            .cutin-container { transform: scale(0.45); } /* Adjusted to 0.45 */
+            .cutin-container {
+                transform: scale(0.65);
+                flex-direction: column-reverse; /* Stack vertically for mobile */
+                gap: 10px;
+            }
+            .vs-text {
+                margin: 0;
+                font-size: 3rem;
+            }
         }
 
         #ready-fight { pointer-events: none; }
@@ -569,7 +577,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 92</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 93</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -696,10 +704,18 @@
         function playSe(name) {
             const el = document.getElementById('se-' + name);
             if (el) {
-                const clone = el.cloneNode(true);
-                clone.muted = false; // クローン側でミュート解除
-                clone.volume = 1.0;  // 音量設定
-                clone.play().catch(e => console.log("SE play failed", e));
+                if (name === 'win' || name === 'lose') {
+                    // Direct play for result sounds to improve mobile reliability
+                    el.currentTime = 0;
+                    el.volume = 1.0;
+                    el.muted = false;
+                    el.play().catch(e => console.log("SE play failed", e));
+                } else {
+                    const clone = el.cloneNode(true);
+                    clone.muted = false; // クローン側でミュート解除
+                    clone.volume = 1.0;  // 音量設定
+                    clone.play().catch(e => console.log("SE play failed", e));
+                }
 
                 // Vibration API
                 if (navigator.vibrate) {
@@ -890,6 +906,7 @@
         };
 
         window.showItemBook = () => {
+            // Sound played in pointerdown
             const cont = el('item-book-content');
             cont.innerHTML = '';
             // コスト順にソートして表示
@@ -923,7 +940,7 @@
         };
 
         window.startCpuGame = () => {
-            unlockAudio(); 
+            // Sound played in pointerdown
             isOnline = false;
             role = 'cpu';
             maxPlayers = 2;
@@ -1581,6 +1598,10 @@
         window.initRound = async () => {
             clearBattleTimers(); // 追加: ラウンド開始時に前の演出をキャンセル
             if(timerInterval) clearInterval(timerInterval); // 念のためここでも
+            
+            // Clear info box
+            const infoBox = el('battle-info-box');
+            if(infoBox) infoBox.innerText = "";
 
             playSe('flip'); // ラウンド開始音
 
@@ -1796,8 +1817,12 @@
                     ui.btn.innerText = "ENGAGE";
                     toggleInputs(true); 
                     updateUI();
-                    
+
                     const infoBox = el('battle-info-box');
+                    
+                    // Show self item info first
+                    const myItem = ITEMS_DEF[state.p.item];
+                    if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
                     
                     // Pre-check for Nullify against Crystal/Fast/Chest
                     let enemyNullify = (state.c.item === 'nullify');
@@ -1809,10 +1834,6 @@
                         if(infoBox) {
                             infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
                             infoBox.classList.add('text-yellow-400');
-                            setTimeout(() => {
-                                infoBox.classList.remove('text-yellow-400');
-                                infoBox.innerText = "";
-                            }, 3000);
                         }
                     }
                     if (state.c.item === 'chest' && state.p.item !== 'nullify') {
@@ -1820,12 +1841,10 @@
                             state.c.total += 100; // CPU bonus
                             if(infoBox) {
                                 infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`; 
-                                setTimeout(() => infoBox.innerText = "", 3000);
                             }
                         } else {
                              if(infoBox) {
                                  infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
-                                 setTimeout(() => infoBox.innerText = "", 3000);
                              }
                         }
                     }
@@ -1836,10 +1855,6 @@
                          if(infoBox) {
                              infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`;
                              infoBox.classList.add('text-purple-400');
-                             setTimeout(() => {
-                                 infoBox.classList.remove('text-purple-400');
-                                 // Leave text for a while or clear?
-                             }, 4000);
                          }
                     }
                     
