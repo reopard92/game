@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：84</title>
+    <title>Resource Strategy Card Battle：85</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -264,7 +264,7 @@
         .cutin-container { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; justify-content: center; transform: scale(0.9); opacity: 0; }
         .cutin-box { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; }
         .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; }
-        .cutin-img-box { width: 120px; height: 120px; border: 2px solid; border-radius: 50%; overflow: hidden; background: transparent; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .cutin-img-box { width: 120px; height: 120px; border: 2px solid; border-radius: 12px; overflow: hidden; background: transparent; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
         .cutin-img-box.p { border-color: #93c5fd; box-shadow: 0 0 30px #93c5fd; }
         .cutin-img-box.c { border-color: #f43f5e; box-shadow: 0 0 30px #f43f5e; }
         .cutin-img { width: 90%; height: 90%; object-fit: contain; }
@@ -518,14 +518,14 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 84</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 85</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
                 <li><b class="text-white">5ラウンド制</b>：HPが多い方が勝利</li>
                 <li><b class="text-blue-400">1000 PTS</b>：全ラウンド共通のポイントを配分</li>
                 <li><b class="text-purple-400">SPDフェーズ (SPEED)</b>：
-                    <br><span class="pl-4">勝者: <b class="text-yellow-400">攻撃1.2倍</b> & <b class="text-green-400">消費30%還元</b></span>
+                    <br><span class="pl-4">勝者: <b class="text-yellow-400">消費30%還元</b></span>
                     <br><span class="pl-4 text-red-400">★即死: 先行でHPを0にすれば即勝利</span>
                 </li>
                 <li><b class="text-green-400">構築フェーズ (BUILD)</b>：
@@ -724,18 +724,18 @@
         let battleTimers = []; 
 
         const ITEMS_DEF = {
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
-            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
             'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
-            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
             'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "ミラーシールド.png" },
-            'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
-            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
             'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
             'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
-            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
-            'crystal': { cost: 60, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" }
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
+            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
+            'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
+            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
+            'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
+            'crystal': { cost: 60, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" },
+            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" }
         };
         // All items except 'none' for random pool
         const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal'];
@@ -798,7 +798,12 @@
         window.showItemBook = () => {
             const cont = el('item-book-content');
             cont.innerHTML = '';
-            Object.keys(ITEMS_DEF).forEach(k => {
+            // 名前順にソートして表示
+            const sortedKeys = Object.keys(ITEMS_DEF).sort((a, b) => {
+                return ITEMS_DEF[a].name.localeCompare(ITEMS_DEF[b].name, 'ja');
+            });
+            
+            sortedKeys.forEach(k => {
                 const item = ITEMS_DEF[k];
                 cont.innerHTML += `
                     <div class="item-book-entry">
@@ -1542,7 +1547,7 @@
             }
 
             updateUI();
-            startTimer(15);
+            startTimer(20);
         }
 
         function generateCPU() {
@@ -1788,14 +1793,14 @@
                 pFirst = state.p.spd >= state.c.spd;
             }
             
-            const pMult = state.pAdv ? 1.5 : 1.0; 
-            const cMult = state.cAdv ? 1.5 : 1.0;
+            const pMult = 1.0; 
+            const cMult = 1.0;
             const pAtkFinal = Math.ceil(state.p.atk * pMult);
             const cAtkFinal = Math.ceil(state.c.atk * cMult);
 
             if(state.pAdv || state.cAdv) {
                 el('adv-badge').classList.remove('hidden');
-                el('adv-badge').innerText = state.pAdv ? "YOU: ATK x1.5" : "OPP: ATK x1.5";
+                el('adv-badge').innerText = state.pAdv ? "INITIATIVE WIN!" : "OPPONENT ADVANTAGE";
             } 
             // REMOVED RESOURCE ADVANTAGE DISPLAY
 
