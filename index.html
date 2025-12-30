@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：85</title>
+    <title>Resource Strategy Card Battle：86</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -89,7 +89,7 @@
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: transparent; border: 2px solid transparent; box-shadow: none;
-            border-radius: 8px; overflow: hidden; background-repeat: no-repeat;
+            border-radius: 12px; overflow: hidden; background-repeat: no-repeat;
             background-position: center; background-size: cover;
         }
         .battle-card-front { transform: rotateY(0deg); z-index: 2; }
@@ -141,30 +141,30 @@
         
         /* Adjusted Button Height & Press Effect */
         .btn-row-wrapper { 
-            display: flex; gap: 2px; height: 52px; /* Height increased for depth space */
+            display: flex; gap: 2px; height: 52px; 
             width: 100%; justify-content: space-between; margin-top: 4px;
-            padding-bottom: 4px; /* Ensure shadow is visible */
+            padding-bottom: 4px; 
             align-items: flex-start;
         }
         
-        /* Button Press Effect Mixin Style - Changed to use JS class .active-press */
+        /* Button Press Effect Mixin Style */
         .btn-mini { 
-            flex: 1; height: 48px; /* Fixed height part */
+            flex: 1; height: 48px;
             background: rgba(255,255,255,0.05); 
             border: 1px solid rgba(255,255,255,0.1); 
             color: #cbd5e1; font-family: 'Cinzel'; font-weight: bold; font-size: 11px; 
             display: flex; align-items: center; justify-content: center; 
             border-radius: 4px; padding: 0; min-width: 0; 
-            box-shadow: 0 4px 0 #000000; /* Darker Shadow for depth */
+            box-shadow: 0 4px 0 #000000;
             transform: translateY(0);
-            transition: none; /* Instant reaction */
+            transition: none; 
             cursor: pointer;
             user-select: none;
         }
         .btn-mini.active-press { 
             background: rgba(255,255,255,0.2); color: #fff; 
-            box-shadow: 0 0 0 #000000; /* Remove shadow */
-            transform: translateY(4px); /* Move down */
+            box-shadow: 0 0 0 #000000;
+            transform: translateY(4px);
         }
         
         .btn-action-side { 
@@ -177,9 +177,9 @@
             text-shadow: 0 0 10px rgba(255,255,255,0.5); 
             border-radius: 8px; letter-spacing: 2px; 
             backdrop-filter: blur(4px); 
-            box-shadow: 0 4px 0 #000000; /* Darker Shadow */
+            box-shadow: 0 4px 0 #000000;
             transform: translateY(0);
-            transition: none; /* Instant */
+            transition: none;
             cursor: pointer;
             user-select: none;
         }
@@ -199,7 +199,7 @@
             position: relative; aspect-ratio: 1/1; 
             background: rgba(255,255,255,0.02); 
             border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             overflow: hidden; backdrop-filter: blur(2px); 
             opacity: 0.5; filter: grayscale(0.5); 
             box-shadow: 0 4px 0 rgba(0,0,0,0.8); 
@@ -216,7 +216,7 @@
             border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); 
             opacity: 1; filter: none; 
             transform: translateY(0) scale(1);
-            box-shadow: 0 4px 0 rgba(0,0,0,1); /* Selected shadow */
+            box-shadow: 0 4px 0 rgba(0,0,0,1);
         }
         .item-btn.selected.active-press {
             box-shadow: 0 0 0 rgba(0,0,0,0);
@@ -230,7 +230,7 @@
         /* Rare Item Effect */
         .item-btn.item-rare {
             border-color: #ffd700 !important;
-            box-shadow: 0 4px 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5); /* Gold shadow */
+            box-shadow: 0 4px 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5);
             animation: rare-pulse 2s infinite;
         }
         .item-btn.item-rare.active-press {
@@ -518,7 +518,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 85</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 86</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -724,21 +724,22 @@
         let battleTimers = []; 
 
         const ITEMS_DEF = {
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
+            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
+            'chest': { cost: 0, name: "宝箱", desc: "フェーズ2開始時に自分のPTSを＋100する", img: "宝箱.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "ミラーシールド.png" },
-            'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
-            'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
-            'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
-            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
             'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
-            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
+            'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
+            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
+            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
             'crystal': { cost: 60, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" },
-            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" }
+            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
+            'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
         // All items except 'none' for random pool
-        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal'];
+        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal', 'chest'];
 
         let state = {
             round: 1,
@@ -791,6 +792,7 @@
 
         window.enterOnlineMode = () => {
             if (!userId) return alert("認証サーバーに接続中... しばらくしてから再度お試しください。");
+            unlockAudio(); 
             el('home-screen').classList.add('hidden');
             el('name-screen').classList.remove('hidden');
         };
@@ -798,9 +800,9 @@
         window.showItemBook = () => {
             const cont = el('item-book-content');
             cont.innerHTML = '';
-            // 名前順にソートして表示
+            // コスト順にソートして表示
             const sortedKeys = Object.keys(ITEMS_DEF).sort((a, b) => {
-                return ITEMS_DEF[a].name.localeCompare(ITEMS_DEF[b].name, 'ja');
+                return ITEMS_DEF[a].cost - ITEMS_DEF[b].cost;
             });
             
             sortedKeys.forEach(k => {
@@ -829,6 +831,7 @@
         };
 
         window.startCpuGame = () => {
+            unlockAudio(); 
             isOnline = false;
             role = 'cpu';
             maxPlayers = 2;
@@ -1132,7 +1135,7 @@
                     if (rewindTriggered) {
                          el('result-overlay').classList.add('hidden');
                          el('wait-overlay').classList.add('hidden');
-                         el('notice-msg').innerText = "REWIND ACTIVATED!";
+                         el('notice-msg').innerText = "時戻し発動！ ラウンドをやり直します...";
                          setTimeout(() => initRound(), 1000);
                          return;
                     }
@@ -1161,7 +1164,7 @@
 
                          if (allReady && currentDbRound === state.round) {
                              console.log("[Host Logic] Initiating next round transition...");
-                             el('notice-msg').innerText = "SYNCING NEXT ROUND...";
+                             el('notice-msg').innerText = "次のラウンドを同期中...";
                              
                              const updates = {
                                 round: currentDbRound + 1,
@@ -1182,7 +1185,7 @@
                                 .then(() => console.log("[Host Logic] Round update success"))
                                 .catch(err => {
                                     console.error("[Host Logic] Round update failed:", err);
-                                    el('notice-msg').innerText = "SYNC ERROR: RETRYING...";
+                                    el('notice-msg').innerText = "同期エラー：再試行中...";
                                 });
                          }
                     }
@@ -1302,7 +1305,7 @@
                     ui.btn.disabled = false;
                     toggleInputs(true);
                     updateUI();
-                    startTimer(15);
+                    startTimer(20);
                 }
             }
             const allPhase2 = data.players.every(pid => data.playerData[pid].phase2);
@@ -1460,6 +1463,8 @@
         window.initRound = async () => {
             clearBattleTimers(); // 追加: ラウンド開始時に前の演出をキャンセル
             if(timerInterval) clearInterval(timerInterval); // 念のためここでも
+
+            playSe('flip'); // ラウンド開始音
 
             // First, reset cards immediately to prevent leaking previous round data
             ['spd','hp','atk','def'].forEach(k => {
@@ -1674,8 +1679,27 @@
                     toggleInputs(true); 
                     updateUI();
                     
-                    // Pre-check for Nullify against Crystal/Fast
+                    // Pre-check for Nullify against Crystal/Fast/Chest
                     let enemyNullify = (state.c.item === 'nullify');
+
+                    // 宝箱効果（無効化されていない場合のみ）
+                    if (state.p.item === 'chest' && !enemyNullify) {
+                        state.p.total += 100;
+                        updateUI();
+                        el('notice-msg').innerText = `【宝箱】ボーナス獲得！ PTS+100`;
+                        el('notice-msg').classList.add('text-yellow-400');
+                        setTimeout(() => el('notice-msg').classList.remove('text-yellow-400'), 3000);
+                    }
+                    if (state.c.item === 'chest' && state.p.item !== 'nullify') {
+                        if (!isOnline) {
+                            state.c.total += 100; // CPU bonus
+                            el('notice-msg').innerText = `敵が【宝箱】を使用！ 敵PTS+100`; // Notify player
+                            setTimeout(() => el('notice-msg').innerText = "", 3000);
+                        } else {
+                             el('notice-msg').innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
+                             setTimeout(() => el('notice-msg').innerText = "", 3000);
+                        }
+                    }
                     
                     // 水晶玉の効果：相手のアイテムを表示 (相手がnullifyでない場合のみ)
                     if (state.p.item === 'crystal' && !enemyNullify) {
@@ -1741,12 +1765,12 @@
             
             if (state.p.item === 'nullify' && state.c.item !== 'nullify') {
                 cNullified = true;
-                el('notice-msg').innerText = "NULLIFY ACTIVATED! OPPONENT ITEM DISABLED!";
+                el('notice-msg').innerText = "無効化発動！ 相手のアイテムを無効化！";
                 state.c.item = 'none'; // Force overwrite to none
             }
             if (state.c.item === 'nullify' && state.p.item !== 'nullify') {
                 pNullified = true;
-                el('notice-msg').innerText = "OPPONENT USED NULLIFY! YOUR ITEM DISABLED!";
+                el('notice-msg').innerText = "相手が無効化を使用！ あなたのアイテムは無効化されました！";
                 state.p.item = 'none'; // Force overwrite to none
             }
             
@@ -1800,7 +1824,7 @@
 
             if(state.pAdv || state.cAdv) {
                 el('adv-badge').classList.remove('hidden');
-                el('adv-badge').innerText = state.pAdv ? "INITIATIVE WIN!" : "OPPONENT ADVANTAGE";
+                el('adv-badge').innerText = state.pAdv ? "先攻奪取！" : "後攻（相手が先攻）";
             } 
             // REMOVED RESOURCE ADVANTAGE DISPLAY
 
@@ -1823,7 +1847,7 @@
                              if (state.c.item === 'prot' || state.c.item === 'boost') {
                                 if (state.c.item === 'prot') state.c.currHp = 1;
                                 else state.c.currHp = 0; 
-                                el('notice-msg').innerText = "OPPONENT SURVIVED!";
+                                el('notice-msg').innerText = "相手は耐えた！";
                             } else {
                                 dead = true;
                             }
@@ -1837,7 +1861,7 @@
                             if (state.p.item === 'prot' || state.p.item === 'boost') {
                                 if (state.p.item === 'prot') state.p.currHp = 1;
                                 else state.p.currHp = 0;
-                                el('notice-msg').innerText = "SURVIVED!";
+                                el('notice-msg').innerText = "耐えた！";
                             } else {
                                 dead = true;
                             }
@@ -1912,7 +1936,7 @@
              if (cWin && state.p.item === 'rewind') {
                  // Player uses rewind
                  if (!state.rewindUsed.includes(userId)) {
-                     el('notice-msg').innerText = "TIME REWIND ACTIVATED! REPLAYING ROUND...";
+                     el('notice-msg').innerText = "時戻し発動！ ラウンドをやり直します...";
                      userWhoRewound = userId;
                      replayed = true;
                  }
@@ -1922,7 +1946,7 @@
                  const actualOppId = isOnline ? (state.roomPlayers || []).find(p => p !== userId) : 'cpu';
 
                  if (actualOppId && !state.rewindUsed.includes(actualOppId)) {
-                     el('notice-msg').innerText = "OPPONENT REWIND ACTIVATED! REPLAYING ROUND...";
+                     el('notice-msg').innerText = "相手が時戻しを発動！ ラウンドをやり直します...";
                      userWhoRewound = actualOppId;
                      replayed = true;
                  }
@@ -1987,6 +2011,9 @@
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; pWin=true; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; cWin=true; }
             
+            if(pWin) playSe('select'); // Victory sound
+            else if(cWin) playSe('attack'); // Defeat sound
+            
             // Check Rewind
             if (applyRewind(pWin, cWin)) {
                 // If rewound, revert win count
@@ -2039,7 +2066,7 @@
                 
                 // ★追加: 待機メッセージを変更してユーザーに状態を伝える
                 const waitMsg = el('wait-overlay').querySelector('.font-gaming');
-                if(waitMsg) waitMsg.innerText = "WAITING FOR OPPONENT...";
+                if(waitMsg) waitMsg.innerText = "対戦相手を待っています...";
 
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
                 // Ready flag update
