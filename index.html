@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：93</title>
+    <title>Resource Strategy Card Battle：94</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -303,7 +303,8 @@
         /* Cut-in, Ready Fight */
         #item-cutin { pointer-events: none; }
         .cutin-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; backdrop-filter: blur(10px); }
-        .cutin-container { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; justify-content: center; transform: scale(0.9); opacity: 0; }
+        /* CHANGED: Always column-reverse for consistent look */
+        .cutin-container { display: flex; flex-direction: column-reverse; gap: 10px; align-items: center; justify-content: center; transform: scale(0.8); opacity: 0; }
         .cutin-box { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; }
         .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; }
         .cutin-img-box { width: 120px; height: 120px; border: 2px solid; border-radius: 12px; overflow: hidden; background: transparent; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
@@ -312,22 +313,14 @@
         .cutin-img { width: 90%; height: 90%; object-fit: contain; }
         .cutin-name { font-family: 'Noto Sans JP', sans-serif; font-weight: bold; font-size: 1.1rem; color: #fff; text-align: center; margin-top: 8px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .cutin-desc-sm { font-family: 'Noto Sans JP', sans-serif; font-size: 0.8rem; color: #e2e8f0; text-align: center; line-height: 1.4; background: rgba(255,255,255,0.05); padding: 6px; border-radius: 6px; width: 100%; border: 1px solid rgba(255,255,255,0.1); }
-        .vs-text { font-family: 'Cinzel'; font-size: 4rem; color: #fcd34d; text-shadow: 0 0 30px #fcd34d; margin-top: 35px; font-weight: bold; font-style: italic; }
+        .vs-text { font-family: 'Cinzel'; font-size: 3rem; color: #fcd34d; text-shadow: 0 0 30px #fcd34d; margin: 0; font-weight: bold; font-style: italic; }
         @keyframes cutin-anim { 0% { opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; } }
-        @keyframes cutin-scale { 0% { transform: scale(1.3); opacity: 0; } 15% { transform: scale(1); opacity: 1; } 90% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0; } }
+        @keyframes cutin-scale { 0% { transform: scale(1.3); opacity: 0; } 15% { transform: scale(0.8); opacity: 1; } 90% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(0.9); opacity: 0; } }
         .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
         /* Mobile adjust for Cutin */
         @media (max-width: 640px) {
-            .cutin-container {
-                transform: scale(0.65);
-                flex-direction: column-reverse; /* Stack vertically for mobile */
-                gap: 10px;
-            }
-            .vs-text {
-                margin: 0;
-                font-size: 3rem;
-            }
+            .cutin-container { transform: scale(0.45); }
         }
 
         #ready-fight { pointer-events: none; }
@@ -577,7 +570,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 93</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 94</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1713,10 +1706,10 @@
                 return true;
             });
 
-            if (budget > 300 && validItems.length > 0) {
-                 if (Math.random() < 0.4) {
+            if (budget > 200 && validItems.length > 0) { // Condition relaxed
+                 if (Math.random() < 0.8) { // Chance increased to 80%
                      const choice = validItems[Math.floor(Math.random() * validItems.length)];
-                     if (ITEMS_DEF[choice].cost <= 100) { 
+                     if (ITEMS_DEF[choice].cost <= 100) { // Limit cost slightly
                          state.c.item = choice;
                      }
                  }
@@ -1817,7 +1810,7 @@
                     ui.btn.innerText = "ENGAGE";
                     toggleInputs(true); 
                     updateUI();
-
+                    
                     const infoBox = el('battle-info-box');
                     
                     // Show self item info first
@@ -1832,7 +1825,7 @@
                         state.p.total += 100;
                         updateUI();
                         if(infoBox) {
-                            infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
+                            infoBox.innerText += `\n【宝箱】ボーナス獲得！ PTS+100`;
                             infoBox.classList.add('text-yellow-400');
                         }
                     }
@@ -1840,11 +1833,11 @@
                         if (!isOnline) {
                             state.c.total += 100; // CPU bonus
                             if(infoBox) {
-                                infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`; 
+                                infoBox.innerText += `\n敵が【宝箱】を使用！ 敵PTS+100`; 
                             }
                         } else {
                              if(infoBox) {
-                                 infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
+                                 infoBox.innerText += `\n敵が【宝箱】を使用！ 敵PTS+100`;
                              }
                         }
                     }
@@ -1853,7 +1846,7 @@
                     if (state.p.item === 'crystal' && !enemyNullify) {
                          const enemyItemName = ITEMS_DEF[state.c.item] ? ITEMS_DEF[state.c.item].name : "不明";
                          if(infoBox) {
-                             infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`;
+                             infoBox.innerText += `\n【水晶玉】予知: 敵は「${enemyItemName}」を選択中\n解析: 敵残存 ${Math.floor(state.c.total)} PTS`; // Added remaining PTS here
                              infoBox.classList.add('text-purple-400');
                          }
                     }
@@ -1927,7 +1920,11 @@
             
             // Apply Scope Effect (after nullify check)
             if (state.p.item === 'scope' && state.c.total !== undefined) {
-                 if(infoBox) infoBox.innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
+                 // Scope effect now moved to phase 1 resolve or here just in case?
+                 // Original logic had it here, but instruction says display at start of Phase 2.
+                 // We added it to resolvePhase1 for Crystal/Scope like behavior.
+                 // Let's keep it consistent.
+                 if(infoBox) infoBox.innerText += `\n解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
             }
             if (state.c.item === 'scope') {
                 // CPU sees your points (no UI needed)
