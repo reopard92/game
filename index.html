@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：87</title>
+    <title>Resource Strategy Card Battle：88</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -522,7 +522,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 87</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 88</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -636,12 +636,12 @@
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.volume = 0; 
+                    el.muted = true; // ミュートにする
                     el.play().then(() => {
                         el.pause();
                         el.currentTime = 0;
-                        el.volume = 1; 
-                    }).catch(e => console.log("Unlock failed", e));
+                        // el.muted = false; // 元に戻さない（playSeでクローンする際に音量を設定するため）
+                    }).catch(() => {});
                 }
             });
         }
@@ -650,7 +650,8 @@
             const el = document.getElementById('se-' + name);
             if (el) {
                 const clone = el.cloneNode(true);
-                clone.volume = 1; 
+                clone.muted = false; // クローン側でミュート解除
+                clone.volume = 1.0;  // 音量設定
                 clone.play().catch(e => console.log("SE play failed", e));
 
                 // Vibration API
@@ -1387,7 +1388,7 @@
                 count--;
                 ui.timer.innerText = count;
                 
-                if (count <= 3 && count > 0) {
+                if (count === 3) {
                      ui.timer.classList.add('timer-urgent');
                      playSe('countdown');
                 }
@@ -1850,7 +1851,7 @@
                              if (state.c.item === 'prot' || state.c.item === 'boost') {
                                 if (state.c.item === 'prot') state.c.currHp = 1;
                                 else state.c.currHp = 0; 
-                                el('notice-msg').innerText = "相手は耐えた！";
+                                el('notice-msg').innerText = "OPPONENT SURVIVED!";
                             } else {
                                 dead = true;
                             }
@@ -1864,7 +1865,7 @@
                             if (state.p.item === 'prot' || state.p.item === 'boost') {
                                 if (state.p.item === 'prot') state.p.currHp = 1;
                                 else state.p.currHp = 0;
-                                el('notice-msg').innerText = "耐えた！";
+                                el('notice-msg').innerText = "SURVIVED!";
                             } else {
                                 dead = true;
                             }
@@ -1896,7 +1897,7 @@
                         state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
                         
                         if (state.c.currHp <= 0) {
-                             if (state.c.item === 'prot' || state.c.item === 'boost') {
+                             if (!state.cNullified && (state.c.item === 'prot' || state.c.item === 'boost')) {
                                 if (state.c.item === 'prot') state.c.currHp = 1;
                                 else state.c.currHp = 0;
                             }
@@ -1908,7 +1909,7 @@
                         state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; 
                         
                         if (state.p.currHp <= 0) {
-                             if (state.p.item === 'prot' || state.p.item === 'boost') {
+                             if (!state.pNullified && (state.p.item === 'prot' || state.p.item === 'boost')) {
                                 if (state.p.item === 'prot') state.p.currHp = 1;
                                 else state.p.currHp = 0;
                             }
