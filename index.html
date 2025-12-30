@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：88</title>
+    <title>Resource Strategy Card Battle：89</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -139,7 +139,6 @@
         .control-label { font-family: 'Cinzel'; font-weight: bold; font-size: 12px; width: 60px; flex-shrink: 0; letter-spacing: 1px; }
         .control-val { font-family: 'Cinzel'; font-weight: bold; font-size: 18px; text-align: right; width: 60px; flex-shrink: 0; text-shadow: 0 0 5px currentColor; }
         
-        /* Adjusted Button Height & Press Effect */
         .btn-row-wrapper { 
             display: flex; gap: 2px; height: 52px; 
             width: 100%; justify-content: space-between; margin-top: 4px;
@@ -147,7 +146,6 @@
             align-items: flex-start;
         }
         
-        /* Button Press Effect Mixin Style */
         .btn-mini { 
             flex: 1; height: 48px;
             background: rgba(255,255,255,0.05); 
@@ -224,32 +222,29 @@
         }
         .item-btn.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; box-shadow: none; transform: none; }
         
-        /* Ban Style for Used Rewind */
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
-        /* Rare Item Effect */
+        /* Rainbow Aura for Rare Items */
+        @keyframes rainbow-aura {
+            0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; border-color: #ff0000; }
+            14% { box-shadow: 0 0 10px #ff7f00, 0 0 20px #ff7f00; border-color: #ff7f00; }
+            28% { box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; border-color: #ffff00; }
+            42% { box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; border-color: #00ff00; }
+            57% { box-shadow: 0 0 10px #0000ff, 0 0 20px #0000ff; border-color: #0000ff; }
+            71% { box-shadow: 0 0 10px #4b0082, 0 0 20px #4b0082; border-color: #4b0082; }
+            85% { box-shadow: 0 0 10px #9400d3, 0 0 20px #9400d3; border-color: #9400d3; }
+            100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; border-color: #ff0000; }
+        }
+
         .item-btn.item-rare {
-            border-color: #ffd700 !important;
-            box-shadow: 0 4px 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5);
-            animation: rare-pulse 2s infinite;
+            animation: rainbow-aura 4s linear infinite;
         }
         .item-btn.item-rare.active-press {
-            box-shadow: 0 0 0 #b8860b, inset 0 0 10px rgba(255, 215, 0, 0.5);
             transform: translateY(4px) scale(1);
+            box-shadow: none;
         }
-
-        .item-btn.item-rare::after {
-            content: ''; position: absolute; top: -150%; left: -150%; width: 400%; height: 400%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
-            transform: rotate(45deg);
-            animation: rare-shine 3s infinite;
-            pointer-events: none;
-        }
-        @keyframes rare-pulse { 0%, 100% { border-color: #ffd700; } 50% { border-color: #fff; } }
-        @keyframes rare-shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
-        /* Font Size 1.4x for PT */
         .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
         .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
         .item-btn.selected .item-img { opacity: 1; }
@@ -257,6 +252,26 @@
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
         .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
         .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: 'Noto Sans JP'; }
+
+        /* Battle Info Box (New) */
+        .battle-info-box {
+            width: 100%;
+            height: 3.5rem; /* ~2 lines */
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #fff;
+            padding: 4px;
+            font-family: 'Noto Sans JP', sans-serif;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+            line-height: 1.2;
+        }
 
         /* Cut-in, Ready Fight */
         #item-cutin { pointer-events: none; }
@@ -381,7 +396,7 @@
         <div id="phase-timer" class="phase-timer hidden">15</div>
         <div id="notice-msg" class="absolute top-2 w-full text-center text-[11px] text-yellow-400 font-bold z-50 tracking-wider shadow-black drop-shadow-md"></div>
 
-        <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-4 w-full max-w-md mx-auto relative z-10">
+        <div id="arena-1v1" class="flex-1 flex flex-col justify-center gap-2 w-full max-w-md mx-auto relative z-10 px-1">
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-red-500 w-4">OPP</div>
                 <div class="card-grid">
@@ -391,7 +406,7 @@
                     <div class="battle-card-wrapper" id="card-c-def-wrap"><div class="battle-card-inner"><div class="battle-card-front card-def"><div class="card-val" style="color:#fff" id="card-c-def">?</div></div><div class="battle-card-back card-def">?</div></div></div>
                 </div>
             </div>
-            <div class="h-8 flex items-center justify-center relative"><div id="adv-badge" class="hidden bg-yellow-600 text-white font-gaming text-[12px] px-6 py-1 rounded border border-yellow-300 shadow-xl absolute z-30 opacity-0 tracking-widest">INITIATIVE WIN!</div></div>
+            <div class="h-6 flex items-center justify-center relative"><div id="adv-badge" class="hidden bg-yellow-600 text-white font-gaming text-[12px] px-6 py-1 rounded border border-yellow-300 shadow-xl absolute z-30 opacity-0 tracking-widest">INITIATIVE WIN!</div></div>
             <div class="flex gap-2 items-center">
                 <div class="card-row-label text-blue-400 w-4">YOU</div>
                 <div class="card-grid">
@@ -401,9 +416,10 @@
                     <div class="battle-card-wrapper" id="card-p-def-wrap"><div class="battle-card-inner"><div class="battle-card-front card-def"><div class="card-val" style="color:#fff" id="card-p-def">-</div></div><div class="battle-card-back card-def">?</div></div></div>
                 </div>
             </div>
+            <div id="battle-info-box" class="battle-info-box"></div>
         </div>
 
-        <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10">
+        <div id="arena-4p" class="hidden flex-1 flex flex-col justify-between py-2 w-full max-w-md mx-auto relative z-10 px-1">
             <div class="opp-container-4p" id="opp-list-4p"></div>
             <div class="opp-container-3p hidden" id="opp-list-3p"></div>
             <div class="flex gap-2 items-center justify-center mt-2 scale-90 origin-bottom">
@@ -415,6 +431,7 @@
                     <div class="battle-card-front card-def"><div class="card-val text-blue-300" id="4p-p-def">-</div></div>
                 </div>
             </div>
+            <div id="battle-info-box-4p" class="battle-info-box"></div>
         </div>
         <div id="c-dmg-float" class="dmg-float text-blue-300" style="top:25%"></div>
         <div id="p-dmg-float" class="dmg-float text-red-500" style="top:75%"></div>
@@ -522,7 +539,7 @@
             <button onclick="enterOnlineMode()" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button onclick="showItemBook()" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 88</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 89</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1137,7 +1154,8 @@
                     if (rewindTriggered) {
                          el('result-overlay').classList.add('hidden');
                          el('wait-overlay').classList.add('hidden');
-                         el('notice-msg').innerText = "時戻し発動！ ラウンドをやり直します...";
+                         const infoBox = el('battle-info-box');
+                         if(infoBox) infoBox.innerText = "時戻し発動！ ラウンドをやり直します...";
                          setTimeout(() => initRound(), 1000);
                          return;
                     }
@@ -1166,7 +1184,8 @@
 
                          if (allReady && currentDbRound === state.round) {
                              console.log("[Host Logic] Initiating next round transition...");
-                             el('notice-msg').innerText = "次のラウンドを同期中...";
+                             const infoBox = el('battle-info-box');
+                             if(infoBox) infoBox.innerText = "次のラウンドを同期中...";
                              
                              const updates = {
                                 round: currentDbRound + 1,
@@ -1187,7 +1206,7 @@
                                 .then(() => console.log("[Host Logic] Round update success"))
                                 .catch(err => {
                                     console.error("[Host Logic] Round update failed:", err);
-                                    el('notice-msg').innerText = "同期エラー：再試行中...";
+                                    if(infoBox) infoBox.innerText = "同期エラー：再試行中...";
                                 });
                          }
                     }
@@ -1388,16 +1407,19 @@
                 count--;
                 ui.timer.innerText = count;
                 
-                if (count === 3) {
+                if (count <= 3 && count > 0) {
                      ui.timer.classList.add('timer-urgent');
                      playSe('countdown');
                 }
 
                 if (state.p.item === 'drone' && count === 7) {
                      const used = state.c.hpCost + state.c.atk + state.c.def;
-                     el('notice-msg').innerText = `解析完了: 敵使用コスト ${used} PTS`;
-                     ui.timer.classList.add('text-green-400'); 
-                     setTimeout(()=>ui.timer.classList.remove('text-green-400'), 500);
+                     const infoBox = el('battle-info-box');
+                     if(infoBox) {
+                        infoBox.innerText = `解析完了: 敵使用コスト ${used} PTS`;
+                        infoBox.classList.add('text-green-400'); 
+                        setTimeout(()=>infoBox.classList.remove('text-green-400'), 500);
+                     }
                 }
                 
                 if (count <= 0) {
@@ -1419,7 +1441,22 @@
         };
 
         window.step = (key, delta) => {
-            // playSeRemoved
+            // Check budget
+            if (delta > 0) {
+                let currentTotalCost = 0;
+                if (state.phase === 1) {
+                     currentTotalCost = state.inputs.spd; 
+                     if (state.p.item && ITEMS_DEF[state.p.item]) {
+                         currentTotalCost += ITEMS_DEF[state.p.item].cost;
+                     }
+                } else {
+                     currentTotalCost = state.inputs.hp + state.inputs.atk + state.inputs.def;
+                }
+                
+                const remaining = state.p.total - currentTotalCost;
+                if (remaining < delta) return; // Cannot afford increase
+            }
+            
             state.inputs[key] = Math.max(0, state.inputs[key] + delta);
             updateUI();
         };
@@ -1467,6 +1504,10 @@
         window.initRound = async () => {
             clearBattleTimers(); // 追加: ラウンド開始時に前の演出をキャンセル
             if(timerInterval) clearInterval(timerInterval); // 念のためここでも
+            
+            // Clear info box
+            const infoBox = el('battle-info-box');
+            if(infoBox) infoBox.innerText = "";
 
             playSe('flip'); // ラウンド開始音
 
@@ -1506,7 +1547,7 @@
                 const rareClass = item.cost >= 100 ? 'item-rare' : ''; // 追加: レア演出クラス
                 
                 ui.itemContainer.innerHTML += `
-                    <div class="item-btn ${bannedClass} ${rareClass}" id="item-${key}" onclick="selectItem('${key}')" oncontextmenu="return false;">
+                    <div class="item-btn ${bannedClass} ${rareClass}" id="item-${key}" oncontextmenu="return false;">
                         <img src="${item.img}" class="item-img" onerror="this.style.display='none'">
                         <div class="item-label text-blue-100">${item.name}</div>
                         <div class="item-cost">${item.cost} PT</div>
@@ -1683,6 +1724,8 @@
                     toggleInputs(true); 
                     updateUI();
                     
+                    const infoBox = el('battle-info-box');
+                    
                     // Pre-check for Nullify against Crystal/Fast/Chest
                     let enemyNullify = (state.c.item === 'nullify');
 
@@ -1690,27 +1733,41 @@
                     if (state.p.item === 'chest' && !enemyNullify) {
                         state.p.total += 100;
                         updateUI();
-                        el('notice-msg').innerText = `【宝箱】ボーナス獲得！ PTS+100`;
-                        el('notice-msg').classList.add('text-yellow-400');
-                        setTimeout(() => el('notice-msg').classList.remove('text-yellow-400'), 3000);
+                        if(infoBox) {
+                            infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
+                            infoBox.classList.add('text-yellow-400');
+                            setTimeout(() => {
+                                infoBox.classList.remove('text-yellow-400');
+                                infoBox.innerText = "";
+                            }, 3000);
+                        }
                     }
                     if (state.c.item === 'chest' && state.p.item !== 'nullify') {
                         if (!isOnline) {
                             state.c.total += 100; // CPU bonus
-                            el('notice-msg').innerText = `敵が【宝箱】を使用！ 敵PTS+100`; // Notify player
-                            setTimeout(() => el('notice-msg').innerText = "", 3000);
+                            if(infoBox) {
+                                infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`; 
+                                setTimeout(() => infoBox.innerText = "", 3000);
+                            }
                         } else {
-                             el('notice-msg').innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
-                             setTimeout(() => el('notice-msg').innerText = "", 3000);
+                             if(infoBox) {
+                                 infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
+                                 setTimeout(() => infoBox.innerText = "", 3000);
+                             }
                         }
                     }
                     
                     // 水晶玉の効果：相手のアイテムを表示 (相手がnullifyでない場合のみ)
                     if (state.p.item === 'crystal' && !enemyNullify) {
                          const enemyItemName = ITEMS_DEF[state.c.item] ? ITEMS_DEF[state.c.item].name : "不明";
-                         el('notice-msg').innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`;
-                         el('notice-msg').classList.add('text-purple-400');
-                         setTimeout(() => el('notice-msg').classList.remove('text-purple-400'), 4000);
+                         if(infoBox) {
+                             infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`;
+                             infoBox.classList.add('text-purple-400');
+                             setTimeout(() => {
+                                 infoBox.classList.remove('text-purple-400');
+                                 // Leave text for a while or clear?
+                             }, 4000);
+                         }
                     }
                     
                     // Item Logic: Lock inputs for specific items
@@ -1729,7 +1786,7 @@
                          ui.blocks.def.style.opacity = '0.5';
                     }
 
-                    let time = 15;
+                    let time = 20;
                     // 早送り判定：自分がnullifyなら相手のfastは無効
                     if (state.c.item === 'fast' && state.p.item !== 'nullify') time = 7;
                     
@@ -1763,24 +1820,26 @@
             // 1. 本来のアイテムでカットイン演出
             await showDualCutin(state.p.item, state.c.item);
 
+            const infoBox = el('battle-info-box');
+
             // 2. 無効化判定とID書き換え
             let pNullified = false;
             let cNullified = false;
             
             if (state.p.item === 'nullify' && state.c.item !== 'nullify') {
                 cNullified = true;
-                el('notice-msg').innerText = "無効化発動！ 相手のアイテムを無効化！";
+                if(infoBox) infoBox.innerText = "無効化発動！ 相手のアイテムを無効化！";
                 state.c.item = 'none'; // Force overwrite to none
             }
             if (state.c.item === 'nullify' && state.p.item !== 'nullify') {
                 pNullified = true;
-                el('notice-msg').innerText = "相手が無効化を使用！ あなたのアイテムは無効化されました！";
+                if(infoBox) infoBox.innerText = "相手が無効化を使用！ あなたのアイテムは無効化されました！";
                 state.p.item = 'none'; // Force overwrite to none
             }
             
             // Apply Scope Effect (after nullify check)
             if (state.p.item === 'scope' && state.c.total !== undefined) {
-                 el('notice-msg').innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
+                 if(infoBox) infoBox.innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
             }
             if (state.c.item === 'scope') {
                 // CPU sees your points (no UI needed)
@@ -1794,6 +1853,7 @@
 
         function startBattleSequence() {
             state.p.currHp = undefined; state.c.currHp = undefined;
+            const infoBox = el('battle-info-box');
             
             // Swap Logic
             if (state.p.item === 'swap') { [state.c.atk, state.c.def] = [state.c.def, state.c.atk]; }
@@ -1851,7 +1911,7 @@
                              if (state.c.item === 'prot' || state.c.item === 'boost') {
                                 if (state.c.item === 'prot') state.c.currHp = 1;
                                 else state.c.currHp = 0; 
-                                el('notice-msg').innerText = "OPPONENT SURVIVED!";
+                                if(infoBox) infoBox.innerText = "相手は耐えた！";
                             } else {
                                 dead = true;
                             }
@@ -1865,7 +1925,7 @@
                             if (state.p.item === 'prot' || state.p.item === 'boost') {
                                 if (state.p.item === 'prot') state.p.currHp = 1;
                                 else state.p.currHp = 0;
-                                el('notice-msg').innerText = "SURVIVED!";
+                                if(infoBox) infoBox.innerText = "耐えた！";
                             } else {
                                 dead = true;
                             }
@@ -1897,7 +1957,7 @@
                         state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
                         
                         if (state.c.currHp <= 0) {
-                             if (!state.cNullified && (state.c.item === 'prot' || state.c.item === 'boost')) {
+                             if (state.c.item === 'prot' || state.c.item === 'boost') {
                                 if (state.c.item === 'prot') state.c.currHp = 1;
                                 else state.c.currHp = 0;
                             }
@@ -1909,7 +1969,7 @@
                         state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; 
                         
                         if (state.p.currHp <= 0) {
-                             if (!state.pNullified && (state.p.item === 'prot' || state.p.item === 'boost')) {
+                             if (state.p.item === 'prot' || state.p.item === 'boost') {
                                 if (state.p.item === 'prot') state.p.currHp = 1;
                                 else state.p.currHp = 0;
                             }
@@ -1936,11 +1996,12 @@
         function applyRewind(pWin, cWin) {
              let replayed = false;
              let userWhoRewound = null;
+             const infoBox = el('battle-info-box');
 
              if (cWin && state.p.item === 'rewind') {
                  // Player uses rewind
                  if (!state.rewindUsed.includes(userId)) {
-                     el('notice-msg').innerText = "時戻し発動！ ラウンドをやり直します...";
+                     if(infoBox) infoBox.innerText = "時戻し発動！ ラウンドをやり直します...";
                      userWhoRewound = userId;
                      replayed = true;
                  }
@@ -1950,7 +2011,7 @@
                  const actualOppId = isOnline ? (state.roomPlayers || []).find(p => p !== userId) : 'cpu';
 
                  if (actualOppId && !state.rewindUsed.includes(actualOppId)) {
-                     el('notice-msg').innerText = "相手が時戻しを発動！ ラウンドをやり直します...";
+                     if(infoBox) infoBox.innerText = "相手が時戻しを発動！ ラウンドをやり直します...";
                      userWhoRewound = actualOppId;
                      replayed = true;
                  }
@@ -2015,9 +2076,6 @@
             if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; pWin=true; }
             else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; cWin=true; }
             
-            if(pWin) playSe('win'); // Victory sound
-            else if(cWin) playSe('lose'); // Defeat sound
-            
             // Check Rewind
             if (applyRewind(pWin, cWin)) {
                 // If rewound, revert win count
@@ -2025,6 +2083,9 @@
                 if(cWin) state.c.wins--;
                 return;
             }
+
+            if(pWin) playSe('win'); // Victory sound
+            else if(cWin) playSe('lose'); // Defeat sound
 
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
