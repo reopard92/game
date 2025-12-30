@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：95</title>
+    <title>Resource Strategy Card Battle：96</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -570,7 +570,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 95</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 96</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1812,40 +1812,41 @@
                     updateUI();
                     
                     const infoBox = el('battle-info-box');
+                    if (infoBox) infoBox.innerText = ""; // 一旦クリア
                     
-                    // Show self item info first
-                    const myItem = ITEMS_DEF[state.p.item];
-                    if (infoBox) {
-                        if (['crystal', 'scope', 'chest'].includes(state.p.item)) {
-                            infoBox.innerText = ""; // 空にしておく（後で効果が表示される）
-                        } else {
-                            infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
-                        }
-                    }
-                    
-                    // Pre-check for Nullify against Crystal/Fast/Chest
+                    // Pre-check for Nullify
                     let enemyNullify = (state.c.item === 'nullify');
 
-                    // 宝箱効果（無効化されていない場合のみ）
-                    if (state.p.item === 'chest' && !enemyNullify) {
-                        state.p.total += 100;
-                        updateUI();
-                        if(infoBox) {
-                            infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
-                            infoBox.classList.add('text-yellow-400');
+                    // Default text for normal items
+                    if (!['crystal', 'scope', 'chest'].includes(state.p.item)) {
+                        const myItem = ITEMS_DEF[state.p.item];
+                        if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
+                    }
+
+                    // 宝箱 (Chest) Logic - Simply add PTS if not nullified
+                    if (state.p.item === 'chest') {
+                        if (!enemyNullify) {
+                            state.p.total += 100;
+                            updateUI();
+                            if(infoBox) {
+                                infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
+                                infoBox.classList.add('text-yellow-400');
+                                setTimeout(() => infoBox.classList.remove('text-yellow-400'), 3000);
+                            }
+                        } else {
+                             // Nullified case
+                             if(infoBox) infoBox.innerText = `【宝箱】の効果は無効化されました。`;
                         }
                     }
                     if (state.c.item === 'chest' && state.p.item !== 'nullify') {
                         if (!isOnline) {
                             state.c.total += 100; // CPU bonus
-                            if(infoBox) {
-                                infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`; 
-                            }
-                        } else {
-                             if(infoBox) {
-                                 infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
-                             }
                         }
+                         // 相手の宝箱使用メッセージも表示
+                         if(infoBox) {
+                             const currentText = infoBox.innerText;
+                             infoBox.innerText = (currentText ? currentText + "\n" : "") + `敵が【宝箱】を使用！ 敵PTS+100`;
+                         }
                     }
                     
                     // 水晶玉の効果：相手のアイテムを表示 (相手がnullifyでない場合のみ)
