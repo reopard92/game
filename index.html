@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：91</title>
+    <title>Resource Strategy Card Battle：92</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -14,6 +14,12 @@
             --color-hp: #22c55e;
             --color-atk: #ef4444;
             --color-def: #3b82f6;
+            
+            /* 淡い枠線用の色定義 */
+            --color-spd-pale: #fde047; /* Yellow-300 */
+            --color-hp-pale: #86efac;  /* Green-300 */
+            --color-atk-pale: #fca5a5; /* Red-300 */
+            --color-def-pale: #93c5fd; /* Blue-300 */
             
             --bg-deep: #0f172a;
             --glass-bg: rgba(255, 255, 255, 0.05);
@@ -69,7 +75,8 @@
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 2px; justify-content: center; }
-        .action-area { width: 70px; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 6px; flex-shrink: 0; }
+        /* Action Area Adjustment: flex-col, height 100% to allow button to grow */
+        .action-area { width: 70px; display: flex; flex-direction: column; justify-content: flex-start; padding-bottom: 6px; flex-shrink: 0; height: 100%; }
 
         /* Card Styles */
         .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; max-width: 260px; margin: 0 auto; position: relative; z-index: 10;} 
@@ -95,18 +102,19 @@
         .battle-card-front { transform: rotateY(0deg); z-index: 2; }
         .battle-card-back { transform: rotateY(180deg); background-image: url('裏面.png'); background-color: #1e293b; }
 
-        /* Front Card Border Colors */
-        .battle-card-front.card-spd { background-image: url('SPD.png'); border-color: var(--color-spd); }
-        .battle-card-front.card-hp { background-image: url('HP.png'); border-color: var(--color-hp); }
-        .battle-card-front.card-atk { background-image: url('ATK.png'); border-color: var(--color-atk); }
-        .battle-card-front.card-def { background-image: url('DEF.png'); border-color: var(--color-def); }
+        /* Front Card Border Colors - PALE */
+        .battle-card-front.card-spd { background-image: url('SPD.png'); border-color: var(--color-spd-pale); }
+        .battle-card-front.card-hp { background-image: url('HP.png'); border-color: var(--color-hp-pale); }
+        .battle-card-front.card-atk { background-image: url('ATK.png'); border-color: var(--color-atk-pale); }
+        .battle-card-front.card-def { background-image: url('DEF.png'); border-color: var(--color-def-pale); }
 
-        /* Back Card Border Colors */
-        .battle-card-back.card-spd { border-color: var(--color-spd); }
-        .battle-card-back.card-hp { border-color: var(--color-hp); }
-        .battle-card-back.card-atk { border-color: var(--color-atk); }
-        .battle-card-back.card-def { border-color: var(--color-def); }
+        /* Back Card Border Colors - PALE */
+        .battle-card-back.card-spd { border-color: var(--color-spd-pale); }
+        .battle-card-back.card-hp { border-color: var(--color-hp-pale); }
+        .battle-card-back.card-atk { border-color: var(--color-atk-pale); }
+        .battle-card-back.card-def { border-color: var(--color-def-pale); }
 
+        /* Text colors remain vivid for readability */
         .card-spd { color: #fff; }
         .card-hp { color: #fff; }
         .card-atk { color: #fff; }
@@ -177,7 +185,8 @@
         
         .btn-action-side { 
             width: 100%; 
-            height: 140px; /* Reduced height from 100% to fixed */
+            /* height removed to allow flex grow */
+            flex-grow: 1;
             background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); 
             border: 1px solid rgba(255,255,255,0.2); 
             color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 16px; 
@@ -191,7 +200,8 @@
             transition: none;
             cursor: pointer;
             user-select: none;
-            margin-top: auto; /* Align bottom */
+            margin-top: 6px; 
+            margin-bottom: 2px;
         }
         .btn-action-side.active-press { 
             background: rgba(255,255,255,0.2); 
@@ -236,21 +246,25 @@
         
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
-        /* Rainbow Aura for Rare Items */
-        @keyframes rainbow-aura {
-            0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; border-color: #ff0000; }
-            14% { box-shadow: 0 0 10px #ff7f00, 0 0 20px #ff7f00; border-color: #ff7f00; }
-            28% { box-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00; border-color: #ffff00; }
-            42% { box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; border-color: #00ff00; }
-            57% { box-shadow: 0 0 10px #0000ff, 0 0 20px #0000ff; border-color: #0000ff; }
-            71% { box-shadow: 0 0 10px #4b0082, 0 0 20px #4b0082; border-color: #4b0082; }
-            85% { box-shadow: 0 0 10px #9400d3, 0 0 20px #9400d3; border-color: #9400d3; }
-            100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; border-color: #ff0000; }
+        /* Rare Item Effect (Shiny Aura) */
+        .item-btn.item-rare {
+            border-color: #ffd700 !important;
+            box-shadow: 0 4px 0 #b8860b; 
+        }
+        
+        .item-btn.item-rare::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+            pointer-events: none;
+        }
+        @keyframes shine {
+            0% { left: -100%; opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { left: 200%; opacity: 0; }
         }
 
-        .item-btn.item-rare {
-            animation: rainbow-aura 4s linear infinite;
-        }
         .item-btn.item-rare.active-press {
             transform: translateY(4px) scale(1);
             box-shadow: none;
@@ -305,7 +319,7 @@
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
         /* Mobile adjust for Cutin */
         @media (max-width: 640px) {
-            .cutin-container { transform: scale(0.55); }
+            .cutin-container { transform: scale(0.45); } /* Adjusted to 0.45 */
         }
 
         #ready-fight { pointer-events: none; }
@@ -555,7 +569,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 91</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 92</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1567,10 +1581,6 @@
         window.initRound = async () => {
             clearBattleTimers(); // 追加: ラウンド開始時に前の演出をキャンセル
             if(timerInterval) clearInterval(timerInterval); // 念のためここでも
-            
-            // Clear info box
-            const infoBox = el('battle-info-box');
-            if(infoBox) infoBox.innerText = "";
 
             playSe('flip'); // ラウンド開始音
 
