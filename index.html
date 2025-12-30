@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：94</title>
+    <title>Resource Strategy Card Battle：95</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -163,7 +163,7 @@
             align-items: flex-start;
         }
         
-        /* Button Press Effect Mixin Style - Changed to use JS class .active-press */
+        /* Button Press Effect Mixin Style */
         .btn-mini { 
             flex: 1; height: 48px;
             background: rgba(255,255,255,0.05); 
@@ -246,7 +246,7 @@
         
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
-        /* Rare Item Effect (Shiny Aura) */
+        /* Rare Item Effect */
         .item-btn.item-rare {
             border-color: #ffd700 !important;
             box-shadow: 0 4px 0 #b8860b; 
@@ -570,7 +570,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 94</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 95</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -1706,12 +1706,12 @@
                 return true;
             });
 
-            if (budget > 200 && validItems.length > 0) { // Condition relaxed
-                 if (Math.random() < 0.8) { // Chance increased to 80%
-                     const choice = validItems[Math.floor(Math.random() * validItems.length)];
-                     if (ITEMS_DEF[choice].cost <= 100) { // Limit cost slightly
-                         state.c.item = choice;
-                     }
+            // 修正箇所: 80%の確率でアイテムを選択する
+            if (validItems.length > 0 && Math.random() < 0.8) { 
+                 const affordableItems = validItems.filter(k => ITEMS_DEF[k].cost <= budget);
+                 
+                 if (affordableItems.length > 0) {
+                     state.c.item = affordableItems[Math.floor(Math.random() * affordableItems.length)];
                  }
             }
             const itemCost = ITEMS_DEF[state.c.item].cost;
@@ -1815,7 +1815,13 @@
                     
                     // Show self item info first
                     const myItem = ITEMS_DEF[state.p.item];
-                    if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
+                    if (infoBox) {
+                        if (['crystal', 'scope', 'chest'].includes(state.p.item)) {
+                            infoBox.innerText = ""; // 空にしておく（後で効果が表示される）
+                        } else {
+                            infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
+                        }
+                    }
                     
                     // Pre-check for Nullify against Crystal/Fast/Chest
                     let enemyNullify = (state.c.item === 'nullify');
@@ -1825,7 +1831,7 @@
                         state.p.total += 100;
                         updateUI();
                         if(infoBox) {
-                            infoBox.innerText += `\n【宝箱】ボーナス獲得！ PTS+100`;
+                            infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
                             infoBox.classList.add('text-yellow-400');
                         }
                     }
@@ -1833,11 +1839,11 @@
                         if (!isOnline) {
                             state.c.total += 100; // CPU bonus
                             if(infoBox) {
-                                infoBox.innerText += `\n敵が【宝箱】を使用！ 敵PTS+100`; 
+                                infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`; 
                             }
                         } else {
                              if(infoBox) {
-                                 infoBox.innerText += `\n敵が【宝箱】を使用！ 敵PTS+100`;
+                                 infoBox.innerText = `敵が【宝箱】を使用！ 敵PTS+100`;
                              }
                         }
                     }
@@ -1846,9 +1852,16 @@
                     if (state.p.item === 'crystal' && !enemyNullify) {
                          const enemyItemName = ITEMS_DEF[state.c.item] ? ITEMS_DEF[state.c.item].name : "不明";
                          if(infoBox) {
-                             infoBox.innerText += `\n【水晶玉】予知: 敵は「${enemyItemName}」を選択中\n解析: 敵残存 ${Math.floor(state.c.total)} PTS`; // Added remaining PTS here
+                             infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`; // PTS表示削除
                              infoBox.classList.add('text-purple-400');
                          }
+                    }
+
+                    // 拡大鏡 (Scope) の効果
+                    if (state.p.item === 'scope' && !enemyNullify) {
+                        if(infoBox) {
+                             infoBox.innerText = `解析: 敵残存 ${Math.floor(state.c.total)} PTS`;
+                        }
                     }
                     
                     // Item Logic: Lock inputs for specific items
@@ -1918,17 +1931,7 @@
                 state.p.item = 'none'; // Force overwrite to none
             }
             
-            // Apply Scope Effect (after nullify check)
-            if (state.p.item === 'scope' && state.c.total !== undefined) {
-                 // Scope effect now moved to phase 1 resolve or here just in case?
-                 // Original logic had it here, but instruction says display at start of Phase 2.
-                 // We added it to resolvePhase1 for Crystal/Scope like behavior.
-                 // Let's keep it consistent.
-                 if(infoBox) infoBox.innerText += `\n解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
-            }
-            if (state.c.item === 'scope') {
-                // CPU sees your points (no UI needed)
-            }
+            // Scope effect moved to resolvePhase1
             
             state.pNullified = pNullified;
             state.cNullified = cNullified;
