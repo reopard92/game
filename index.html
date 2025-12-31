@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：96</title>
+    <title>Resource Strategy Card Battle：97</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -340,40 +340,15 @@
 
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        
-        .lobby-btn { 
-            width: 100%; height: 60px; 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
-            border-radius: 4px; margin-bottom: 12px; transition: none; 
-            text-shadow: 0 0 5px rgba(255,255,255,0.3); 
-            box-shadow: 0 4px 0 #000000; 
-            transform: translateY(0);
-            cursor: pointer;
-            user-select: none;
-        }
-        .lobby-btn:hover { background: rgba(255,255,255,0.1); }
-        .lobby-btn.active-press { 
-            transform: translateY(4px); 
-            box-shadow: 0 0 0 rgba(0,0,0,0);
-            background: #fcd34d; color: #000; 
-        }
+        .lobby-btn { width: 100%; height: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transition: all 0.3s; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+        .lobby-btn:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+        .lobby-btn:active { transform: scale(0.95); background: #fcd34d; color: #000; box-shadow: 0 0 30px #fcd34d; }
         
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
         .room-item { padding: 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
-        
-        .join-btn { 
-            padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
-            color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: none; 
-            box-shadow: 0 3px 0 #000000; transform: translateY(0);
-            cursor: pointer;
-            user-select: none;
-        }
-        .join-btn.active-press { 
-            transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0);
-            background: rgba(147, 197, 253, 0.4); color: #fff; 
-        }
+        .join-btn { padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: all 0.2s; }
+        .join-btn:hover { background: rgba(147, 197, 253, 0.4); color: #fff; box-shadow: 0 0 10px #93c5fd; }
         
         .name-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 24px; width: 80%; max-width: 300px; transition: all 0.3s; }
         .name-input:focus { border-color: #fcd34d; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); outline: none; }
@@ -382,12 +357,6 @@
         #blk-hp { border-left-color: var(--color-hp); }
         #blk-atk { border-left-color: var(--color-atk); }
         #blk-def { border-left-color: var(--color-def); }
-
-        /* Item List Modal */
-        #item-list-overlay { z-index: 200; overflow-y: auto; }
-        .item-book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 20px auto; padding: 10px; }
-        .item-book-entry { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; }
-        .item-book-img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="select-none">
@@ -1842,11 +1811,13 @@
                         if (!isOnline) {
                             state.c.total += 100; // CPU bonus
                         }
-                         // 相手の宝箱使用メッセージも表示
+                         // 削除: 相手の宝箱使用メッセージも表示
+                         /*
                          if(infoBox) {
                              const currentText = infoBox.innerText;
                              infoBox.innerText = (currentText ? currentText + "\n" : "") + `敵が【宝箱】を使用！ 敵PTS+100`;
                          }
+                         */
                     }
                     
                     // 水晶玉の効果：相手のアイテムを表示 (相手がnullifyでない場合のみ)
@@ -1932,7 +1903,13 @@
                 state.p.item = 'none'; // Force overwrite to none
             }
             
-            // Scope effect moved to resolvePhase1
+            // Apply Scope Effect (after nullify check)
+            if (state.p.item === 'scope' && state.c.total !== undefined) {
+                 if(infoBox) infoBox.innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
+            }
+            if (state.c.item === 'scope') {
+                // CPU sees your points (no UI needed)
+            }
             
             state.pNullified = pNullified;
             state.cNullified = cNullified;
