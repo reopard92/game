@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：97</title>
+    <title>Resource Strategy Card Battle：98</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -272,7 +272,11 @@
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
         .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
-        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; }
+        .item-img { 
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; 
+            pointer-events: none; /* No interaction for image */
+            -webkit-touch-callout: none; /* No long press menu */
+        }
         .item-btn.selected .item-img { opacity: 1; }
         
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
@@ -340,15 +344,40 @@
 
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .lobby-btn { width: 100%; height: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05); transition: all 0.3s; text-shadow: 0 0 5px rgba(255,255,255,0.3); }
-        .lobby-btn:hover { background: rgba(255,255,255,0.1); box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-        .lobby-btn:active { transform: scale(0.95); background: #fcd34d; color: #000; box-shadow: 0 0 30px #fcd34d; }
+        
+        .lobby-btn { 
+            width: 100%; height: 60px; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
+            border-radius: 4px; margin-bottom: 12px; transition: none; 
+            text-shadow: 0 0 5px rgba(255,255,255,0.3); 
+            box-shadow: 0 4px 0 #000000; 
+            transform: translateY(0);
+            cursor: pointer;
+            user-select: none;
+        }
+        .lobby-btn:hover { background: rgba(255,255,255,0.1); }
+        .lobby-btn.active-press { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            background: #fcd34d; color: #000; 
+        }
         
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
         .room-item { padding: 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .room-item:last-child { border-bottom: none; }
-        .join-btn { padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: all 0.2s; }
-        .join-btn:hover { background: rgba(147, 197, 253, 0.4); color: #fff; box-shadow: 0 0 10px #93c5fd; }
+        
+        .join-btn { 
+            padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
+            color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: none; 
+            box-shadow: 0 3px 0 #000000; transform: translateY(0);
+            cursor: pointer;
+            user-select: none;
+        }
+        .join-btn.active-press { 
+            transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0);
+            background: rgba(147, 197, 253, 0.4); color: #fff; 
+        }
         
         .name-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; font-family: 'Cinzel'; font-size: 1.5rem; text-align: center; padding: 12px; border-radius: 8px; margin-bottom: 24px; width: 80%; max-width: 300px; transition: all 0.3s; }
         .name-input:focus { border-color: #fcd34d; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); outline: none; }
@@ -357,6 +386,12 @@
         #blk-hp { border-left-color: var(--color-hp); }
         #blk-atk { border-left-color: var(--color-atk); }
         #blk-def { border-left-color: var(--color-def); }
+
+        /* Item List Modal */
+        #item-list-overlay { z-index: 200; overflow-y: auto; }
+        .item-book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 20px auto; padding: 10px; }
+        .item-book-entry { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        .item-book-img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="select-none">
@@ -539,7 +574,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 96</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 98</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -713,47 +748,47 @@
                 if (action) {
                     if (action === 'step') {
                         playSe('select');
-                        step(btn.dataset.key, parseInt(btn.dataset.val));
+                        window.step(btn.dataset.key, parseInt(btn.dataset.val));
                     } else if (action === 'selectItem') {
                         playSe('select');
                         const itemId = btn.id.replace('item-', '');
-                        selectItem(itemId);
+                        window.selectItem(itemId);
                     } else if (action === 'commitPhase') {
-                         commitPhase(); 
+                         window.commitPhase(); 
                     } else if (action === 'startCpuGame') {
                         playSe('select');
-                        startCpuGame();
+                        window.startCpuGame();
                     } else if (action === 'enterOnlineMode') {
                         playSe('select');
-                        enterOnlineMode();
+                        window.enterOnlineMode();
                     } else if (action === 'showItemBook') {
                         playSe('select');
-                        showItemBook();
+                        window.showItemBook();
                     } else if (action === 'closeItemBook') {
                         playSe('select');
                         el('item-list-overlay').classList.add('hidden');
                     } else if (action === 'submitName') {
                         playSe('select');
-                        submitName();
+                        window.submitName();
                     } else if (action === 'createRoom') {
                         playSe('select');
-                        createRoom(parseInt(btn.dataset.val));
+                        window.createRoom(parseInt(btn.dataset.val));
                     } else if (action === 'joinRoom') {
                         playSe('select');
                         // logic handled in refreshRoomList or separate
-                        joinRoom(btn.dataset.id, btn.dataset.max);
+                        window.joinRoom(btn.dataset.id, btn.dataset.max);
                     } else if (action === 'backToHome') {
                         playSe('select');
-                        backToHome();
+                        window.backToHome();
                     } else if (action === 'cleanupRooms') {
                         playSe('select');
-                        cleanupRooms();
+                        window.cleanupRooms();
                     } else if (action === 'cancelRoom') {
                         playSe('select');
-                        cancelRoom();
+                        window.cancelRoom();
                     } else if (action === 'nextRound') {
                         playSe('select');
-                        nextRound();
+                        window.nextRound();
                     }
                 }
             }
@@ -1699,7 +1734,7 @@
 
         window.commitPhase = () => {
             if(!updateUI()) return;
-            playSe('decide');
+            window.playSe('decide');
             toggleInputs(false); 
             stopTimer();
             
@@ -1786,18 +1821,19 @@
                     // Pre-check for Nullify
                     let enemyNullify = (state.c.item === 'nullify');
 
-                    // Default text for normal items
+                    // Default text for normal items (Not special ones that change text)
                     if (!['crystal', 'scope', 'chest'].includes(state.p.item)) {
                         const myItem = ITEMS_DEF[state.p.item];
                         if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
                     }
 
-                    // 宝箱 (Chest) Logic - Simply add PTS if not nullified
+                    // 宝箱 (Chest) Logic
                     if (state.p.item === 'chest') {
                         if (!enemyNullify) {
                             state.p.total += 100;
                             updateUI();
                             if(infoBox) {
+                                // 修正: 説明文ではなく効果のみを表示
                                 infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
                                 infoBox.classList.add('text-yellow-400');
                                 setTimeout(() => infoBox.classList.remove('text-yellow-400'), 3000);
@@ -1812,19 +1848,14 @@
                             state.c.total += 100; // CPU bonus
                         }
                          // 削除: 相手の宝箱使用メッセージも表示
-                         /*
-                         if(infoBox) {
-                             const currentText = infoBox.innerText;
-                             infoBox.innerText = (currentText ? currentText + "\n" : "") + `敵が【宝箱】を使用！ 敵PTS+100`;
-                         }
-                         */
                     }
                     
                     // 水晶玉の効果：相手のアイテムを表示 (相手がnullifyでない場合のみ)
                     if (state.p.item === 'crystal' && !enemyNullify) {
                          const enemyItemName = ITEMS_DEF[state.c.item] ? ITEMS_DEF[state.c.item].name : "不明";
                          if(infoBox) {
-                             infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`; // PTS表示削除
+                             // 修正: 拡大鏡の効果を削除
+                             infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`; 
                              infoBox.classList.add('text-purple-400');
                          }
                     }
@@ -1832,6 +1863,7 @@
                     // 拡大鏡 (Scope) の効果
                     if (state.p.item === 'scope' && !enemyNullify) {
                         if(infoBox) {
+                             // 修正: 説明文ではなく効果のみを表示
                              infoBox.innerText = `解析: 敵残存 ${Math.floor(state.c.total)} PTS`;
                         }
                     }
@@ -1903,13 +1935,7 @@
                 state.p.item = 'none'; // Force overwrite to none
             }
             
-            // Apply Scope Effect (after nullify check)
-            if (state.p.item === 'scope' && state.c.total !== undefined) {
-                 if(infoBox) infoBox.innerText = `解析結果: 敵残存 ${Math.floor(state.c.total)} PTS`;
-            }
-            if (state.c.item === 'scope') {
-                // CPU sees your points (no UI needed)
-            }
+            // Scope effect moved to resolvePhase1
             
             state.pNullified = pNullified;
             state.cNullified = cNullified;
@@ -2150,8 +2176,7 @@
                 return;
             }
 
-            if(pWin) playSe('win'); // Victory sound
-            else if(cWin) playSe('lose'); // Defeat sound
+            window.playSe(pWin ? 'win' : 'lose');
 
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
