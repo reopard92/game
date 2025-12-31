@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：99</title>
+    <title>Resource Strategy Card Battle：100</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -246,33 +246,55 @@
         
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
-        /* Rare Item Effect */
+        /* Rare Item Effect (Particle Aura) */
         .item-btn.item-rare {
-            border-color: #ffd700 !important;
-            box-shadow: 0 4px 0 #b8860b; 
+            overflow: hidden;
+            /* No gold border forced */
         }
         
         .item-btn.item-rare::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg);
-            animation: shine 3s infinite;
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle, rgba(255,215,0,0.8) 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(255,215,0,0.6) 1px, transparent 1.5px),
+                radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1.5px);
+            background-size: 15px 15px, 20px 20px, 10px 10px, 25px 25px;
+            background-position: 0 0, 5px 5px, 2px 8px, 10px 2px;
+            opacity: 0.6;
+            animation: particle-rise 3s linear infinite;
             pointer-events: none;
+            z-index: 1;
         }
-        @keyframes shine {
-            0% { left: -100%; opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { left: 200%; opacity: 0; }
+
+        .item-label, .item-cost { z-index: 5; } /* Ensure text is above particles */
+
+        @keyframes particle-rise {
+            0% { background-position: 0 100%, 5px 110%, 2px 120%, 10px 105%; opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { background-position: 0 -20%, 5px -10%, 2px 0%, 10px -15%; opacity: 0; }
         }
 
         .item-btn.item-rare.active-press {
-            transform: translateY(4px) scale(1);
+            transform: translateY(4px) scale(0.96);
             box-shadow: none;
         }
+        /* Override selected scale behavior for rare to maintain press effect consistency */
+        .item-btn.item-rare.selected.active-press {
+            transform: translateY(4px) scale(1);
+        }
+
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
         .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
-        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; pointer-events: none; -webkit-touch-callout: none; }
+        .item-img { 
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; 
+            pointer-events: none; /* No interaction for image */
+            -webkit-touch-callout: none; /* No long press menu */
+        }
         .item-btn.selected .item-img { opacity: 1; }
         
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
@@ -570,7 +592,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 99</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 100</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -837,8 +859,8 @@
             'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
             'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
             'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
-            'nullify': { cost: 60, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
-            'crystal': { cost: 60, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" }
+            'nullify': { cost: 70, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
+            'crystal': { cost: 80, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" }
         };
         // All items except 'none' for random pool
         const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal', 'chest'];
