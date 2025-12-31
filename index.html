@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：98</title>
+    <title>Resource Strategy Card Battle：99</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -272,11 +272,7 @@
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
         .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
-        .item-img { 
-            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; 
-            pointer-events: none; /* No interaction for image */
-            -webkit-touch-callout: none; /* No long press menu */
-        }
+        .item-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; pointer-events: none; -webkit-touch-callout: none; }
         .item-btn.selected .item-img { opacity: 1; }
         
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
@@ -574,7 +570,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 98</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 99</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -724,6 +720,7 @@
         // Global definition of el for safety
         const el = (id) => document.getElementById(id);
         window.el = el;
+        window.playSe = playSe;
         
         // --- BUTTON EFFECT & AUDIO HANDLING (Global Event Delegation) ---
         let audioUnlocked = false;
@@ -1827,7 +1824,7 @@
                         if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
                     }
 
-                    // 宝箱 (Chest) Logic
+                    // 宝箱 (Chest) Logic - Simply add PTS if not nullified
                     if (state.p.item === 'chest') {
                         if (!enemyNullify) {
                             state.p.total += 100;
