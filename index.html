@@ -59,7 +59,7 @@
         @keyframes drift { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, -50px); } }
         @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 0.6; } }
 
-        /* Magic Circle Background */
+        /* Magic Circle Background (Luxury Idea 2) */
         .magic-circle-bg {
             position: fixed;
             top: 50%; left: 50%;
@@ -267,10 +267,10 @@
         
         .item-btn.banned::after { content: '✖'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 30px; color: rgba(255,0,0,0.8); text-shadow: 0 0 5px black; font-weight: bold; z-index: 10; background: rgba(0,0,0,0.5); }
 
-        /* Rare Item Effect (Particle Aura) */
+        /* Rare Item Effect */
         .item-btn.item-rare {
-            overflow: hidden;
-            /* No gold border forced */
+            border-color: #ffd700 !important;
+            box-shadow: 0 4px 0 #b8860b; 
         }
         
         .item-btn.item-rare::before {
@@ -323,7 +323,7 @@
         /* Removed font-family for item desc to use inherited font */
         .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: inherit; }
 
-        /* Modified Battle Info Box Style & Position */
+        /* Modified Battle Info Box Style & Position (Added back from instruction) */
         .battle-info-box {
             width: 100%;
             height: 3rem; /* ~2 lines */
@@ -384,69 +384,22 @@
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         
-        /* Luxury Home Screen UI (Idea 1, 2, 3, 4) */
-        .luxury-title {
-            background: linear-gradient(to bottom, #ffd700, #b8860b, #ffd700);
-            -webkit-background-clip: text;
-            color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-            animation: text-shimmer 4s ease-in-out infinite alternate;
+        .lobby-btn { 
+            width: 100%; height: 60px; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
+            border-radius: 4px; margin-bottom: 12px; transition: none; 
+            text-shadow: 0 0 5px rgba(255,255,255,0.3); 
+            box-shadow: 0 4px 0 #000000; 
+            transform: translateY(0);
+            cursor: pointer;
+            user-select: none;
         }
-        @keyframes text-shimmer {
-            0% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) brightness(1); }
-            100% { filter: drop-shadow(0 2px 8px rgba(255,215,0,0.4)) brightness(1.2); }
-        }
-
-        /* Shape change: Cut Corner (Octagon-ish) */
-        .cut-corner-btn {
-            clip-path: polygon(
-                12px 0, 100% 0, 
-                100% calc(100% - 12px), calc(100% - 12px) 100%, 
-                0 100%, 0 12px
-            );
-        }
-
-        .decorative-btn {
-            position: relative;
-            background: rgba(20, 30, 50, 0.7);
-            backdrop-filter: blur(10px);
-            border: none; /* Border handled by box-shadow or pseudo-element in clip-path scenario is tricky, using simple bg */
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5);
-            color: #fff;
-            transition: none;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        /* Corner Accents */
-        .decorative-btn::before, .decorative-btn::after {
-            content: ''; position: absolute; width: 8px; height: 8px;
-            border: 2px solid var(--gold-base);
-            transition: all 0.3s; opacity: 0.8;
-            pointer-events: none;
-        }
-        .decorative-btn::before { top: 0; left: 0; border-right: none; border-bottom: none; }
-        .decorative-btn::after { bottom: 0; right: 0; border-left: none; border-top: none; }
-        
-        .decorative-btn:hover::before { width: 100%; height: 100%; border-color: rgba(255,215,0,0.3); }
-        .decorative-btn:hover::after { width: 100%; height: 100%; border-color: rgba(255,215,0,0.3); }
-        
-        .decorative-btn:active {
-             background: rgba(255, 215, 0, 0.2);
-             transform: translateY(2px);
-        }
-
-        .floating-anim { animation: float-slow 6s ease-in-out infinite; }
-        @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        .floating-card-decor {
-            position: absolute;
-            width: 60px; height: 84px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 4px;
-            z-index: -1;
+        .lobby-btn:hover { background: rgba(255,255,255,0.1); }
+        .lobby-btn:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            background: #fcd34d; color: #000; 
         }
         
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
@@ -454,13 +407,11 @@
         .room-item:last-child { border-bottom: none; }
         
         .join-btn { 
-            padding: 8px 16px; /* Bigger padding */
-            background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
+            padding: 4px 12px; background: rgba(147, 197, 253, 0.2); border: 1px solid rgba(147, 197, 253, 0.4); 
             color: #93c5fd; font-weight: bold; border-radius: 4px; font-family: 'Cinzel'; transition: none; 
             box-shadow: 0 3px 0 #000000; transform: translateY(0);
             cursor: pointer;
             user-select: none;
-            font-size: 14px; /* Larger text */
         }
         .join-btn:active { 
             transform: translateY(3px); box-shadow: 0 0 0 rgba(0,0,0,0);
@@ -841,7 +792,7 @@
         window.el = el;
         window.playSe = playSe;
         
-        // --- BUTTON EFFECT (Active State via JS Class for better response) ---
+        // --- BUTTON EFFECT & AUDIO HANDLING (Global Event Delegation) ---
         let audioUnlocked = false;
         function unlockAllAudio() {
             if (audioUnlocked) return;
@@ -1028,6 +979,7 @@
         };
 
         window.selectItem = (itemId) => {
+            playSe('select');
             // 禁止アイテムチェック
             const btn = el('item-'+itemId);
             if (btn && btn.classList.contains('banned')) return;
@@ -1230,10 +1182,6 @@
                     rewindUsed: [],
                     updatedAt: serverTimestamp()
                 };
-                
-                // アイテム再抽選はせず、同じアイテムで再戦するか、リセットするか。
-                // 通常はリセットが好ましいが、簡略化のためそのままか、新規生成。
-                // ここではステータスリセットのみ。
                 
                 if (d.players) {
                      d.players.forEach(p => {
@@ -1662,6 +1610,7 @@
         };
 
         window.step = (key, delta) => {
+            // playSeRemoved from here, called in onclick
             // Check budget
             if (delta > 0) {
                 let currentTotalCost = 0;
@@ -1875,7 +1824,7 @@
 
         window.commitPhase = () => {
             if(!updateUI()) return;
-            window.playSe('decide');
+            playSe('decide');
             toggleInputs(false); 
             stopTimer();
             
