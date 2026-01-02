@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：101</title>
+    <title>Resource Strategy Card Battle：102</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -26,6 +26,12 @@
             --glass-border: rgba(255, 255, 255, 0.1);
             --accent-glow: rgba(147, 197, 253, 0.6);
             --text-main: #e2e8f0;
+            
+            /* Luxury Colors */
+            --gold-light: #fffcd6;
+            --gold-base: #ffd700;
+            --gold-dark: #b8860b;
+            --gold-shadow: #8b6508;
         }
 
         body {
@@ -52,6 +58,21 @@
         }
         @keyframes drift { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, -50px); } }
         @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 0.6; } }
+
+        /* Magic Circle Background (Luxury Idea 2) */
+        .magic-circle-bg {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 150vmax; height: 150vmax;
+            transform: translate(-50%, -50%);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 m-40 0 a 40 40 0 1 0 80 0 a 40 40 0 1 0 -80 0' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.05'/%3E%3Cpath d='M50 50 m-30 0 a 30 30 0 1 0 60 0 a 30 30 0 1 0 -60 0' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.05'/%3E%3Cpath d='M50 10 L50 90 M10 50 L90 50' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.05'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+            animation: spin-slow 120s linear infinite;
+        }
+        @keyframes spin-slow { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 
         .font-gaming { font-family: 'Cinzel', serif; letter-spacing: 1px; } 
         .font-tech { font-family: 'Cormorant Garamond', serif; font-weight: bold; }
@@ -363,22 +384,47 @@
         .hidden { display: none !important; }
         .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         
-        .lobby-btn { 
-            width: 100%; height: 60px; 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-            color: #fff; font-family: 'Cinzel'; font-weight: bold; font-size: 20px; 
-            border-radius: 4px; margin-bottom: 12px; transition: none; 
-            text-shadow: 0 0 5px rgba(255,255,255,0.3); 
-            box-shadow: 0 4px 0 #000000; 
-            transform: translateY(0);
-            cursor: pointer;
-            user-select: none;
+        /* Luxury Home Screen UI (Idea 1, 2, 3, 4) */
+        .luxury-title {
+            background: linear-gradient(to bottom, #ffd700, #b8860b, #ffd700);
+            -webkit-background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            animation: text-shimmer 4s ease-in-out infinite alternate;
         }
-        .lobby-btn:hover { background: rgba(255,255,255,0.1); }
-        .lobby-btn.active-press { 
-            transform: translateY(4px); 
-            box-shadow: 0 0 0 rgba(0,0,0,0);
-            background: #fcd34d; color: #000; 
+        @keyframes text-shimmer {
+            0% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) brightness(1); }
+            100% { filter: drop-shadow(0 2px 8px rgba(255,215,0,0.4)) brightness(1.2); }
+        }
+
+        .decorative-btn {
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            background: rgba(20, 30, 50, 0.6);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .decorative-btn::before, .decorative-btn::after {
+            content: ''; position: absolute; width: 10px; height: 10px;
+            border: 1px solid var(--gold-base);
+            transition: all 0.3s; opacity: 0.7;
+        }
+        .decorative-btn::before { top: 2px; left: 2px; border-right: none; border-bottom: none; }
+        .decorative-btn::after { bottom: 2px; right: 2px; border-left: none; border-top: none; }
+        .decorative-btn:hover::before { top: 0; left: 0; }
+        .decorative-btn:hover::after { bottom: 0; right: 0; }
+        
+        .floating-anim { animation: float-slow 6s ease-in-out infinite; }
+        @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .floating-card-decor {
+            position: absolute;
+            width: 60px; height: 84px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            z-index: -1;
         }
         
         .scroll-list { width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; margin-bottom: 12px; background: rgba(0,0,0,0.3); }
@@ -413,6 +459,7 @@
     </style>
 </head>
 <body class="select-none">
+    <div class="magic-circle-bg"></div> <!-- Luxury BG -->
     <div class="firefly" style="animation-delay: 0s; top: 80%; left: 20%;"></div>
     <div class="firefly" style="animation-delay: 2s; top: 60%; left: 80%;"></div>
     <div class="firefly" style="animation-delay: 4s; top: 40%; left: 40%;"></div>
@@ -570,7 +617,7 @@
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming text-white mb-8 tracking-widest text-shadow">PLAYER NAME</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
-        <button data-action="submitName" class="lobby-btn">ENTER</button>
+        <button data-action="submitName" class="lobby-btn decorative-btn">ENTER</button>
     </div>
     <!-- Wait Overlay -->
     <div id="wait-overlay" class="overlay hidden">
@@ -585,15 +632,25 @@
     </div>
     <!-- Home Screen -->
     <div id="home-screen" class="overlay p-6 text-center">
-        <h1 class="text-5xl font-gaming text-white mb-2 tracking-widest" style="text-shadow:0 0 15px rgba(255,255,255,0.5);">RESOURCE BATTLE</h1>
-        <div class="text-xs text-gray-400 mb-8 tracking-widest">- STRATEGY CARD GAME -</div>
-        <div class="w-full max-w-sm space-y-4">
-            <button data-action="startCpuGame" class="lobby-btn">PRACTICE (CPU)</button>
-            <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
-            <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
+        <div class="relative w-full max-w-sm mx-auto mb-8 floating-anim">
+            <!-- Decorative Cards Background -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-40 pointer-events-none" style="z-index: -1;">
+                <div class="floating-card-decor" style="transform: rotate(-15deg) translate(-60px, 10px);"></div>
+                <div class="floating-card-decor" style="transform: rotate(15deg) translate(60px, 10px);"></div>
+                <div class="floating-card-decor" style="transform: rotate(0deg) translate(0, -10px);"></div>
+            </div>
+            
+            <h1 class="text-5xl font-gaming mb-2 tracking-widest luxury-title">RESOURCE BATTLE</h1>
+            <div class="text-xs text-gray-400 tracking-widest">- STRATEGY CARD GAME -</div>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 101</div>
-        <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
+
+        <div class="w-full max-w-sm space-y-4">
+            <button data-action="startCpuGame" class="lobby-btn decorative-btn">PRACTICE (CPU)</button>
+            <button data-action="enterOnlineMode" class="lobby-btn decorative-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
+            <button data-action="showItemBook" class="lobby-btn decorative-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
+        </div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 102</div>
+        <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
                 <li><b class="text-white">5ラウンド制</b>：HPが多い方が勝利</li>
@@ -613,9 +670,9 @@
         <h2 class="text-3xl font-gaming text-white mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
             <div class="flex gap-2 mb-4">
-                <button data-action="createRoom" data-val="2" class="lobby-btn text-sm">CREATE 1vs1</button>
-                <button data-action="createRoom" data-val="3" class="lobby-btn text-sm !border-green-400 !text-green-400">CREATE 3P</button>
-                <button data-action="createRoom" data-val="4" class="lobby-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
+                <button data-action="createRoom" data-val="2" class="lobby-btn decorative-btn text-sm">CREATE 1vs1</button>
+                <button data-action="createRoom" data-val="3" class="lobby-btn decorative-btn text-sm !border-green-400 !text-green-400">CREATE 3P</button>
+                <button data-action="createRoom" data-val="4" class="lobby-btn decorative-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
             </div>
             <div class="text-xs text-gray-400 mb-2">WAITING ROOMS</div>
             <div id="room-list" class="scroll-list">
@@ -1938,7 +1995,7 @@
                     // Pre-check for Nullify
                     let enemyNullify = (state.c.item === 'nullify');
 
-                    // Default text for normal items (Not special ones that change text)
+                    // Default text for normal items
                     if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
                         const myItem = ITEMS_DEF[state.p.item];
                         if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
@@ -2342,8 +2399,7 @@
                 return;
             }
 
-            if(pWin) playSe('win'); // Victory sound
-            else if(cWin) playSe('lose'); // Defeat sound
+            window.playSe(pWin ? 'win' : 'lose');
 
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
