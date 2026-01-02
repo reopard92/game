@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：102</title>
+    <title>Resource Strategy Card Battle：103</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -397,24 +397,46 @@
             100% { filter: drop-shadow(0 2px 8px rgba(255,215,0,0.4)) brightness(1.2); }
         }
 
+        /* Shape change: Cut Corner (Octagon-ish) */
+        .cut-corner-btn {
+            clip-path: polygon(
+                12px 0, 100% 0, 
+                100% calc(100% - 12px), calc(100% - 12px) 100%, 
+                0 100%, 0 12px
+            );
+        }
+
         .decorative-btn {
-            border: 1px solid rgba(255,255,255,0.2);
             position: relative;
-            background: rgba(20, 30, 50, 0.6);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            background: rgba(20, 30, 50, 0.7);
+            backdrop-filter: blur(10px);
+            border: none; /* Border handled by box-shadow or pseudo-element in clip-path scenario is tricky, using simple bg */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5);
+            color: #fff;
+            transition: none;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        /* Corner Accents */
         .decorative-btn::before, .decorative-btn::after {
-            content: ''; position: absolute; width: 10px; height: 10px;
-            border: 1px solid var(--gold-base);
-            transition: all 0.3s; opacity: 0.7;
+            content: ''; position: absolute; width: 8px; height: 8px;
+            border: 2px solid var(--gold-base);
+            transition: all 0.3s; opacity: 0.8;
+            pointer-events: none;
         }
-        .decorative-btn::before { top: 2px; left: 2px; border-right: none; border-bottom: none; }
-        .decorative-btn::after { bottom: 2px; right: 2px; border-left: none; border-top: none; }
-        .decorative-btn:hover::before { top: 0; left: 0; }
-        .decorative-btn:hover::after { bottom: 0; right: 0; }
+        .decorative-btn::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .decorative-btn::after { bottom: 0; right: 0; border-left: none; border-top: none; }
         
+        .decorative-btn:hover::before { width: 100%; height: 100%; border-color: rgba(255,215,0,0.3); }
+        .decorative-btn:hover::after { width: 100%; height: 100%; border-color: rgba(255,215,0,0.3); }
+        
+        .decorative-btn.active-press {
+             background: rgba(255, 215, 0, 0.2);
+             transform: translateY(2px);
+        }
+
         .floating-anim { animation: float-slow 6s ease-in-out infinite; }
         @keyframes float-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
@@ -617,7 +639,7 @@
     <div id="name-screen" class="overlay hidden p-6 text-center">
         <h1 class="text-4xl font-gaming text-white mb-8 tracking-widest text-shadow">PLAYER NAME</h1>
         <input type="text" id="player-name-input" class="name-input" placeholder="ENTER NAME" maxlength="8">
-        <button data-action="submitName" class="lobby-btn decorative-btn">ENTER</button>
+        <button data-action="submitName" class="lobby-btn decorative-btn cut-corner-btn">ENTER</button>
     </div>
     <!-- Wait Overlay -->
     <div id="wait-overlay" class="overlay hidden">
@@ -644,13 +666,26 @@
             <div class="text-xs text-gray-400 tracking-widest">- STRATEGY CARD GAME -</div>
         </div>
 
-        <div class="w-full max-w-sm space-y-4">
-            <button data-action="startCpuGame" class="lobby-btn decorative-btn">PRACTICE (CPU)</button>
-            <button data-action="enterOnlineMode" class="lobby-btn decorative-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
-            <button data-action="showItemBook" class="lobby-btn decorative-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
+        <div class="home-menu-container w-full max-w-sm mx-auto flex flex-col gap-4">
+            <!-- Main Button -->
+            <button data-action="enterOnlineMode" class="lobby-btn decorative-btn cut-corner-btn !h-20 !text-2xl !text-white !border-white hover:!bg-white hover:!text-black">
+                ONLINE BATTLE
+            </button>
+            
+            <!-- Sub Buttons Row -->
+            <div class="flex gap-4">
+                <button data-action="startCpuGame" class="lobby-btn decorative-btn cut-corner-btn !text-sm flex-1">
+                    PRACTICE (CPU)
+                </button>
+                <button data-action="showItemBook" class="lobby-btn decorative-btn cut-corner-btn !text-sm !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black flex-1">
+                    ITEM LIST
+                </button>
+            </div>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 102</div>
-        <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy">
+
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 103</div>
+        
+        <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy mx-auto">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
                 <li><b class="text-white">5ラウンド制</b>：HPが多い方が勝利</li>
@@ -670,9 +705,9 @@
         <h2 class="text-3xl font-gaming text-white mb-6">LOBBY</h2>
         <div class="w-full max-w-sm">
             <div class="flex gap-2 mb-4">
-                <button data-action="createRoom" data-val="2" class="lobby-btn decorative-btn text-sm">CREATE 1vs1</button>
-                <button data-action="createRoom" data-val="3" class="lobby-btn decorative-btn text-sm !border-green-400 !text-green-400">CREATE 3P</button>
-                <button data-action="createRoom" data-val="4" class="lobby-btn decorative-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
+                <button data-action="createRoom" data-val="2" class="lobby-btn decorative-btn cut-corner-btn text-sm">CREATE 1vs1</button>
+                <button data-action="createRoom" data-val="3" class="lobby-btn decorative-btn cut-corner-btn text-sm !border-green-400 !text-green-400">CREATE 3P</button>
+                <button data-action="createRoom" data-val="4" class="lobby-btn decorative-btn cut-corner-btn text-sm !border-purple-500 !text-purple-400">CREATE 4P</button>
             </div>
             <div class="text-xs text-gray-400 mb-2">WAITING ROOMS</div>
             <div id="room-list" class="scroll-list">
