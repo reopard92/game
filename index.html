@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：117</title>
+    <title>Resource Strategy Card Battle：109</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -32,11 +32,6 @@
             --gold-base: #ffd700;
             --gold-dark: #b8860b;
             --gold-shadow: #8b6508;
-            
-            /* Purple Theme for Items */
-            --purple-light: #e9d5ff;
-            --purple-main: #c084fc;
-            --purple-dark: #9333ea;
         }
 
         body {
@@ -44,7 +39,6 @@
             background-color: var(--bg-deep);
             color: var(--text-main);
             overflow: hidden;
-            /* 【修正】ここを復活させました。これがないとスマホでボタンが反応しません */
             touch-action: none;
             height: 100vh;
             width: 100vw;
@@ -241,7 +235,7 @@
 
         .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; padding-bottom: 4px; }
         
-        /* Item Button Press Effect - MODIFIED COLORS */
+        /* Item Button Press Effect */
         .item-btn { 
             position: relative; aspect-ratio: 1/1; 
             background: rgba(255,255,255,0.02); 
@@ -260,8 +254,7 @@
             transform: translateY(4px) scale(0.96);
         }
         .item-btn.selected { 
-            border-color: var(--purple-main); /* Purple-400 */
-            background: rgba(192, 132, 252, 0.1); /* Purple tint */
+            border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); 
             opacity: 1; filter: none; 
             transform: translateY(0) scale(1);
             box-shadow: 0 4px 0 rgba(0,0,0,1);
@@ -317,7 +310,7 @@
 
 
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
-        .item-cost { font-size: 11px; color: var(--purple-light); /* Purple-200 */ font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
+        .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
         .item-img { 
             position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; 
             pointer-events: none; /* No interaction for image */
@@ -326,11 +319,11 @@
         .item-btn.selected .item-img { opacity: 1; }
         
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
-        .item-info-title { font-size: 11px; font-weight: bold; color: var(--purple-light); /* Purple-300 */ margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
+        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
         /* Removed font-family for item desc to use inherited font */
         .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: inherit; }
 
-        /* Modified Battle Info Box Style & Position - UNIFIED PURPLE COLOR */
+        /* Modified Battle Info Box Style & Position */
         .battle-info-box {
             width: 100%;
             height: 3rem; /* ~2 lines */
@@ -343,7 +336,7 @@
             justify-content: center;
             text-align: center;
             font-size: 0.7rem;
-            color: var(--purple-light); /* Purple-300 */
+            color: #fff;
             padding: 2px;
             font-family: inherit;
             text-shadow: 0 0 4px rgba(0,0,0,0.8);
@@ -690,7 +683,7 @@
             </div>
         </div>
 
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 117</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 109</div>
         
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy mx-auto">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
@@ -846,6 +839,20 @@
         window.el = el;
         window.playSe = playSe;
         
+        // --- タッチ操作による拡大縮小の防止 ---
+        
+        // ダブルタップ拡大防止 (ボタン連打は阻害しないよう、ズーム動作のみを防ぐ)
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+
+        // 2本指操作（ピンチズームなど）の防止
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length >= 2) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
         // --- BUTTON EFFECT & AUDIO HANDLING (Global Event Delegation) ---
         let audioUnlocked = false;
         function unlockAllAudio() {
@@ -1115,8 +1122,7 @@
                 }
             });
             const item = ITEMS_DEF[itemId];
-            // 変更: コスト表示を追加
-            ui.infoTitle.innerText = `${item.name}：${item.cost}pt`;
+            ui.infoTitle.innerText = item.name;
             ui.infoDesc.innerText = item.desc;
             updateUI();
         };
@@ -1701,7 +1707,8 @@
                      const infoBox = el('battle-info-box');
                      if(infoBox) {
                         infoBox.innerText = `解析完了: 敵使用コスト ${used} PTS`;
-                        // Default purple maintained
+                        infoBox.classList.add('text-green-400'); 
+                        setTimeout(()=>infoBox.classList.remove('text-green-400'), 500);
                      }
                 }
                 
@@ -1790,7 +1797,7 @@
             
             // Clear info box
             const infoBox = el('battle-info-box');
-            if(infoBox) infoBox.innerHTML = "";
+            if(infoBox) infoBox.innerText = "";
 
             playSe('flip'); // ラウンド開始音
 
@@ -1811,7 +1818,8 @@
                 state.p.total += state.pendingDrain;
                 if(infoBox) {
                     infoBox.innerText = `前ラウンドの吸収: +${state.pendingDrain} PTS`;
-                    // Default purple maintained
+                    infoBox.classList.add('text-green-400');
+                    setTimeout(() => infoBox.classList.remove('text-green-400'), 3000);
                 }
                 state.pendingDrain = 0;
             }
@@ -1862,8 +1870,7 @@
             // Update UI for none selection manually to avoid sound
             const noneBtn = el('item-none');
             if(noneBtn) noneBtn.classList.add('selected');
-            // 変更: コスト表示を追加
-            ui.infoTitle.innerText = `${ITEMS_DEF['none'].name}：${ITEMS_DEF['none'].cost}pt`;
+            ui.infoTitle.innerText = ITEMS_DEF['none'].name;
             ui.infoDesc.innerText = ITEMS_DEF['none'].desc;
             updateUI();
             
@@ -1985,7 +1992,8 @@
                  const infoBox = el('battle-info-box');
                  if(infoBox) {
                      infoBox.innerText = `ミラー水晶玉発動: ${ITEMS_DEF[state.c.item].name}をコピーしました`;
-                     // Purple maintained
+                     infoBox.classList.add('text-purple-400');
+                     setTimeout(() => infoBox.classList.remove('text-purple-400'), 3000);
                  }
             } else if (state.p.item === 'mirror_crystal' && state.c.item === 'mirror_crystal') {
                  // Both mirror - cancel each other
@@ -2051,18 +2059,16 @@
                     updateUI();
                     
                     const infoBox = el('battle-info-box');
-                    // 変更: フェーズ2開始時、アイテム画像と説明を表示 (デフォルト紫色)
-                    if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
-                        const myItem = ITEMS_DEF[state.p.item];
-                        if (infoBox) {
-                            infoBox.innerHTML = `<img src="${myItem.img}" style="height:2rem; width:2rem; object-fit:contain; margin-right:0.5rem; opacity:0.8;"><span>${myItem.desc}</span>`;
-                        }
-                    } else if (infoBox) {
-                        infoBox.innerHTML = ""; // Clear if special item logic below handles it
-                    }
+                    if (infoBox) infoBox.innerText = ""; // 一旦クリア
                     
                     // Pre-check for Nullify
                     let enemyNullify = (state.c.item === 'nullify');
+
+                    // Default text for normal items
+                    if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
+                        const myItem = ITEMS_DEF[state.p.item];
+                        if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
+                    }
 
                     // 宝箱 (Chest) Logic - Simply add PTS if not nullified
                     if (state.p.item === 'chest') {
@@ -2072,7 +2078,8 @@
                             if(infoBox) {
                                 // 修正: 説明文ではなく効果のみを表示
                                 infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
-                                // Default purple
+                                infoBox.classList.add('text-yellow-400');
+                                setTimeout(() => infoBox.classList.remove('text-yellow-400'), 3000);
                             }
                         } else {
                              // Nullified case
@@ -2092,7 +2099,7 @@
                          if(infoBox) {
                              // 修正: 拡大鏡の効果を削除
                              infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`; 
-                             // Default purple
+                             infoBox.classList.add('text-purple-400');
                          }
                     }
 
@@ -2133,3 +2140,407 @@
 
             }, 2000); 
         }
+
+        async function clearRoomInputs() {
+             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+             if (maxPlayers === 2) {
+                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                 if(!snap.empty) {
+                     const d = snap.docs[0].data();
+                     const updates = {};
+                     d.players.forEach(p => updates[`playerData.${p}.input`] = null);
+                     await updateDoc(roomRef, updates);
+                 }
+             } else {
+             }
+        }
+
+        async function resolvePhase2() {
+            if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
+            
+            // 1. 本来のアイテムでカットイン演出
+            await showDualCutin(state.p.item, state.c.item);
+
+            const infoBox = el('battle-info-box');
+
+            // 2. 無効化判定とID書き換え
+            let pNullified = false;
+            let cNullified = false;
+            
+            if (state.p.item === 'nullify' && state.c.item !== 'nullify') {
+                cNullified = true;
+                if(infoBox) infoBox.innerText = "無効化発動！ 相手のアイテムを無効化！";
+                state.c.item = 'none'; // Force overwrite to none
+            }
+            if (state.c.item === 'nullify' && state.p.item !== 'nullify') {
+                pNullified = true;
+                if(infoBox) infoBox.innerText = "相手が無効化を使用！ あなたのアイテムは無効化されました！";
+                state.p.item = 'none'; // Force overwrite to none
+            }
+            
+            state.pNullified = pNullified;
+            state.cNullified = cNullified;
+            
+            // Drain Logic (Modified for Version 108)
+            if (state.p.item === 'drain' && !pNullified) {
+                 // Pending for next round
+                 state.pendingDrain = state.c.atk;
+                 // 削除指示により表示処理削除
+            }
+            if (state.c.item === 'drain' && !cNullified) {
+                 if (!isOnline) {
+                      state.pendingCpuDrain = state.p.atk; 
+                 }
+            }
+
+
+            startBattleSequence();
+        }
+
+        function startBattleSequence() {
+            state.p.currHp = undefined; state.c.currHp = undefined;
+            const infoBox = el('battle-info-box');
+            
+            // Swap Logic
+            if (state.p.item === 'swap') { [state.c.atk, state.c.def] = [state.c.def, state.c.atk]; }
+            if (state.c.item === 'swap') { [state.p.atk, state.p.def] = [state.p.def, state.p.atk]; }
+
+            // Mirror Sword / Hand Mirror / Shield Logic (Force stats)
+            if (state.p.item === 'shield') { state.p.def = state.c.def; ui.cP.def.innerText = state.p.def; }
+            if (state.p.item === 'mirror') { state.p.atk = state.c.atk; ui.cP.atk.innerText = state.p.atk; }
+            if (state.p.item === 'handmirror') { 
+                state.p.atk = state.c.atk; ui.cP.atk.innerText = state.p.atk;
+                state.p.def = state.c.def; ui.cP.def.innerText = state.p.def;
+            }
+            
+            if (state.c.item === 'shield') { state.c.def = state.p.def; ui.cC.def.innerText = state.c.def; }
+            if (state.c.item === 'mirror') { state.c.atk = state.p.atk; ui.cC.atk.innerText = state.c.atk; }
+            if (state.c.item === 'handmirror') { 
+                state.c.atk = state.p.atk; ui.cC.atk.innerText = state.c.atk;
+                state.c.def = state.p.def; ui.cC.def.innerText = state.c.def;
+            }
+
+            let pFirst = false;
+            if (state.p.spd === 0 && state.c.spd === 0) {
+                pFirst = state.p.total >= state.c.total;
+            } else {
+                pFirst = state.p.spd >= state.c.spd;
+            }
+            
+            const pMult = 1.0; 
+            const cMult = 1.0;
+            const pAtkFinal = Math.ceil(state.p.atk * pMult);
+            const cAtkFinal = Math.ceil(state.c.atk * cMult);
+
+            if(state.pAdv || state.cAdv) {
+                el('adv-badge').classList.remove('hidden');
+                el('adv-badge').innerText = state.pAdv ? "先攻奪取！" : "後攻（相手が先攻）";
+            } 
+            // REMOVED RESOURCE ADVANTAGE DISPLAY
+
+            // Jammer Logic: if opponent uses jammer, don't reveal their cards
+            const revealOpponent = (state.c.item !== 'jammer');
+
+            const seq = [
+                { t: 500, f: () => { 
+                    reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); 
+                    if (revealOpponent) reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); 
+                }},
+                { t: 1500, f: () => { 
+                    if(pFirst) { 
+                        highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); 
+                    } else { 
+                        highlight(ui.wrapsC.atk); 
+                        if (revealOpponent) reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); 
+                    }
+                }},
+                { t: 2500, f: () => {
+                    if(pFirst && state.pAdv) { ui.cP.atk.innerText = pAtkFinal; ui.cP.atk.classList.add('val-boost'); }
+                    if(!pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
+                }},
+                { t: 3500, f: () => { 
+                    if(pFirst) { 
+                        highlight(ui.wrapsC.def); 
+                        if (revealOpponent) reveal(ui.wrapsC.def, ui.cC.def, state.c.def); 
+                    } else { 
+                        highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); 
+                    }
+                }},
+                
+                { t: 4500, f: () => {
+                    let dead = false;
+                    if(pFirst) { 
+                        const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
+                        state.c.currHp = state.c.hp - dmg; 
+                        
+                        if (state.c.currHp <= 0) {
+                             if (state.c.item === 'prot' || state.c.item === 'boost') {
+                                if (state.c.item === 'prot') state.c.currHp = 1;
+                                else state.c.currHp = 0; 
+                                if(infoBox) infoBox.innerText = "相手は耐えた！";
+                            } else {
+                                dead = true;
+                            }
+                        }
+                        updateHpVal(ui.cC.hp, state.c.currHp);
+                    } else { 
+                        const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
+                        state.p.currHp = state.p.hp - dmg; 
+                        
+                        if (state.p.currHp <= 0) {
+                            if (state.p.item === 'prot' || state.p.item === 'boost') {
+                                if (state.p.item === 'prot') state.p.currHp = 1;
+                                else state.p.currHp = 0;
+                                if(infoBox) infoBox.innerText = "耐えた！";
+                            } else {
+                                dead = true;
+                            }
+                        }
+                        updateHpVal(ui.cP.hp, state.p.currHp);
+                    }
+                    clearHighlights();
+                    
+                    if (dead) {
+                        setTimeout(() => {
+                            const pHp = state.p.currHp!==undefined ? state.p.currHp : state.p.hp;
+                            const cHp = state.c.currHp!==undefined ? state.c.currHp : state.c.hp;
+                            endRound(pHp, cHp);
+                        }, 1000);
+                        return true; 
+                    }
+                }},
+                
+                { t: 6000, f: () => { 
+                    if(!pFirst) { 
+                        highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); 
+                    } else { 
+                        highlight(ui.wrapsC.atk); 
+                        if (revealOpponent) reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); 
+                    }
+                }},
+                { t: 7000, f: () => {
+                    if(!pFirst && state.pAdv) { ui.cP.atk.innerText = pAtkFinal; ui.cP.atk.classList.add('val-boost'); }
+                    if(pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
+                }},
+                { t: 8000, f: () => { 
+                    if(!pFirst) { 
+                        highlight(ui.wrapsC.def); 
+                        if (revealOpponent) reveal(ui.wrapsC.def, ui.cC.def, state.c.def); 
+                    } else { 
+                        highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); 
+                    }
+                }},
+                
+                { t: 9000, f: () => {
+                    if(!pFirst) { 
+                        const dmg = Math.max(0, pAtkFinal - state.c.def); hit('c', dmg); 
+                        state.c.currHp = (state.c.currHp!==undefined ? state.c.currHp : state.c.hp) - dmg;
+                        
+                        if (state.c.currHp <= 0) {
+                             if (state.c.item === 'prot' || state.c.item === 'boost') {
+                                if (state.c.item === 'prot') state.c.currHp = 1;
+                                else state.c.currHp = 0;
+                            }
+                        }
+                        updateHpVal(ui.cC.hp, state.c.currHp); 
+                    } 
+                    else { 
+                        const dmg = Math.max(0, cAtkFinal - state.p.def); hit('p', dmg); 
+                        state.p.currHp = (state.p.currHp!==undefined ? state.p.currHp : state.p.hp) - dmg; 
+                        
+                        if (state.p.currHp <= 0) {
+                             if (state.p.item === 'prot' || state.p.item === 'boost') {
+                                if (state.p.item === 'prot') state.p.currHp = 1;
+                                else state.p.currHp = 0;
+                            }
+                        }
+                        updateHpVal(ui.cP.hp, state.p.currHp); 
+                    }
+                    clearHighlights();
+                }},
+                { t: 10500, f: () => {
+                    const pHp = state.p.currHp!==undefined ? state.p.currHp : state.p.hp;
+                    const cHp = state.c.currHp!==undefined ? state.c.currHp : state.c.hp;
+                    endRound(pHp, cHp);
+                }}
+            ];
+            
+            // 変更: タイマーIDを保存
+            seq.forEach(s => {
+                const tid = setTimeout(s.f, s.t);
+                battleTimers.push(tid);
+            });
+        }
+
+        // --- Rewind Logic ---
+        function applyRewind(pWin, cWin) {
+             let replayed = false;
+             let userWhoRewound = null;
+             const infoBox = el('battle-info-box');
+
+             if (cWin && state.p.item === 'rewind') {
+                 // Player uses rewind
+                 if (!state.rewindUsed.includes(userId)) {
+                     if(infoBox) infoBox.innerText = "時戻し発動！ ラウンドをやり直します...";
+                     userWhoRewound = userId;
+                     replayed = true;
+                 }
+             } else if (pWin && state.c.item === 'rewind') {
+                 // Opponent uses rewind (Modified Logic: Find actual Opponent ID)
+                 // state.roomPlayers is always populated by subscribeRoom
+                 const actualOppId = isOnline ? (state.roomPlayers || []).find(p => p !== userId) : 'cpu';
+
+                 if (actualOppId && !state.rewindUsed.includes(actualOppId)) {
+                     if(infoBox) infoBox.innerText = "相手が時戻しを発動！ ラウンドをやり直します...";
+                     userWhoRewound = actualOppId;
+                     replayed = true;
+                 }
+             }
+
+             if (replayed && userWhoRewound) {
+                 // 修正: オンライン時はここでローカルstateを更新しない。onSnapshotに任せる。
+                 if (!isOnline) {
+                     // オフライン時は即座に反映
+                     if (!state.rewindUsed.includes(userWhoRewound)) {
+                         state.rewindUsed.push(userWhoRewound);
+                     }
+                 }
+
+                 // If online, sync this usage to DB if host OR if self used it (Guest write permission)
+                 if (isOnline && (role === 'host' || userWhoRewound === userId)) {
+                     // 非同期で実行
+                     (async () => {
+                         const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                         try {
+                             // プレイヤーリスト取得のため最新を取得
+                             const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                             if(!snap.empty) {
+                                 const d = snap.docs[0].data();
+                                 const updates = {
+                                     round: state.round,
+                                     rewindUsed: arrayUnion(userWhoRewound),
+                                     phase: 1
+                                 };
+                                 // 入力リセット
+                                 if(d.players) {
+                                     d.players.forEach(p => {
+                                         updates[`playerData.${p}.input`] = null;
+                                         updates[`playerData.${p}.phase1`] = null; 
+                                         updates[`playerData.${p}.phase2`] = null; 
+                                         updates[`playerData.${p}.ready`] = false;
+                                     });
+                                 }
+                                 await updateDoc(roomRef, updates);
+                             }
+                         } catch(e) { console.error("Rewind sync error", e); }
+                     })();
+                 }
+                 
+                 // If offline, just restart
+                 if (!isOnline) {
+                    setTimeout(() => {
+                        // In offline, initRound will use local state.rewindUsed
+                        initRound();
+                    }, 2000);
+                 }
+             }
+             return replayed;
+        }
+
+        function endRound(pHp, cHp) {
+            clearBattleTimers(); // Ensure animations stop
+
+            if (maxPlayers >= 3) return; 
+            
+            let title = "DRAW"; let color = "text-yellow-500";
+            let pWin = false, cWin = false;
+
+            if(pHp > cHp) { state.p.wins++; title="VICTORY"; color="text-yellow-400"; pWin=true; }
+            else if(cHp > pHp) { state.c.wins++; title="DEFEAT"; color="text-red-500"; cWin=true; }
+            
+            // Check Rewind
+            if (applyRewind(pWin, cWin)) {
+                // If rewound, revert win count
+                if(pWin) state.p.wins--;
+                if(cWin) state.c.wins--;
+                return;
+            }
+
+            window.playSe(pWin ? 'win' : 'lose');
+
+            el('player-score').innerText = state.p.wins;
+            el('cpu-score').innerText = state.c.wins;
+            
+            el('res-title').innerText = title;
+            el('res-title').className = `text-5xl font-gaming ${color} mb-6`;
+            
+            // OPP REM Hidden
+            el('res-content').innerHTML = `
+                <div class="grid grid-cols-2 gap-4 text-sm mb-4 border-b border-gray-700 pb-4">
+                    <div class="text-right border-r border-gray-700 pr-4">
+                        <div class="text-blue-400 font-bold mb-1 font-gaming">YOU</div>
+                        <div class="text-2xl font-bold font-gaming text-white">${state.p.wins} WINS</div>
+                        <div class="text-xs text-gray-400 mt-2 font-tech">HP: ${Math.floor(pHp)}</div>
+                        <div class="text-xs text-gray-400 font-tech">MANA: ${Math.floor(state.p.total)}</div>
+                    </div>
+                    <div class="text-left pl-4">
+                        <div class="text-red-500 font-bold mb-1 font-gaming">OPP</div>
+                        <div class="text-2xl font-bold text-white font-gaming">${state.c.wins} WINS</div>
+                        <div class="text-xs text-gray-400 mt-2 font-tech">HP: ${Math.floor(cHp)}</div>
+                        <div class="text-xs text-gray-400 font-tech">MANA: ???</div>
+                    </div>
+                </div>
+            `;
+            // Show Rematch Button if Online and Host
+            if (isOnline && role === 'host') {
+                 el('rematch-btn').classList.remove('hidden');
+            } else {
+                 el('rematch-btn').classList.add('hidden');
+            }
+
+            el('result-overlay').classList.remove('hidden');
+        }
+
+        window.nextRound = async () => {
+            if (maxPlayers >= 3) return; 
+            
+            if(state.p.wins >= 3 || state.c.wins >= 3 || state.round >= 5) {
+                el('result-overlay').classList.add('hidden');
+                el('game-over-overlay').classList.remove('hidden');
+                const win = state.p.wins > state.c.wins;
+                el('final-result-title').innerText = win ? "VICTORY" : "DEFEAT";
+                el('final-result-title').className = win ? "text-6xl font-gaming mb-4 text-yellow-400" : "text-6xl font-gaming mb-4 text-red-500";
+                
+                // Show Rematch Button if Online and Host in Game Over screen too
+                if (isOnline && role === 'host') {
+                     el('rematch-btn').classList.remove('hidden');
+                } else {
+                     el('rematch-btn').classList.add('hidden');
+                }
+                return;
+            }
+
+            if (isOnline) {
+                el('result-overlay').classList.add('hidden'); 
+                el('wait-overlay').classList.remove('hidden');
+                
+                // ★追加: 待機メッセージを変更してユーザーに状態を伝える
+                const waitMsg = el('wait-overlay').querySelector('.font-gaming');
+                if(waitMsg) waitMsg.innerText = "対戦相手を待っています...";
+
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+                // Ready flag update
+                await updateDoc(roomRef, { [`playerData.${userId}.ready`]: true });
+            } else {
+                state.round++;
+                // Reset rewind usage on next round (Offline)
+                state.rewindUsed = [];
+                el('current-round').innerText = state.round;
+                el('result-overlay').classList.add('hidden');
+                initRound();
+            }
+        };
+
+    </script>
+</body>
+</html>
