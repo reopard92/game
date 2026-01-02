@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：100</title>
+    <title>Resource Strategy Card Battle：101</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -592,7 +592,7 @@
             <button data-action="enterOnlineMode" class="lobby-btn !text-white !border-white hover:!bg-white hover:!text-black">ONLINE BATTLE</button>
             <button data-action="showItemBook" class="lobby-btn !text-blue-300 !border-blue-300 hover:!bg-blue-300 hover:!text-black text-sm">ITEM LIST</button>
         </div>
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 100</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 101</div>
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
             <ul class="text-xs text-gray-300 space-y-2 list-disc list-inside font-sans">
@@ -641,10 +641,13 @@
         <button data-action="nextRound" class="w-full max-w-xs h-14 bg-yellow-600 text-black font-bold text-xl rounded font-gaming border border-yellow-400 shadow-lg">NEXT ROUND</button>
     </div>
     <!-- Game Over Overlay -->
-    <div id="game-over-overlay" class="overlay hidden">
+    <div id="game-over-overlay" class="overlay hidden p-6 text-center">
         <h1 id="final-result-title" class="text-6xl font-gaming mb-4 text-white animate-pulse">VICTORY</h1>
         <p class="text-gray-500 tracking-[0.5em] mb-8 font-tech">BATTLE FINISHED</p>
-        <button onclick="location.reload()" class="px-12 py-4 bg-blue-800 text-white font-bold rounded border border-blue-500 shadow-lg">RETURN TO TITLE</button>
+        <div class="flex flex-col gap-4 items-center justify-center w-full">
+            <button onclick="location.reload()" class="w-full max-w-xs px-8 py-4 bg-blue-800 text-white font-bold rounded border border-blue-500 shadow-lg">RETURN TO TITLE</button>
+            <button id="rematch-btn" data-action="rematch" class="hidden w-full max-w-xs px-8 py-4 bg-green-700 text-white font-bold rounded border border-green-500 shadow-lg mt-2">REMATCH</button>
+        </div>
     </div>
 
     <!-- Firebase SDKs -->
@@ -808,6 +811,9 @@
                     } else if (action === 'nextRound') {
                         playSe('select');
                         window.nextRound();
+                    } else if (action === 'rematch') {
+                        playSe('select');
+                        window.rematch();
                     }
                 }
             }
@@ -850,20 +856,23 @@
         const ITEMS_DEF = {
             'none': { cost: 0, name: "アイテムなし", desc: "アイテムなし。通常の戦術で戦う。", img: "アイテムなし.png" },
             'chest': { cost: 0, name: "宝箱", desc: "フェーズ2開始時に自分のPTSを＋100する", img: "宝箱.png" },
+            'jammer': { cost: 20, name: "ジャマー", desc: "自分のHP,ATK,DEFカード数値を相手に開示せずバトルを行う", img: "ジャマー.png" },
+            'mirror': { cost: 40, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
+            'shield': { cost: 40, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "ミラーシールド.png" },
             'fast': { cost: 50, name: "早送り", desc: "相手の構築時間を7秒に短縮させる。", img: "早送り.png" },
-            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" },
-            'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
-            'swap': { cost: 60, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
-            'shield': { cost: 50, name: "ミラーシールド", desc: "相手と同じDEF値になる(DEF操作不可)。", img: "ミラーシールド.png" },
+            'swap': { cost: 50, name: "攻守逆転", desc: "敵のATKとDEFを入れ替える。", img: "攻防逆転.png" },
             'boost': { cost: 50, name: "増強剤", desc: "HPが0になっても即死しない(HP0のまま行動)。", img: "増強剤.png" },
-            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
-            'mirror': { cost: 50, name: "ミラーソード", desc: "相手と同じATK値になる(ATK操作不可)。", img: "ミラーソード.png" },
-            'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
+            'drain': { cost: 50, name: "吸収", desc: "相手の攻撃力分ptsを得る", img: "吸収.png" },
+            'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'nullify': { cost: 70, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
-            'crystal': { cost: 80, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" }
+            'mirror_crystal': { cost: 80, name: "ミラー水晶玉", desc: "相手と同じアイテムを使用する", img: "ミラー水晶玉.png" },
+            'crystal': { cost: 90, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" },
+            'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
+            'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
+            'prot': { cost: 200, name: "01プロテクション", desc: "HP0になる攻撃を受けた時、HP1で耐える。", img: "01プロテクション.png" }
         };
         // All items except 'none' for random pool
-        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal', 'chest'];
+        const ITEM_POOL_KEYS = ['fast', 'prot', 'scope', 'swap', 'shield', 'boost', 'rewind', 'mirror', 'handmirror', 'nullify', 'crystal', 'chest', 'mirror_crystal', 'jammer', 'drain'];
 
         let state = {
             round: 1,
@@ -982,6 +991,13 @@
             // 禁止アイテムチェック
             const btn = el('item-'+itemId);
             if (btn && btn.classList.contains('banned')) return;
+
+            // コストチェック
+            if (state.phase === 1 && ITEMS_DEF[itemId].cost > (state.p.total - state.inputs.spd)) {
+                el('notice-msg').innerText = "ポイントが足りません！";
+                setTimeout(() => el('notice-msg').innerText = "", 1000);
+                return;
+            }
 
             if (state.phase !== 1) return;
             state.p.item = itemId;
@@ -1159,6 +1175,44 @@
             }
         };
 
+        window.rematch = async () => {
+            if (!isOnline || role !== 'host') return;
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+            const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+            if (!snap.empty) {
+                const d = snap.docs[0].data();
+                const updates = {
+                    round: 1,
+                    phase: 1,
+                    pickOrder: [],
+                    targets: {},
+                    pickIndex: 0,
+                    rewindUsed: [],
+                    updatedAt: serverTimestamp()
+                };
+                
+                // アイテム再抽選はせず、同じアイテムで再戦するか、リセットするか。
+                // 通常はリセットが好ましいが、簡略化のためそのままか、新規生成。
+                // ここではステータスリセットのみ。
+                
+                if (d.players) {
+                     d.players.forEach(p => {
+                         updates[`playerData.${p}.input`] = null;
+                         updates[`playerData.${p}.phase1`] = null; 
+                         updates[`playerData.${p}.phase2`] = null; 
+                         updates[`playerData.${p}.ready`] = false;
+                     });
+                }
+                await updateDoc(roomRef, updates);
+                
+                // ローカルのステータスもリセット
+                state.round = 1;
+                state.p.total = START_PTS; state.c.total = START_PTS;
+                state.p.wins = 0; state.c.wins = 0;
+                // initRoundはonSnapshotで検知されるはず
+            }
+        };
+
         window.deleteRoom = async () => {
             if (roomId && role === 'host') {
                 const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
@@ -1258,6 +1312,23 @@
                         
                         initRound();
                         isGameStarted = true;
+                    }
+
+                    // REMATCH CHECK (Round reset to 1 from >1 or game over)
+                    if (data.round === 1 && state.round > 1) {
+                         // Reset Local State
+                         state.round = 1;
+                         state.p.total = START_PTS; state.c.total = START_PTS;
+                         state.p.wins = 0; state.c.wins = 0;
+                         state.rewindUsed = [];
+                         el('current-round').innerText = state.round;
+                         el('player-score').innerText = 0;
+                         el('cpu-score').innerText = 0;
+                         el('game-over-overlay').classList.add('hidden');
+                         el('result-overlay').classList.add('hidden');
+                         el('wait-overlay').classList.add('hidden');
+                         initRound();
+                         return;
                     }
 
                     // REWIND CHECK (Before Round Check)
@@ -1788,6 +1859,33 @@
 
             ui.btn.innerText = "REVEALING...";
             
+            // --- Mirror Crystal Logic (Copy Phase 1) ---
+            if (state.p.item === 'mirror_crystal' && state.c.item !== 'mirror_crystal') {
+                 // Copy opponent item logic
+                 state.p.item = state.c.item;
+                 const infoBox = el('battle-info-box');
+                 if(infoBox) {
+                     infoBox.innerText = `ミラー水晶玉発動: ${ITEMS_DEF[state.c.item].name}をコピーしました`;
+                     infoBox.classList.add('text-purple-400');
+                     setTimeout(() => infoBox.classList.remove('text-purple-400'), 3000);
+                 }
+            } else if (state.p.item === 'mirror_crystal' && state.c.item === 'mirror_crystal') {
+                 // Both mirror - cancel each other
+                 state.p.item = 'none';
+                 state.c.item = 'none';
+                 const infoBox = el('battle-info-box');
+                 if(infoBox) {
+                     infoBox.innerText = `ミラー同士が共鳴し、効果が打ち消されました`;
+                 }
+            }
+            // For CPU or local display consistency, if CPU uses mirror crystal
+            if (state.c.item === 'mirror_crystal' && state.p.item !== 'mirror_crystal') {
+                 state.c.item = state.p.item;
+            } else if (state.c.item === 'mirror_crystal') {
+                 state.c.item = 'none';
+            }
+
+
             // REMOVED: await showDualCutin(state.p.item, state.c.item); // Phase 1 Item Reveal Removed
 
             setTimeout(() => {
@@ -1841,7 +1939,7 @@
                     let enemyNullify = (state.c.item === 'nullify');
 
                     // Default text for normal items (Not special ones that change text)
-                    if (!['crystal', 'scope', 'chest'].includes(state.p.item)) {
+                    if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
                         const myItem = ITEMS_DEF[state.p.item];
                         if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
                     }
@@ -1954,10 +2052,23 @@
                 state.p.item = 'none'; // Force overwrite to none
             }
             
-            // Scope effect moved to resolvePhase1
-            
             state.pNullified = pNullified;
             state.cNullified = cNullified;
+            
+            // Drain Logic
+            if (state.p.item === 'drain' && !pNullified) {
+                 state.p.total += state.c.atk;
+                 if (infoBox) {
+                     const addText = `吸収発動: PTS +${state.c.atk}`;
+                     infoBox.innerText = infoBox.innerText ? infoBox.innerText + "\n" + addText : addText;
+                 }
+            }
+            if (state.c.item === 'drain' && !cNullified) {
+                 if (!isOnline) {
+                      state.c.total += state.p.atk; 
+                 }
+            }
+
 
             startBattleSequence();
         }
@@ -2003,14 +2114,34 @@
             } 
             // REMOVED RESOURCE ADVANTAGE DISPLAY
 
+            // Jammer Logic: if opponent uses jammer, don't reveal their cards
+            const revealOpponent = (state.c.item !== 'jammer');
+
             const seq = [
-                { t: 500, f: () => { reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); }},
-                { t: 1500, f: () => { if(pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
+                { t: 500, f: () => { 
+                    reveal(ui.wrapsP.hp, ui.cP.hp, state.p.hp); 
+                    if (revealOpponent) reveal(ui.wrapsC.hp, ui.cC.hp, state.c.hp); 
+                }},
+                { t: 1500, f: () => { 
+                    if(pFirst) { 
+                        highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); 
+                    } else { 
+                        highlight(ui.wrapsC.atk); 
+                        if (revealOpponent) reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); 
+                    }
+                }},
                 { t: 2500, f: () => {
                     if(pFirst && state.pAdv) { ui.cP.atk.innerText = pAtkFinal; ui.cP.atk.classList.add('val-boost'); }
                     if(!pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
                 }},
-                { t: 3500, f: () => { if(pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
+                { t: 3500, f: () => { 
+                    if(pFirst) { 
+                        highlight(ui.wrapsC.def); 
+                        if (revealOpponent) reveal(ui.wrapsC.def, ui.cC.def, state.c.def); 
+                    } else { 
+                        highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); 
+                    }
+                }},
                 
                 { t: 4500, f: () => {
                     let dead = false;
@@ -2055,12 +2186,26 @@
                     }
                 }},
                 
-                { t: 6000, f: () => { if(!pFirst) { highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); } else { highlight(ui.wrapsC.atk); reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); }}},
+                { t: 6000, f: () => { 
+                    if(!pFirst) { 
+                        highlight(ui.wrapsP.atk); reveal(ui.wrapsP.atk, ui.cP.atk, state.p.atk); 
+                    } else { 
+                        highlight(ui.wrapsC.atk); 
+                        if (revealOpponent) reveal(ui.wrapsC.atk, ui.cC.atk, state.c.atk); 
+                    }
+                }},
                 { t: 7000, f: () => {
                     if(!pFirst && state.pAdv) { ui.cP.atk.innerText = pAtkFinal; ui.cP.atk.classList.add('val-boost'); }
                     if(pFirst && state.cAdv) { ui.cC.atk.innerText = cAtkFinal; ui.cC.atk.classList.add('val-boost'); }
                 }},
-                { t: 8000, f: () => { if(!pFirst) { highlight(ui.wrapsC.def); reveal(ui.wrapsC.def, ui.cC.def, state.c.def); } else { highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); }}},
+                { t: 8000, f: () => { 
+                    if(!pFirst) { 
+                        highlight(ui.wrapsC.def); 
+                        if (revealOpponent) reveal(ui.wrapsC.def, ui.cC.def, state.c.def); 
+                    } else { 
+                        highlight(ui.wrapsP.def); reveal(ui.wrapsP.def, ui.cP.def, state.p.def); 
+                    }
+                }},
                 
                 { t: 9000, f: () => {
                     if(!pFirst) { 
@@ -2179,6 +2324,8 @@
         }
 
         function endRound(pHp, cHp) {
+            clearBattleTimers(); // Ensure animations stop
+
             if (maxPlayers >= 3) return; 
             
             let title = "DRAW"; let color = "text-yellow-500";
@@ -2195,7 +2342,8 @@
                 return;
             }
 
-            window.playSe(pWin ? 'win' : 'lose');
+            if(pWin) playSe('win'); // Victory sound
+            else if(cWin) playSe('lose'); // Defeat sound
 
             el('player-score').innerText = state.p.wins;
             el('cpu-score').innerText = state.c.wins;
@@ -2220,6 +2368,13 @@
                     </div>
                 </div>
             `;
+            // Show Rematch Button if Online and Host
+            if (isOnline && role === 'host') {
+                 el('rematch-btn').classList.remove('hidden');
+            } else {
+                 el('rematch-btn').classList.add('hidden');
+            }
+
             el('result-overlay').classList.remove('hidden');
         }
 
@@ -2232,6 +2387,13 @@
                 const win = state.p.wins > state.c.wins;
                 el('final-result-title').innerText = win ? "VICTORY" : "DEFEAT";
                 el('final-result-title').className = win ? "text-6xl font-gaming mb-4 text-yellow-400" : "text-6xl font-gaming mb-4 text-red-500";
+                
+                // Show Rematch Button if Online and Host in Game Over screen too
+                if (isOnline && role === 'host') {
+                     el('rematch-btn').classList.remove('hidden');
+                } else {
+                     el('rematch-btn').classList.add('hidden');
+                }
                 return;
             }
 
