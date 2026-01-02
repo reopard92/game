@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：119</title>
+    <title>Resource Strategy Card Battle：109</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -32,11 +32,6 @@
             --gold-base: #ffd700;
             --gold-dark: #b8860b;
             --gold-shadow: #8b6508;
-            
-            /* Purple Theme for Items (New) */
-            --purple-light: #e9d5ff; /* Purple-200 */
-            --purple-main: #c084fc;  /* Purple-400 */
-            --purple-dark: #9333ea;  /* Purple-600 */
         }
 
         body {
@@ -44,7 +39,7 @@
             background-color: var(--bg-deep);
             color: var(--text-main);
             overflow: hidden;
-            touch-action: none; /* スマホ操作用 */
+            touch-action: none;
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -64,7 +59,7 @@
         @keyframes drift { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, -50px); } }
         @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 0.6; } }
 
-        /* Magic Circle Background */
+        /* Magic Circle Background (Luxury Idea 2) */
         .magic-circle-bg {
             position: fixed;
             top: 50%; left: 50%;
@@ -101,6 +96,7 @@
             box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
         }
         .input-controls { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 2px; justify-content: center; }
+        /* Action Area Adjustment: flex-col, height 100% to allow button to grow */
         .action-area { width: 70px; display: flex; flex-direction: column; justify-content: flex-start; padding-bottom: 6px; flex-shrink: 0; height: 100%; }
 
         /* Card Styles */
@@ -127,16 +123,19 @@
         .battle-card-front { transform: rotateY(0deg); z-index: 2; }
         .battle-card-back { transform: rotateY(180deg); background-image: url('裏面.png'); background-color: #1e293b; }
 
+        /* Front Card Border Colors - PALE */
         .battle-card-front.card-spd { background-image: url('SPD.png'); border-color: var(--color-spd-pale); }
         .battle-card-front.card-hp { background-image: url('HP.png'); border-color: var(--color-hp-pale); }
         .battle-card-front.card-atk { background-image: url('ATK.png'); border-color: var(--color-atk-pale); }
         .battle-card-front.card-def { background-image: url('DEF.png'); border-color: var(--color-def-pale); }
 
+        /* Back Card Border Colors - PALE */
         .battle-card-back.card-spd { border-color: var(--color-spd-pale); }
         .battle-card-back.card-hp { border-color: var(--color-hp-pale); }
         .battle-card-back.card-atk { border-color: var(--color-atk-pale); }
         .battle-card-back.card-def { border-color: var(--color-def-pale); }
 
+        /* Text colors remain vivid for readability */
         .card-spd { color: #fff; }
         .card-hp { color: #fff; }
         .card-atk { color: #fff; }
@@ -185,6 +184,7 @@
             align-items: flex-start;
         }
         
+        /* Button Press Effect Mixin Style */
         .btn-mini { 
             flex: 1; height: 48px;
             background: rgba(255,255,255,0.05); 
@@ -235,7 +235,7 @@
 
         .item-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; padding-bottom: 4px; }
         
-        /* Item Button Press Effect - MODIFIED COLORS */
+        /* Item Button Press Effect */
         .item-btn { 
             position: relative; aspect-ratio: 1/1; 
             background: rgba(255,255,255,0.02); 
@@ -253,10 +253,8 @@
             box-shadow: 0 0 0 rgba(0,0,0,0);
             transform: translateY(4px) scale(0.96);
         }
-        /* 変更: 選択状態を紫色に変更 */
         .item-btn.selected { 
-            border-color: var(--purple-main); 
-            background: rgba(192, 132, 252, 0.1); 
+            border-color: #fcd34d; background: rgba(251, 191, 36, 0.1); 
             opacity: 1; filter: none; 
             transform: translateY(0) scale(1);
             box-shadow: 0 4px 0 rgba(0,0,0,1);
@@ -292,11 +290,27 @@
             z-index: 1;
         }
 
+        .item-label, .item-cost { z-index: 5; } /* Ensure text is above particles */
+
+        @keyframes particle-rise {
+            0% { background-position: 0 100%, 5px 110%, 2px 120%, 10px 105%; opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { background-position: 0 -20%, 5px -10%, 2px 0%, 10px -15%; opacity: 0; }
+        }
+
+        .item-btn.item-rare.active-press {
+            transform: translateY(4px) scale(0.96);
+            box-shadow: none;
+        }
+        /* Override selected scale behavior for rare to maintain press effect consistency */
+        .item-btn.item-rare.selected.active-press {
+            transform: translateY(4px) scale(1);
+        }
+
+
         .item-label { font-size: 8px; font-weight: bold; color: #fff; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); text-align: center; line-height: 1.1; margin-top: auto; padding-bottom: 2px; font-family: 'Noto Sans JP'; }
-        
-        /* 変更: コスト表示を紫色に */
-        .item-cost { font-size: 11px; color: var(--purple-light); font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
-        
+        .item-cost { font-size: 11px; color: #fcd34d; font-family: 'Cinzel'; font-weight: bold; z-index: 2; text-shadow: 0 0 5px rgba(0,0,0,0.8); position: absolute; top: 1px; right: 1px;}
         .item-img { 
             position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.8; z-index: 1; transition: opacity 0.2s; 
             pointer-events: none; /* No interaction for image */
@@ -305,10 +319,7 @@
         .item-btn.selected .item-img { opacity: 1; }
         
         .item-info-box { background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(255,255,255,0.1); padding: 8px; margin-top: 6px; border-radius: 0 0 8px 8px; min-height: 40px; display: flex; flex-direction: column; justify-content: center; }
-        
-        /* 変更: タイトルを紫色に */
-        .item-info-title { font-size: 11px; font-weight: bold; color: var(--purple-light); margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
-        
+        .item-info-title { font-size: 11px; font-weight: bold; color: #fcd34d; margin-bottom: 2px; font-family: 'Cinzel'; letter-spacing: 1px; }
         /* Removed font-family for item desc to use inherited font */
         .item-info-desc { font-size: 10px; color: #e2e8f0; line-height: 1.2; font-family: inherit; }
 
@@ -325,7 +336,7 @@
             justify-content: center;
             text-align: center;
             font-size: 0.7rem;
-            color: var(--purple-light); /* 変更: 全てのフェーズ下テキストを紫色に統一 */
+            color: #fff;
             padding: 2px;
             font-family: inherit;
             text-shadow: 0 0 4px rgba(0,0,0,0.8);
@@ -335,6 +346,7 @@
         /* Cut-in, Ready Fight */
         #item-cutin { pointer-events: none; }
         .cutin-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; backdrop-filter: blur(10px); }
+        /* CHANGED: Always column-reverse for consistent look */
         .cutin-container { display: flex; flex-direction: column-reverse; gap: 10px; align-items: center; justify-content: center; transform: scale(0.8); opacity: 0; }
         .cutin-box { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; }
         .cutin-label { font-family: 'Cinzel'; font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; }
@@ -349,17 +361,41 @@
         @keyframes cutin-scale { 0% { transform: scale(1.3); opacity: 0; } 15% { transform: scale(0.8); opacity: 1; } 90% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(0.9); opacity: 0; } }
         .animate-cutin .cutin-overlay { animation: cutin-anim 4s forwards; }
         .animate-cutin .cutin-container { animation: cutin-scale 4s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
-        
+        /* Mobile adjust for Cutin */
         @media (max-width: 640px) {
             .cutin-container { transform: scale(0.45); }
         }
 
         #ready-fight { pointer-events: none; }
         .rf-overlay { position: absolute; inset: 0; z-index: 55; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); opacity: 0; backdrop-filter: blur(2px); }
-        .rf-text { font-family: 'Cinzel'; font-weight: bold; font-size: 15vw; color: #fff; text-shadow: 0 0 30px #fcd34d; letter-spacing: 0.1em; transform: scale(0); white-space: nowrap; } 
+        .rf-text { font-family: 'Cinzel'; font-weight: bold; font-size: 15vw; color: #fff; text-shadow: 0 0 30px #fcd34d; letter-spacing: 0.1em; transform: scale(0); white-space: nowrap; } /* Scaled font size */
         .rf-text.fight { color: #f43f5e; text-shadow: 0 0 40px #f43f5e; font-size: 6rem; }
         @keyframes rf-pop { 0% { transform: scale(0); opacity: 0; } 20% { transform: scale(1.1); opacity: 1; } 40% { transform: scale(1); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
         .anim-rf { animation: rf-pop 1s cubic-bezier(0.19, 1, 0.22, 1) forwards; }
+
+        /* Timer - Adjusted */
+        .phase-timer {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Cinzel'; font-weight: bold; font-size: 10rem; color: rgba(255,255,255,0.15);
+            pointer-events: none; z-index: 50; 
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .hidden { display: none !important; }
+        .overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
+        /* Luxury Home Screen UI (Idea 1, 2, 3, 4) */
+        .luxury-title {
+            background: linear-gradient(to bottom, #ffd700, #b8860b, #ffd700);
+            -webkit-background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+            animation: text-shimmer 4s ease-in-out infinite alternate;
+        }
+        @keyframes text-shimmer {
+            0% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) brightness(1); }
+            100% { filter: drop-shadow(0 2px 8px rgba(255,215,0,0.4)) brightness(1.2); }
+        }
 
         /* Shape change: Cut Corner (Octagon-ish) */
         .cut-corner-btn {
@@ -374,7 +410,7 @@
             position: relative;
             background: rgba(20, 30, 50, 0.7);
             backdrop-filter: blur(10px);
-            border: none;
+            border: none; /* Border handled by box-shadow or pseudo-element in clip-path scenario is tricky, using simple bg */
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5);
             color: #fff;
             transition: none;
@@ -442,19 +478,6 @@
         .item-book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; width: 100%; max-width: 800px; margin: 20px auto; padding: 10px; }
         .item-book-entry { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; }
         .item-book-img { width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: rgba(255,255,255,0.05); }
-        
-        /* Luxury Home Screen UI (Idea 1, 2, 3, 4) */
-        .luxury-title {
-            background: linear-gradient(to bottom, #ffd700, #b8860b, #ffd700);
-            -webkit-background-clip: text;
-            color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-            animation: text-shimmer 4s ease-in-out infinite alternate;
-        }
-        @keyframes text-shimmer {
-            0% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)) brightness(1); }
-            100% { filter: drop-shadow(0 2px 8px rgba(255,215,0,0.4)) brightness(1.2); }
-        }
     </style>
 </head>
 <body class="select-none">
@@ -660,7 +683,7 @@
             </div>
         </div>
 
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 119</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 109</div>
         
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy mx-auto">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
@@ -816,6 +839,20 @@
         window.el = el;
         window.playSe = playSe;
         
+        // --- タッチ操作による拡大縮小の防止 ---
+        
+        // ダブルタップ拡大防止 (ボタン連打は阻害しないよう、ズーム動作のみを防ぐ)
+        document.addEventListener('dblclick', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+
+        // 2本指操作（ピンチズームなど）の防止
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length >= 2) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
         // --- BUTTON EFFECT & AUDIO HANDLING (Global Event Delegation) ---
         let audioUnlocked = false;
         function unlockAllAudio() {
@@ -1085,8 +1122,7 @@
                 }
             });
             const item = ITEMS_DEF[itemId];
-            // 変更: コスト表示を追加
-            ui.infoTitle.innerText = `${item.name}：${item.cost}pt`;
+            ui.infoTitle.innerText = item.name;
             ui.infoDesc.innerText = item.desc;
             updateUI();
         };
@@ -1671,7 +1707,8 @@
                      const infoBox = el('battle-info-box');
                      if(infoBox) {
                         infoBox.innerText = `解析完了: 敵使用コスト ${used} PTS`;
-                        // Default purple maintained
+                        infoBox.classList.add('text-green-400'); 
+                        setTimeout(()=>infoBox.classList.remove('text-green-400'), 500);
                      }
                 }
                 
@@ -1760,7 +1797,7 @@
             
             // Clear info box
             const infoBox = el('battle-info-box');
-            if(infoBox) infoBox.innerHTML = "";
+            if(infoBox) infoBox.innerText = "";
 
             playSe('flip'); // ラウンド開始音
 
@@ -1781,7 +1818,8 @@
                 state.p.total += state.pendingDrain;
                 if(infoBox) {
                     infoBox.innerText = `前ラウンドの吸収: +${state.pendingDrain} PTS`;
-                    // Default purple maintained
+                    infoBox.classList.add('text-green-400');
+                    setTimeout(() => infoBox.classList.remove('text-green-400'), 3000);
                 }
                 state.pendingDrain = 0;
             }
@@ -1832,8 +1870,7 @@
             // Update UI for none selection manually to avoid sound
             const noneBtn = el('item-none');
             if(noneBtn) noneBtn.classList.add('selected');
-            // 変更: コスト表示を追加
-            ui.infoTitle.innerText = `${ITEMS_DEF['none'].name}：${ITEMS_DEF['none'].cost}pt`;
+            ui.infoTitle.innerText = ITEMS_DEF['none'].name;
             ui.infoDesc.innerText = ITEMS_DEF['none'].desc;
             updateUI();
             
@@ -1936,11 +1973,10 @@
                 state.p.total -= (state.p.hpCost + state.p.atk + state.p.def);
                 
                 if(isOnline) sendInput({ hp: state.p.hp, atk: state.p.atk, def: state.p.def });
-                else resolvePhase2(); // ここでエラーが出ていましたが、修正により関数定義が正しく認識されているはずです
+                else resolvePhase2();
             }
         }
 
-        // resolvePhase1の定義
         async function resolvePhase1() {
             if(!isOnline) {
                 const cpuItemCost = ITEMS_DEF[state.c.item].cost;
@@ -1956,7 +1992,8 @@
                  const infoBox = el('battle-info-box');
                  if(infoBox) {
                      infoBox.innerText = `ミラー水晶玉発動: ${ITEMS_DEF[state.c.item].name}をコピーしました`;
-                     // Purple maintained
+                     infoBox.classList.add('text-purple-400');
+                     setTimeout(() => infoBox.classList.remove('text-purple-400'), 3000);
                  }
             } else if (state.p.item === 'mirror_crystal' && state.c.item === 'mirror_crystal') {
                  // Both mirror - cancel each other
@@ -2022,18 +2059,16 @@
                     updateUI();
                     
                     const infoBox = el('battle-info-box');
-                    // 変更: フェーズ2開始時、アイテム画像と説明を表示 (デフォルト紫色)
-                    if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
-                        const myItem = ITEMS_DEF[state.p.item];
-                        if (infoBox) {
-                            infoBox.innerHTML = `<img src="${myItem.img}" style="height:2rem; width:2rem; object-fit:contain; margin-right:0.5rem; opacity:0.8;"><span>${myItem.desc}</span>`;
-                        }
-                    } else if (infoBox) {
-                        infoBox.innerHTML = ""; // Clear if special item logic below handles it
-                    }
+                    if (infoBox) infoBox.innerText = ""; // 一旦クリア
                     
                     // Pre-check for Nullify
                     let enemyNullify = (state.c.item === 'nullify');
+
+                    // Default text for normal items
+                    if (!['crystal', 'scope', 'chest', 'mirror_crystal', 'jammer'].includes(state.p.item)) {
+                        const myItem = ITEMS_DEF[state.p.item];
+                        if (infoBox) infoBox.innerText = `${myItem.name}: ${myItem.desc}`;
+                    }
 
                     // 宝箱 (Chest) Logic - Simply add PTS if not nullified
                     if (state.p.item === 'chest') {
@@ -2043,7 +2078,8 @@
                             if(infoBox) {
                                 // 修正: 説明文ではなく効果のみを表示
                                 infoBox.innerText = `【宝箱】ボーナス獲得！ PTS+100`;
-                                // Default purple
+                                infoBox.classList.add('text-yellow-400');
+                                setTimeout(() => infoBox.classList.remove('text-yellow-400'), 3000);
                             }
                         } else {
                              // Nullified case
@@ -2063,7 +2099,7 @@
                          if(infoBox) {
                              // 修正: 拡大鏡の効果を削除
                              infoBox.innerText = `【水晶玉】予知: 敵は「${enemyItemName}」を選択中`; 
-                             // Default purple
+                             infoBox.classList.add('text-purple-400');
                          }
                     }
 
@@ -2105,7 +2141,20 @@
             }, 2000); 
         }
 
-        // resolvePhase2の定義
+        async function clearRoomInputs() {
+             const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+             if (maxPlayers === 2) {
+                 const snap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'rooms'), where('__name__', '==', roomId)));
+                 if(!snap.empty) {
+                     const d = snap.docs[0].data();
+                     const updates = {};
+                     d.players.forEach(p => updates[`playerData.${p}.input`] = null);
+                     await updateDoc(roomRef, updates);
+                 }
+             } else {
+             }
+        }
+
         async function resolvePhase2() {
             if(!isOnline) state.c.total -= (state.c.hpCost + state.c.atk + state.c.def);
             
@@ -2132,10 +2181,11 @@
             state.pNullified = pNullified;
             state.cNullified = cNullified;
             
-            // Drain Logic
+            // Drain Logic (Modified for Version 108)
             if (state.p.item === 'drain' && !pNullified) {
                  // Pending for next round
                  state.pendingDrain = state.c.atk;
+                 // 削除指示により表示処理削除
             }
             if (state.c.item === 'drain' && !cNullified) {
                  if (!isOnline) {
@@ -2147,7 +2197,6 @@
             startBattleSequence();
         }
 
-        // startBattleSequenceの定義
         function startBattleSequence() {
             state.p.currHp = undefined; state.c.currHp = undefined;
             const infoBox = el('battle-info-box');
