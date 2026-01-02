@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resource Strategy Card Battle：103</title>
+    <title>Resource Strategy Card Battle：107</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ファンタジー向けフォント */
@@ -683,7 +683,7 @@
             </div>
         </div>
 
-        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 103</div>
+        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">Ver 107</div>
         
         <div class="mt-8 text-left bg-[#0f1c15] p-4 rounded border border-[#3d5a4d] w-full max-w-sm glass-panel-heavy mx-auto">
             <h2 class="text-white font-bold border-b border-[#3d5a4d] pb-1 mb-2 font-gaming">GAME RULES</h2>
@@ -957,7 +957,7 @@
             'drain': { cost: 50, name: "吸収", desc: "相手の攻撃力分ptsを得る", img: "吸収.png" },
             'scope': { cost: 40, name: "拡大鏡", desc: "敵の残PTSを開示する。", img: "拡大鏡.png" },
             'nullify': { cost: 70, name: "無効化", desc: "相手のアイテム効果を無効化する。", img: "無効化.png" },
-            'mirror_crystal': { cost: 80, name: "ミラー水晶玉", desc: "相手と同じアイテムを使用する", img: "ミラー水晶玉.png" },
+            'mirror_crystal': { cost: 120, name: "ミラー水晶玉", desc: "相手の選択したアイテムを確認し、同じアイテムを使用する", img: "ミラー水晶玉.png" },
             'crystal': { cost: 90, name: "水晶玉", desc: "相手の選択したアイテムを確認できる。", img: "水晶玉.png" },
             'rewind': { cost: 90, name: "巻き戻し", desc: "負けた場合、勝敗つかず再戦する（1ラウンド1回のみ）。", img: "巻き戻し.png" },
             'handmirror': { cost: 100, name: "ミラー装備", desc: "相手と同じATK/DEF値になる(操作不可)。", img: "ミラー装備.png" },
@@ -978,7 +978,8 @@
             pickIndex: 0,
             inputs: { spd: 0, hp: 0, atk: 0, def: 0 },
             rewindUsed: [],
-            roomPlayers: [] // Stores player ID list
+            roomPlayers: [], // Stores player ID list
+            pendingDrain: 0 // 次ラウンド付与用
         };
 
         const ui = {
@@ -1301,6 +1302,7 @@
                 state.round = 1;
                 state.p.total = START_PTS; state.c.total = START_PTS;
                 state.p.wins = 0; state.c.wins = 0;
+                state.pendingDrain = 0; // リセット
                 // initRoundはonSnapshotで検知されるはず
             }
         };
@@ -1412,6 +1414,7 @@
                          state.round = 1;
                          state.p.total = START_PTS; state.c.total = START_PTS;
                          state.p.wins = 0; state.c.wins = 0;
+                         state.pendingDrain = 0;
                          state.rewindUsed = [];
                          el('current-round').innerText = state.round;
                          el('player-score').innerText = 0;
@@ -1796,6 +1799,23 @@
                 ui.wrapsC[k].classList.remove('active-turn');
             });
 
+            // Drain Awarding Logic for Player
+            if (state.pendingDrain > 0) {
+                state.p.total += state.pendingDrain;
+                if(infoBox) {
+                    infoBox.innerText = `前ラウンドの吸収: +${state.pendingDrain} PTS`;
+                    infoBox.classList.add('text-green-400');
+                    setTimeout(() => infoBox.classList.remove('text-green-400'), 3000);
+                }
+                state.pendingDrain = 0;
+            }
+            // Drain Awarding Logic for CPU (Offline Only)
+            if (!isOnline && state.pendingCpuDrain > 0) {
+                 state.c.total += state.pendingCpuDrain;
+                 state.pendingCpuDrain = 0;
+            }
+
+
             await showTextCutin(`ROUND ${state.round}`);
 
             state.inputs = { spd: 0, hp: 0, atk: 0, def: 0 };
@@ -1951,6 +1971,21 @@
 
             ui.btn.innerText = "REVEALING...";
             
+            // Rewind Immediate Usage Registration (to prevent re-use even if round replayed)
+            if (state.p.item === 'rewind') {
+                 if (!state.rewindUsed.includes(userId)) {
+                     state.rewindUsed.push(userId);
+                 }
+            }
+            // CPU/Opponent Rewind Registration
+            if (state.c.item === 'rewind') {
+                 // Offline CPU
+                 if (!isOnline) {
+                     if (!state.rewindUsed.includes('cpu')) state.rewindUsed.push('cpu');
+                 }
+                 // Online Opponent: Handled via DB logic or host
+            }
+
             // --- Mirror Crystal Logic (Copy Phase 1) ---
             if (state.p.item === 'mirror_crystal' && state.c.item !== 'mirror_crystal') {
                  // Copy opponent item logic
@@ -2147,17 +2182,18 @@
             state.pNullified = pNullified;
             state.cNullified = cNullified;
             
-            // Drain Logic
+            // Drain Logic (Modified for Version 107)
             if (state.p.item === 'drain' && !pNullified) {
-                 state.p.total += state.c.atk;
+                 // Pending for next round
+                 state.pendingDrain = state.c.atk;
                  if (infoBox) {
-                     const addText = `吸収発動: PTS +${state.c.atk}`;
+                     const addText = `吸収発動: 次ラウンド +${state.c.atk} PTS予定`;
                      infoBox.innerText = infoBox.innerText ? infoBox.innerText + "\n" + addText : addText;
                  }
             }
             if (state.c.item === 'drain' && !cNullified) {
                  if (!isOnline) {
-                      state.c.total += state.p.atk; 
+                      state.pendingCpuDrain = state.p.atk; 
                  }
             }
 
